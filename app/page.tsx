@@ -12,98 +12,128 @@ import FaleConoscoButton from "@/components/FaleConoscoButton";
 export { categories };
 const categories = [
   {
-    id: "artesanato",
-    title: "Artesanato e Criação Manual",
-    icon: "/icons/artesanato.svg",
-    backgroundimg: "/categorias/Artesanato.png",
+    id: "ODS1",
+    title: "ODS 1 - Erradicação da Pobreza",
+    backgroundimg: "/categorias/fundo_ods1.png",
     tagsinv:
       "artesanato, manualidades, trabalhos manuais, feito à mão, feito a mão, handmade, DIY, do it yourself, bordado, bordados, crochê, croche, tricô, trico, macramê, macrame, fuxico, patchwork, quilt, quiltar, costura criativa, costura, tecido, tecidos, bijuteria, bijouteria, colares, pulseiras, brincos, acessórios, biscuit, cerâmica, ceramica, barro, escultura, modelagem, artes plásticas, artes plasticas, pintura em tecido, pintura em tela, pintura decorativa, velas artesanais, velas decorativas, saboaria artesanal, sabão artesanal, reciclagem criativa, reaproveitamento, decoração artesanal, lembrancinhas, lembranças, souvenirs, trabalhos de barbante, barbante",
   },
   {
-    id: "beleza",
-    title: "Beleza, Moda e Estética",
-    icon: "/icons/beleza.svg",
-    backgroundimg: "/categorias/Moda.jpeg",
+    id: "ODS2",
+    title: "ODS 2 - Fome Zero e Agricultura Sustentável",
+    backgroundimg: "/categorias/fundo_ods2.png",
     tagsinv:
       "beleza, estética, estetica, estética facial, estética corporal, salão de beleza, cabeleireiro, cabelereiro, corte de cabelo, escova, maquiagem, make, maquiagem profissional, design de sobrancelha, sobrancelhas, depilação, depilacao, depilação a laser, manicure, pedicure, unha, unhas, alongamento de unhas, esmalteria, cuidados com a pele, skincare, cuidados pessoais, cuidados estéticos, tratamento capilar, hidratação, moda, roupas, vestuário, fashion, tendências, tendência, consultoria de imagem, consultoria de estilo, personal stylist, desfile, estética avançada, harmonização facial, limpeza de pele, rejuvenescimento",
   },
   {
-    id: "comercio",
-    title: "Comércio Local e Vendas",
-    icon: "/icons/comercio.svg",
-    backgroundimg: "/categorias/Comércio.jpg",
+    id: "ODS3",
+    title: "ODS 3 - Saúde e Bem-estar",
+    backgroundimg: "/categorias/fundo_ods3.png",
     tagsinv:
       "comércio, comercio, vendas, lojista, loja, varejo, atacado, comércio local, mercado, feirante, mercadinho, mercearia, quitanda, supermercado, padaria, açougue, bazar, armarinho, livraria, papelaria, brechó, outlet, shopping, e-commerce, ecommerce, loja online, marketplace, delivery, revenda, revendedor, autônomo, autônoma, microempreendedor, MEI",
   },
   {
-    id: "construcao",
-    title: "Construção, Reforma e Manutenção",
-    icon: "/icons/construcao.svg",
-    backgroundimg: "/categorias/Construção.jpg",
+    id: "ODS4",
+    title: "ODS 4 - Educação de Qualidade",
+    backgroundimg: "/categorias/fundo_ods4.png",
     tagsinv:
       "construção, reforma, manutenção, pedreiro, eletricista, encanador, pintor, gesseiro, carpinteiro, serralheiro, mestre de obras, engenheiro civil, arquiteto, construção civil, obra, obras, reparos, conserto, construção de casas, construção de prédios, fundação, alvenaria, reboco, telhado, telha, instalação elétrica, instalação hidráulica, jardinagem, paisagismo, hidráulica, hidráulico, elétrica, elétrica residencial, elétrica predial, manutenção predial, reforma de interiores, acabamento, pisos, porcelanato, azulejo, drywall, gesso, marcenaria",
   },
   {
-    id: "festas",
-    title: "Festas e Eventos",
-    icon: "/icons/festas.svg",
-    backgroundimg: "/categorias/Festa.jpeg",
+    id: "ODS5",
+    title: "ODS 5 - Igualdade de Gênero",
+    backgroundimg: "/categorias/fundo_ods5.png",
     tagsinv:
       "festas, eventos, aniversário, aniversários, casamento, casamentos, debutante, 15 anos, bodas, confraternização, festa infantil, festa de empresa, formatura, buffet, cerimonial, cerimonialista, mestre de cerimônias, decoração de festa, balões, baloes, balonismo, lembrancinhas, lembranças, som, DJ, música ao vivo, banda, iluminação, fotografia, filmagem, aluguel de salão, aluguel de espaço, recepção, bartender, barman, garçom, garçons, segurança para festa, estrutura de eventos, palco, telão, festa temática",
   },
   {
-    id: "gastronomia",
-    title: "Gastronomia e Alimentação",
-    icon: "/icons/gastronomia.svg",
-    backgroundimg: "/categorias/Alimentação.jpeg",
+    id: "ODS6",
+    title: "ODS 6 - Água Potável e Saneamento",
+    backgroundimg: "/categorias/fundo_ods6.png",
     tagsinv:
       "gastronomia, culinária, cozinha, alimentação, comida, restaurante, lanchonete, bar, hamburgueria, pizzaria, sorveteria, confeitaria, padaria, cafeteria, churrascaria, quiosque, marmita, marmitex, self-service, buffet, delivery, comida saudável, alimentação saudável, fit, fitness, marmita fitness, comida caseira, comida japonesa, sushi, sashimi, comida chinesa, yakissoba, comida italiana, massas, lasanha, espaguete, comida brasileira, feijoada, moqueca, acarajé, pastel, quentinha, bebida, sucos, refrigerante, cerveja artesanal, drinks",
   },
   {
-    id: "saude",
-    title: "Saúde, Bem-estar e Fitness",
-    icon: "/icons/saude.svg",
-    backgroundimg: "/categorias/Saúde.jpg",
+    id: "ODS7",
+    title: "ODS 7 - Energia Limpa e Acessível",
+    backgroundimg: "/categorias/fundo_ods7.png",
     tagsinv:
       "saúde, saude, bem-estar, bem estar, fitness, academia, musculação, crossfit, funcional, personal trainer, pilates, yoga, fisioterapia, psicologia, psicólogo, psiquiatra, terapia, terapeuta, nutricionista, nutrição, médico, medica, medicina, clínica, hospital, posto de saúde, posto medico, enfermagem, enfermeiro, enfermeira, cuidados médicos, saúde da família, estética, spa, relaxamento, massagem, massagista, acupuntura, quiropraxia, reiki, meditação, vida saudável, qualidade de vida, emagrecimento",
   },
   {
-    id: "servicos-administrativos",
-    title: "Serviços Administrativos e Apoio",
-    icon: "/icons/administrativo.svg",
-    backgroundimg: "/categorias/Serviços.jpeg",
+    id: "ODS8",
+    title: "ODS 8 - Trabalho Decente e Crescimento Econômico",
+    backgroundimg: "/categorias/fundo_ods8.png",
     tagsinv:
       "serviços administrativos, apoio administrativo, escritório, assistente, secretária, secretaria, auxiliar administrativo, atendente, recepcionista, administrativo, contabilidade, contador, consultoria, gestão, financeiro, recursos humanos, RH, DP, folha de pagamento, emissão de nota fiscal, nota fiscal, processos administrativos, digitação, digitalização, arquivista, organização, suporte administrativo",
   },
   {
-    id: "servicos-automotivos",
-    title: "Serviços Automotivos e Reparos",
-    icon: "/icons/automotivo.svg",
-    backgroundimg: "/categorias/Serviços Automotivos.jpg",
+    id: "ODS9",
+    title: "ODS 9 - Indústria, Inovação e Infraestrutura",
+    backgroundimg: "/categorias/fundo_ods9.png",
     tagsinv:
       "automotivo, carro, moto, caminhão, oficina, oficina mecânica, mecânico, eletricista automotivo, autopeças, auto peças, acessórios automotivos, funilaria, pintura automotiva, alinhamento, balanceamento, troca de óleo, revisão, manutenção de carro, manutenção de moto, reparo de motor, borracharia, pneus, som automotivo, vidro automotivo, ar-condicionado automotivo, chaveiro automotivo, auto center, guincho",
   },
   {
-    id: "tecnologia",
-    title: "Tecnologia e Serviços Digitais",
-    icon: "/icons/tecnologia.svg",
-    backgroundimg: "/categorias/Tecnologia.jpg",
+    id: "ODS10",
+    title: "ODS 10 - Redução das Desigualdades",
+    backgroundimg: "/categorias/fundo_ods10.png",
     tagsinv:
       "tecnologia, digital, serviços digitais, informática, informática, computador, computadores, TI, tecnologia da informação, hardware, software, sistemas, aplicativos, apps, app, desenvolvimento web, sites, programação, programador, desenvolvedor, suporte técnico, manutenção de computador, manutenção de notebook, conserto de celular, celular, smartphones, internet, redes, segurança digital, design gráfico, designer gráfico, edição de vídeo, social media, marketing digital, tráfego pago, SEO, hospedagem de site, cloud, nuvem, banco de dados, inteligência artificial, IA, pc, notebook, tablet",
   },
   {
-    id: "turismo",
-    title: "Turismo, Cultura e Lazer",
-    icon: "/icons/turismo.svg",
-    backgroundimg: "/categorias/Turismo.jpg",
+    id: "ODS11",
+    title: "ODS 11 - Cidades e Comunidades Sustentáveis",
+    backgroundimg: "/categorias/fundo_ods11.png",
     tagsinv:
       "turismo, viagem, viagens, passeios, cultura, lazer, entretenimento, guia turístico, guia de turismo, excursão, excursões, hotel, pousada, hospedagem, resort, hostel, camping, trilha, ecoturismo, turismo rural, turismo de aventura, turismo gastronômico, city tour, museu, teatro, cinema, shows, parques, parque aquático, zoológico, zoologico, praia, montanha, turismo religioso, turismo histórico, turismo cultural",
   },
   {
-    id: "rural",
-    title: "Produtores Rurais e Atividades Agrícolas",
-    icon: "/icons/rural.svg",
-    backgroundimg: "/categorias/Produtoes Rurais.jpg",
+    id: "ODS12",
+    title: "ODS 12 - Consumo e Produção Responsáveis",
+    backgroundimg: "/categorias/fundo_ods12.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS13",
+    title: "ODS 13 - Ação Contra a Mudança Global do Clima",
+    backgroundimg: "/categorias/fundo_ods13.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS14",
+    title: "ODS 14 - Vida na Água",
+    backgroundimg: "/categorias/fundo_ods14.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS15",
+    title: "ODS 15 - Vida Terrestre",
+    backgroundimg: "/categorias/fundo_ods15.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS16",
+    title: "ODS 16 - Paz, Justiça e Instituições Eficazes",
+    backgroundimg: "/categorias/fundo_ods16.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS17",
+    title: "ODS 17 - Parcerias e Meios de Implementação",
+    backgroundimg: "/categorias/fundo_ods17.png",
+    tagsinv:
+      "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
+  },
+    {
+    id: "ODS18",
+    title: "ODS 18 - Igualdade Étnico/Racial",
+    backgroundimg: "/categorias/fundo_ods18.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
@@ -165,7 +195,7 @@ export default function HomePage() {
         <div>
           <Link href="/" target="about:blank">
             <Image
-              src="/LogoMeideSaqua.png"
+              src="/Logo_aquitemods.png"
               alt="Logo MeideSaqua"
               width={2660}
               height={898}

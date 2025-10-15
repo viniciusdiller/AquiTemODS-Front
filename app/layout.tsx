@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "MeideSaquá",
     images: [
       {
-        url: "/logo2sq.png",
+        url: "/logo_aquitemods.png",
         width: 1200,
         height: 630,
         alt: "MeideSaquá Logo",

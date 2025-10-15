@@ -17,8 +17,8 @@ export default function SobrePage() {
                     [background-position:0_100%]
                     [background-size:100%_4px]"
               >
-                <span className=" bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
-                  ESPAÇO MEI
+                <span className=" bg-gradient-to-r from-[#D7386E] to-[#808080] bg-clip-text text-transparent">
+                  Espaço dos ODS
                 </span>
               </h1>
               <p className="text-gray-700 leading-relaxed text-lg">
@@ -66,7 +66,7 @@ export default function SobrePage() {
         {/* --- CURSOS --- */}
         <section className="mt-12 border-t pt-6">
           <h2 className="text-3xl font-bold text-center mb-10">
-            <span className="bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D7386E] to-[#808080] bg-clip-text text-transparent">
               Cursos e Capacitações disponíveis:
             </span>
           </h2>

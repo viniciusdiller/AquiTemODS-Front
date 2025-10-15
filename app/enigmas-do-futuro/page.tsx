@@ -1,0 +1,192 @@
+// EPAÇO MEI
+import Link from "next/link";
+import React from "react";
+import Image from "next/image";
+
+export default function SobrePage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
+      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
+        <section className="mb-8">
+          <div className="md:flex md:items-start md:gap-8 lg:gap-12">
+            <div className="md:w-2/3">
+              <h1
+                className=" text-4xl font-extrabold mb-6 inline-block pb-2
+                    bg-gradient-to-r from-[#017DB9] to-[#22c362]
+                    bg-no-repeat
+                    [background-position:0_100%]
+                    [background-size:100%_4px]"
+              >
+                <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+                  Enigmas do Futuro
+                </span>
+              </h1>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                Aqui você encontra enigmas, reflexões e inspiração para
+                aprender sobre os ODS e moldar um futuro melhor.
+              </p>
+            </div>
+
+            <div className="mt-8 md:mt-0 md:w-1/3 flex-shrink-0">
+              <Image
+                src="/logo_jogo_ods.jpeg"
+                alt="Logo Espaço do Empreendedor"
+                width={400}
+                height={400}
+                className="w-full h-auto rounded-2xl shadow-md"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* --- SEÇÃO DE CONTEÚDO PRINCIPAL --- */}
+        <section className="mt-8 border-t pt-6">
+          <h2 className="text-3xl font-bold text-center mb-10">
+            <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+              O que é "ODS: Enigmas do Futuro"?
+            </span>
+          </h2>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+            "ODS: Enigmas do Futuro" é um jogo interativo de mistério e adivinhação baseado nos 17 Objetivos de Desenvolvimento Sustentável (ODS) da ONU.<br />
+          </p>
+          <h2 className="text-3xl font-bold text-center mb-10">
+            <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+              Objetivo:
+            </span>
+          </h2>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+            O propósito do jogo é usar a lógica e o raciocínio para desvendar enigmas que apresentam cenários e soluções inovadoras ligados a cada um dos ODS. É uma forma envolvente e divertida de aprender sobre e refletir sobre os desafios e o futuro da sustentabilidade global.
+          </p>
+          <h4 className="text-3xl font-bold text-center mb-10">
+            <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+              Ensinar as novas gerações sobre as ODS!
+            </span>
+          </h4>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4"> <br />
+            A iniciativa "ODS: Enigmas do Futuro" nasceu com a missão de ir além das cartilhas e dos textos formais. Nosso objetivo principal é ensinar crianças e adolescentes mais sobre os 17 Objetivos de Desenvolvimento Sustentável (ODS) da ONU, de uma maneira divertida, descontraída e estimulante.<br />
+            Acreditamos que, ao transformar cada ODS em um mistério a ser resolvido, estamos ativando o raciocínio lógico, a curiosidade e o espírito de colaboração das novas gerações. Em vez de apenas memorizar metas, os jovens são convidados a pensar criticamente e descobrir, por conta própria, como as soluções inovadoras estão moldando um futuro mais justo e sustentável. É um convite para que eles se tornem os detetives do futuro!
+          </p>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+         Mais do que um jogo de enigmas, "ODS: Enigmas do Futuro" é uma ferramenta de
+         conscientização e aprendizado ativo sobre o desenvolvimento sustentável,
+         reafirmando o compromisso de educar as novas gerações para que se tornem
+         agentes de transformação, capazes de solucionar os desafios e construir
+         o futuro que desejamos para o nosso planeta.  
+          </p>
+        </section>
+
+        {/* --- CURSOS --- */}
+        <section className="mt-12 border-t pt-6">
+          <h2 className="text-3xl font-bold text-center mb-10">
+            <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+              Link para o enigmas do futuro:
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Exemplo de Item Clicável */}
+            <Link
+              href="https://enigma-do-futuro.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block text-center"
+            >
+              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
+                <Image
+                  src="/enigmas_do_futuro.png"
+                  alt="Logo do Sebrae"
+                  width={400}
+                  height={300}
+                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
+                Enigmas do Futuro
+              </p>
+            </Link>
+          </div>
+        </section>
+
+        {/* --- SEÇÃO DE PERGUNTAS FREQUENTES --- */}
+        <section className="mt-12 border-t pt-6">
+          <div className="space-y-8">
+            <section>
+              <h2 className="text-2xl font-semibold text-[#007a73] mb-3">
+                <span className=" bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
+                  Desejo me formalizar como MEI, atualizar meu cadastro ou obter
+                  mais informações sobre MEI’s, como faço?
+                </span>
+              </h2>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                Você pode acessar o portal nacional de MEI’s no endereço
+                eletrônico{" "}
+                <a
+                  href="https://www.gov.br/empresas-e-negocios/pt-br/empreendedor"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  https://www.gov.br/empresas-e-negocios/pt-br/empreendedor
+                </a>{" "}
+                ou buscar atendimento por meio da nossa Sala do Empreendedor de
+                Saquarema, nos canais de atendimento a seguir:
+              </p>
+              <ul className="list-none text-gray-700 leading-relaxed text-lg space-y-2 mt-6 pt-4 border-t">
+                <li>
+                  <strong>WhatsApp:</strong>{" "}
+                  <a
+                    href="https://wa.me/5522920052534"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:underline hover:text-blue-600"
+                  >
+                    22 92005-2534
+                  </a>
+                </li>
+                <li>
+                  <strong>E-mail:</strong>{" "}
+                  <a
+                    href="mailto:saladoempreendedor@saquarema.rj.gov.br"
+                    className="text-gray-700 hover:underline hover:text-blue-600"
+                  >
+                    <span className="sm:hidden">
+                      saladoempreendedor
+                      <br />
+                      @saquarema.rj.gov.br
+                    </span>
+                    <span className="hidden sm:inline">
+                      saladoempreendedor@saquarema.rj.gov.br
+                    </span>
+                  </a>
+                </li>
+                <li className="pt-2">
+                  <strong>Endereço 1:</strong>{" "}
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=R.+Barão+de+Saquarema,+n°+243+-+Sala+5+-+Centro,+Saquarema+-+RJ,+28990-772"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:underline hover:text-blue-600"
+                  >
+                    R. Barão de Saquarema, n° 243 - Sala 5 - Centro, Saquarema -
+                    RJ, 28990-772
+                  </a>
+                </li>
+                <li>
+                  <strong>Endereço 2:</strong>{" "}
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Av.+Saquarema,+5483+-+Porto+da+Roça,+Saquarema+-+RJ,+28994-711"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:underline hover:text-blue-600"
+                  >
+                    Av. Saquarema, 5483 - Porto da Roça, Saquarema - RJ,
+                    28994-711 (2° andar)
+                  </a>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

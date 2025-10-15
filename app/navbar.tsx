@@ -170,10 +170,16 @@ export function Navbar() {
               Cadastro de Projetos
             </Link>
             <Link
-              href="/espaco-projetos"
+              href="/espaco-dos-ods"
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Espaço Projetos
+              Espaço dos ODS
+            </Link>
+           <Link
+              href="/enigmas-do-futuro"
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Enigmas do Futuro
             </Link>
           </nav>
         </div>
