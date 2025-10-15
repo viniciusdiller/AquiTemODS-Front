@@ -183,17 +183,17 @@ export default function HomePage() {
             className="text-center mb-10"
           >
             <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
-              Vitrine de{" "}
+              Banco de{" "}
               <span className="bg-gradient-to-r from-blue-900 to-blue-500 bg-clip-text text-transparent">
-                MEIs
+                Projetos
               </span>{" "}
-              de Saquarema
+              do Rio de Janeiro
             </h2>
             <p className="text-xl font-bold text-gray-700 md:text-gray-600 max-w-2xl mx-auto">
-              A vitrine digital de quem faz a economia local acontecer. Conheça
+              O banco de dados digital dos projetos que fazem a economia do estado do Rio de Janeiro acontecer. Conheça
               o{" "}
               <span className="bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
-                MEIdeSaquá!
+                AquiTemODS
               </span>{" "}
             </p>
             <div className="max-w-md mx-auto mt-6">
@@ -290,7 +290,7 @@ export default function HomePage() {
 
         <div className="mt-auto pt-10 pb-24">
           <div className="text-center text-gray-600 mb-3">
-            <h3>Gostaria que seu MEI aparecesse na vitrine?</h3>
+            <h3>Gostaria que seu Projeto aparecesse na Banco?</h3>
           </div>
           <ButtonWrapper />
           <FaleConoscoButton />

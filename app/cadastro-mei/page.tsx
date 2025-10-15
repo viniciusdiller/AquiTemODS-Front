@@ -60,7 +60,7 @@ const maskPhone = (value: string) => {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const api = {
-  cadastrarEstabelecimento: async (formData: FormData) => {
+  cadastrarProjeto: async (formData: FormData) => {
     const response = await fetch(`${API_URL}/api/estabelecimentos`, {
       method: "POST",
       body: formData,
@@ -72,7 +72,7 @@ const api = {
     return response.json();
   },
 
-  atualizarEstabelecimento: async (formData: FormData) => {
+  atualizarProjeto: async (formData: FormData) => {
     const response = await fetch(
       `${API_URL}/api/estabelecimentos/solicitar-atualizacao`,
       {
@@ -87,7 +87,7 @@ const api = {
     return response.json();
   },
 
-  excluirEstabelecimento: async (data: { cnpj: string; motivo?: string }) => {
+  excluirProjeto: async (data: { cnpj: string; motivo?: string }) => {
     const response = await fetch(
       `${API_URL}/api/estabelecimentos/solicitar-exclusao`,
       {
@@ -352,7 +352,7 @@ const CadastroMEIPage: React.FC = () => {
 
     // Se a verificação terminou e não há utilizador, redireciona
     if (!user) {
-      toast.error("Você precisa estar logado para cadastrar um MEI.");
+      toast.error("Você precisa estar logado para cadastrar um Projeto.");
       router.push("/login");
     }
   }, [user, isLoading, router]);
@@ -391,12 +391,11 @@ const CadastroMEIPage: React.FC = () => {
       Object.entries(values).forEach(([key, value]) => {
         if (
           value &&
-          key !== "ccmeiFile" &&
           key !== "logo" &&
-          key !== "produtos"
+          key !== "projeto"
         ) {
           if (
-            (key === "areasAtuacao" || key === "tagsInvisiveis") &&
+            (key === "ODS Relacionadas") &&
             Array.isArray(value)
           ) {
             formData.append(key, value.join(", "));
@@ -420,7 +419,7 @@ const CadastroMEIPage: React.FC = () => {
         formData.append("ccmei", ccmeiFileList[0].originFileObj);
       }
 
-      await api.cadastrarEstabelecimento(formData);
+      await api.cadastrarProjeto(formData);
 
       setSubmittedMessage({
         title: "Cadastro realizado com sucesso!",
@@ -445,13 +444,12 @@ const CadastroMEIPage: React.FC = () => {
       Object.entries(values).forEach(([key, value]) => {
         if (
           value &&
-          key !== "ccmeiFile" &&
           key !== "portfolio" &&
           key !== "logo"
         ) {
           if (key === "locais" && Array.isArray(value)) {
             formData.append("areasAtuacao", value.join(", "));
-          } else if (key === "tagsInvisiveis" && Array.isArray(value)) {
+          } else if (key === "ODS Relacionadas" && Array.isArray(value)) {
             formData.append(key, value.join(", "));
           } else {
             formData.append(key, value as string);
@@ -466,17 +464,13 @@ const CadastroMEIPage: React.FC = () => {
 
       portfolioFileList.forEach((file) => {
         if (file.originFileObj) {
-          formData.append("produtos", file.originFileObj); // O backend espera 'produtos'
+          formData.append("produtos", file.originFileObj);
         }
       });
 
-      // O CCMEI é o último para garantir que todos os dados de texto já foram processados
-      if (ccmeiFileList.length > 0 && ccmeiFileList[0].originFileObj) {
-        formData.append("ccmei", ccmeiFileList[0].originFileObj);
-      }
       // --- CORREÇÃO FIM ---
 
-      await api.atualizarEstabelecimento(formData);
+      await api.atualizarProjeto(formData);
 
       setSubmittedMessage({
         title: "Atualização enviada com sucesso!",
@@ -496,7 +490,7 @@ const CadastroMEIPage: React.FC = () => {
   const handleDeleteSubmit = async (values: any) => {
     setLoading(true);
     try {
-      // CORREÇÃO: Campos do objeto com snake_case
+      // ALTERAR ISSO AQUI AINDA
       const dataToSend: {
         cnpj: string;
         motivo?: string;
@@ -513,7 +507,7 @@ const CadastroMEIPage: React.FC = () => {
         dataToSend.motivo = values.motivo;
       }
 
-      await api.excluirEstabelecimento(dataToSend);
+      await api.excluirProjeto(dataToSend);
       setSubmittedMessage({
         title: "Solicitação de exclusão recebida!",
         subTitle:

@@ -17,8 +17,8 @@ import { useAuth } from "@/context/AuthContext";
 const AnimatedLogo = () => {
   const logos = [
     { 
-      src: "/LogoMeideSaqua.png", 
-      alt: "Logo MeideSaqua", 
+      src: "/Logo_aquitemods.png", 
+      alt: "Logo AquiTemODS", 
       className: "h-10 w-auto" 
     },
     { 
@@ -164,16 +164,16 @@ export function Navbar() {
               Sobre o Projeto
             </Link>
             <Link
-              href="/cadastro-mei"
+              href="/cadastro-projetos"
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Cadastro MEIdeSaquá
+              Cadastro de Projetos
             </Link>
             <Link
-              href="/espaco-mei"
+              href="/espaco-projetos"
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Espaço MEI
+              Espaço Projetos
             </Link>
           </nav>
         </div>

@@ -16,14 +16,14 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "MeideSaquá - Descubra os MEIs Saquarema",
+  title: "Aqui Tem ODS",
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "MeideSaquá",
+    title: "Aqui Tem ODS",
     description:
-      "Seu guia completo para explorar e conhecer os MEIs que movimentam a economia de Saquarema.",
+      "Seu guia completo para explorar e conhecer os projetos que movimentam a economia do Rio de Janeiro.",
     url: "https://explora-saqua.vercel.app/",
     siteName: "MeideSaquá",
     images: [

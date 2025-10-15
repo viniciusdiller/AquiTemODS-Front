@@ -28,69 +28,56 @@ const { Text } = Typography;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// --- CORREÇÃO DEFINITIVA ---
-// Este objeto agora mapeia AMBOS os nomes de chaves (`nomeResponsavel` e `nome_responsavel`)
-// para a MESMA ordem e o MESMO nome de exibição.
+// Configuração de rótulos e ordem dos campos
 const fieldConfig: { [key: string]: { label: string; order: number } } = {
-  // Identificação Principal
-  estabelecimentoId: { label: "ID", order: 1 },
-  nomeFantasia: { label: "Nome Fantasia", order: 2 },
-  cnpj: { label: "CNPJ", order: 3 },
-  categoria: { label: "Categoria", order: 4 },
-  status: { label: "Status Atual", order: 5 },
-  cnae: { label: "CNAE", order: 6 },
 
-  // Dados do Responsável (trata as duas variações de nome)
-  nomeResponsavel: { label: "Nome do Responsável", order: 10 },
-  nome_responsavel: { label: "Nome do Responsável", order: 10 },
-  cpfResponsavel: { label: "CPF do Responsável", order: 11 },
-  cpf_responsavel: { label: "CPF do Responsável", order: 11 },
-
-  // Contato e Localização
-  emailEstabelecimento: { label: "Email", order: 20 },
-  contatoEstabelecimento: { label: "Contato", order: 21 },
+  projetoId: { label: "ID", order: 1 },
+  ODS: { label: "ODS", order: 4 },
+  prefeitura: { label: "Prefeitura", order: 2 },
+  nomeProjeto: { label: "Nome do Projeto", order: 10 },
+  emailProjeto: { label: "Email", order: 20 },
   endereco: { label: "Endereço", order: 22 },
-  areasAtuacao: { label: "Áreas de Atuação", order: 23 },
-
-  // Descrições
   descricao: { label: "Descrição", order: 30 },
   descricaoDiferencial: { label: "Diferencial", order: 31 },
-
-  // Mídia e Links (trata as duas variações de nome)
   website: { label: "Website", order: 40 },
+  odsRelacionadas: { label: "ODS Relacionadas", order: 50 },
   instagram: { label: "Instagram", order: 41 },
   logoUrl: { label: "Logo Atual", order: 42 },
   logo: { label: "Nova Logo", order: 42 },
-  ccmeiUrl: { label: "CCMEI Atual", order: 43 },
-  ccmei: { label: "Novo CCMEI", order: 43 },
-  produtosImg: { label: "Portfólio Atual", order: 44 },
-  produtos: { label: "Novo Portfólio", order: 44 },
+  projetoImg: { label: "Portfólio Atual", order: 44 },
+  projetos: { label: "Novo Portfólio", order: 44 },
+  status: { label: "Status Atual", order: 5 },
 
-  // Outros
-  tagsInvisiveis: { label: "Tags", order: 50 },
   createdAt: { label: "Data de Criação", order: 100 },
   updatedAt: { label: "Última Atualização", order: 101 },
 };
 
-interface ImagemProduto {
+interface projetoImg {
   url: string;
 }
 
-interface Estabelecimento {
-  estabelecimentoId: number;
-  nomeFantasia: string;
-  cnpj: string;
+interface Projeto {
+  projetoID: number;
+  nomeProjeto: string;
+  emailProjeto: string;
+  prefeitura: string;
+  ods: string[];
+  odsRelacionadas: string;
+  descricao: string;
+  descricaoDiferencial: string;
+  website?: string;
+  instagram?: string;
   logoUrl?: string;
-  ccmeiUrl?: string;
-  imagensProduto?: ImagemProduto[];
+
+  projetoImg?: projetoImg[];
   dados_atualizacao?: any;
   [key: string]: any;
 }
 
 interface PendingData {
-  cadastros: Estabelecimento[];
-  atualizacoes: Estabelecimento[];
-  exclusoes: Estabelecimento[];
+  cadastros: Projeto[];
+  atualizacoes: Projeto[];
+  exclusoes: Projeto[];
 }
 
 const AdminDashboard: React.FC = () => {
@@ -101,7 +88,7 @@ const AdminDashboard: React.FC = () => {
     exclusoes: [],
   });
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Estabelecimento | null>(
+  const [selectedItem, setSelectedItem] = useState<Projeto | null>(
     null
   );
   const router = useRouter();
@@ -118,32 +105,7 @@ const AdminDashboard: React.FC = () => {
     value: any,
     nomeFantasia: string
   ): React.ReactNode => {
-    if (
-      (key === "ccmeiUrl" || key === "ccmei") &&
-      typeof value === "string" &&
-      value
-    ) {
-      const fileUrl = getFullImageUrl(value);
-      const isPdf = value.toLowerCase().endsWith(".pdf");
-
-      if (isPdf) {
-        return (
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-700 font-semibold underline"
-          >
-            Ver Certificado (PDF)
-          </a>
-        );
-      }
-      return (
-        <Image src={fileUrl} alt={`CCMEI de ${nomeFantasia}`} width={150} />
-      );
-    }
-
-    if ((key === "produtosImg" || key === "produtos") && Array.isArray(value)) {
+    if ((key === "projetoImg" || key === "projetos") && Array.isArray(value)) {
       const imagesUrls = value
         .map((item) => (typeof item === "string" ? item : item.url))
         .map(getFullImageUrl)
@@ -154,7 +116,7 @@ const AdminDashboard: React.FC = () => {
           <Row gutter={[8, 8]}>
             {imagesUrls.map((imageUrl, index) => (
               <Col key={index}>
-                <Image src={imageUrl} alt={`Produto ${index + 1}`} width={80} />
+                <Image src={imageUrl} alt={`Projeto ${index + 1}`} width={80} />
               </Col>
             ))}
           </Row>
@@ -216,7 +178,7 @@ const AdminDashboard: React.FC = () => {
     const token = localStorage.getItem("admin_token");
     try {
       const response = await fetch(
-        `${API_URL}/api/admin/${action}/${selectedItem.estabelecimentoId}`,
+        `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
         { method: "POST", headers: { Authorization: `Bearer ${token}` } }
       );
       const result = await response.json();
@@ -231,14 +193,14 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const showModal = (item: Estabelecimento) => {
+  const showModal = (item: Projeto) => {
     setSelectedItem(item);
     setModalVisible(true);
   };
 
   const renderList = (
     title: string,
-    listData: Estabelecimento[],
+    listData: Projeto[],
     icon: React.ReactNode
   ) => (
     <Col xs={24} md={12} lg={8}>
