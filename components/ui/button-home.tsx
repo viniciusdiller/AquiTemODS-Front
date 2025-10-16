@@ -22,7 +22,7 @@ const NeumorphismButton: React.FC<NeumorphismButtonProps> = ({ href }) => {
     <a
       href={href}
       className={`
-        bg-gradient-to-r from-[#017DB9] to-[#22c362]
+        bg-gradient-to-r from-[#D7386E] to-[#3C6AB2]
         px-4 py-2 rounded-full 
         flex items-center gap-2 
         text-white

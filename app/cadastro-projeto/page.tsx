@@ -157,18 +157,24 @@ const areasAtuacao = [
   "Outro município",
 ];
 const categorias = [
-  "Artesanato e Criação Manual",
-  "Beleza, Moda e Estética",
-  "Comércio Local e Vendas",
-  "Construção, Reforma e Manutenção",
-  "Festas e Eventos",
-  "Gastronomia e Alimentação",
-  "Saúde, Bem-estar e Fitness",
-  "Serviços Administrativos e Apoio",
-  "Serviços Automotivos e Reparos",
-  "Tecnologia e Serviços Digitais",
-  "Turismo, Cultura e Lazer",
-  "Produtores Rurais e Atividades Agrícolas",
+  "ODS 1 - Erradicação da Pobreza",
+  "ODS 2 - Fome Zero e Agricultura Sustentável",
+  "ODS 3 - Saúde e Bem-estar",
+  "ODS 4 - Educação de Qualidade",
+  "ODS 5 - Igualdade de Gênero",
+  "ODS 6 - Água Potável e Saneamento",
+  "ODS 7 - Energia Acessível e Limpa",
+  "ODS 8 - Trabalho Decente e Crescimento Econômico",
+  "ODS 9 - Indústria, Inovação e Infraestrutura",
+  "ODS 10 - Redução das Desigualdades",
+  "ODS 11 - Cidades e Comunidades Sustentáveis",
+  "ODS 12 - Consumo e Produção Responsáveis",
+  "ODS 13 - Ação Contra a Mudança Global do Clima",
+  "ODS 14 - Vida na Água",
+  "ODS 15 - Vida Terrestre",
+  "ODS 16 - Paz, Justiça e Instituições Eficazes",
+  "ODS 17 - Parcerias e Meios de Implementação",
+  "ODS 18 - Igualdade Étnico/Racial",
 ];
 
 const tagsPorCategoria: { [key: string]: string[] } = {
@@ -389,15 +395,8 @@ const CadastroMEIPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
-        if (
-          value &&
-          key !== "logo" &&
-          key !== "projeto"
-        ) {
-          if (
-            (key === "ODS Relacionadas") &&
-            Array.isArray(value)
-          ) {
+        if (value && key !== "logo" && key !== "projeto") {
+          if (key === "ODS Relacionadas" && Array.isArray(value)) {
             formData.append(key, value.join(", "));
           } else {
             formData.append(key, value as string);
@@ -442,11 +441,7 @@ const CadastroMEIPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
-        if (
-          value &&
-          key !== "portfolio" &&
-          key !== "logo"
-        ) {
+        if (value && key !== "portfolio" && key !== "logo") {
           if (key === "locais" && Array.isArray(value)) {
             formData.append("areasAtuacao", value.join(", "));
           } else if (key === "ODS Relacionadas" && Array.isArray(value)) {
@@ -538,7 +533,7 @@ const CadastroMEIPage: React.FC = () => {
     <h2
       className="relative text-2xl font-semibold text-gray-800 mb-6 pl-4 
         before:content-[''] before:absolute before:left-0 before:top-0 before:h-full before:w-1 
-        before:bg-gradient-to-t from-[#017DB9] to-[#22c362]"
+        before:bg-gradient-to-t from-[#D7386E] to-[#3C6AB2]"
     >
       {title}
     </h2>
@@ -546,8 +541,8 @@ const CadastroMEIPage: React.FC = () => {
 
   const renderInitialChoice = () => (
     <>
-      <h1 className="text-4xl font-extrabold mb-6 inline-block pb-2 bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
-        <span className="bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
+      <h1 className="text-4xl font-extrabold mb-6 inline-block pb-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
+        <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
           PORTAL DO MEI
         </span>
       </h1>
@@ -1414,7 +1409,7 @@ const CadastroMEIPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-blue-800 py-20 px-6 sm:px-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
         <Spin spinning={loading} tip="A processar...">
           {flowStep !== "initial" && flowStep !== "submitted" && (

@@ -67,7 +67,7 @@ const ConfirmationContent = () => {
   const renderIcon = () => {
     switch (status) {
       case "loading":
-        return <Loader2 className="h-12 w-12 animate-spin text-blue-500" />;
+        return <Loader2 className="h-12 w-12 animate-spin text-[#D7386E]" />;
       case "success":
         return <CheckCircle className="h-12 w-12 text-green-500" />;
       case "error":
@@ -110,7 +110,7 @@ const ConfirmarNovoEmailPage = () => {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+          <Loader2 className="h-12 w-12 animate-spin text-[#D7386E]" />
         </div>
       }
     >

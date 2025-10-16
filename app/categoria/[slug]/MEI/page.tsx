@@ -252,7 +252,7 @@ export default function MeiDetailPage({
           </p>
           <Button
             asChild
-            className="rounded-full px-6 hover:cursor-pointer hover:text-white bg-gradient-to-br from-[#017DB9] to-[#22c362] text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg active:scale-95 transition-all"
+            className="rounded-full px-6 hover:cursor-pointer hover:text-white bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg active:scale-95 transition-all"
           >
             <Link href="/">Voltar para a Página Inicial</Link>
           </Button>
@@ -309,26 +309,6 @@ export default function MeiDetailPage({
     }
   };
 
-  const linhasVisiveis = 3;
-  const colunas = 4;
-  const limite = linhasVisiveis * colunas;
-
-  const areasAtuacaoString = meiDetails.areasAtuacao || "";
-
-  const areasAtuacaoList: string[] = areasAtuacaoString
-    ? (areasAtuacaoString as string)
-        .split(",")
-        .map((area) => area.trim())
-        .filter((area) => area.length > 0)
-    : [];
-
-  let areasVisiveis = areasAtuacaoList;
-
-  if (!locaisExpandidos && areasAtuacaoList.length > limite) {
-    areasVisiveis = areasAtuacaoList.slice(0, limite - 1);
-    areasVisiveis.push("SHOW_MORE_BUTTON");
-  }
-
   const tagsInvisiveisString = meiDetails.tagsInvisiveis || "";
 
   const tagsList: string[] = tagsInvisiveisString
@@ -338,7 +318,7 @@ export default function MeiDetailPage({
         .filter((tag) => tag.length > 0)
     : [];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#017DB9] to-[#22c362]">
+    <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2]">
       <motion.header
         className="sticky top-0 z-20"
         initial={{ y: "-100%", opacity: 0 }}
@@ -349,7 +329,7 @@ export default function MeiDetailPage({
           <div className="w-full px-4 sm:px-6 py-3 grid grid-cols-[auto_1fr_auto] items-center">
             <Link
               href={`/categoria/${categorySlug}`}
-              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#017DB9] transition-colors p-2 -ml-3 sm:ml-8 md:ml-12 lg:ml-36 rounded-lg"
+              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#D7386E] transition-colors p-2 -ml-3 sm:ml-8 md:ml-12 lg:ml-36 rounded-lg"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="font-medium">Voltar</span>
@@ -376,7 +356,7 @@ export default function MeiDetailPage({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="md:col-span-2 flex flex-col">
                 <div className="mb-6 text-center md:text-left">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#017DB9] pl-3">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E]  pl-3">
                     {meiDetails.nomeFantasia}
                   </h2>
                   <div className="flex items-center justify-center md:justify-start gap-2">
@@ -398,7 +378,7 @@ export default function MeiDetailPage({
                       href={meiDetails.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors"
+                      className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors hover:cursor-pointer"
                     >
                       <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
                         <Instagram size={18} strokeWidth={2} />
@@ -482,7 +462,7 @@ export default function MeiDetailPage({
             variants={itemVariants}
           >
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#017DB9] pl-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E]  pl-3">
                 Portfólio
               </h3>
               <p className="text-sm text-gray-600">
@@ -495,62 +475,8 @@ export default function MeiDetailPage({
           </motion.section>
 
           <AnimatedSection>
-            <div className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] grid grid-cols-1 milecem:grid-cols-4 gap-8">
-              <div className="space-y-5 text-gray-700">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 border-l-4 border-[#017DB9] pl-3">
-                  Área de Atuação
-                </h3>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-[#017DB9]" />
-                  </div>
-                  <span className="leading-relaxed">{meiDetails.endereco}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <Phone className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span>{meiDetails.contatoEstabelecimento}</span>
-                </div>
-              </div>
-              <div className="w-full h-fit bg-gray-50 rounded-3xl border border-gray-200 overflow-hidden milecem:col-span-3">
-                <div className="p-5 md:p-8 text-gray-700">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {areasVisiveis.map((area, index) =>
-                      area === "SHOW_MORE_BUTTON" ? (
-                        <button
-                          key={index}
-                          onClick={() => setLocaisExpandidos(true)}
-                          className="px-3 py-2 rounded-xl border border-[#017DB9] bg-blue-50 text-[#017DB9] font-medium flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-md hover:-translate-y-1"
-                        >
-                          Ver Todos
-                        </button>
-                      ) : (
-                        <div
-                          key={index}
-                          className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 shadow-sm flex items-center justify-center text-sm font-medium hover:cursor-default"
-                        >
-                          {area}
-                        </div>
-                      )
-                    )}
-                    {locaisExpandidos && (
-                      <button
-                        onClick={() => setLocaisExpandidos(false)}
-                        className="px-3 py-2 rounded-xl border border-[#017DB9] bg-blue-50 text-[#017DB9] font-medium flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-md hover:-translate-y-1 col-span-full"
-                      >
-                        Ver Menos
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection>
             <div className="bg-white p-6 rounded-3xl shadow-md md:mx-auto md:max-w-[85%]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#017DB9] pl-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E]  pl-3">
                 Avaliações
               </h3>
               <AvaliacaoModalButton
@@ -630,7 +556,7 @@ export default function MeiDetailPage({
                                     isActive={currentPage === pageNumber}
                                     className={
                                       currentPage === pageNumber
-                                        ? "bg-[#017DB9] text-white hover:bg-gradient-to-br from-[#017DB9] to-[#22c362]"
+                                        ? "bg-[#D7386E]  text-white hover:bg-gradient-to-br from-[#D7386E] to-[#3C6AB2]"
                                         : ""
                                     }
                                   >

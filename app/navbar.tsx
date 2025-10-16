@@ -16,21 +16,21 @@ import { useAuth } from "@/context/AuthContext";
 
 const AnimatedLogo = () => {
   const logos = [
-    { 
-      src: "/Logo_aquitemods.png", 
-      alt: "Logo AquiTemODS", 
-      className: "h-10 w-auto" 
+    {
+      src: "/Logo_aquitemods.png",
+      alt: "Logo AquiTemODS",
+      className: "h-10 w-auto",
     },
-    { 
-      src: "/logo2sq.png", 
-      alt: "Logo Prefeitura de Saquarema", 
-      className: "h-12 w-auto" 
+    {
+      src: "/logo2sq.png",
+      alt: "Logo Prefeitura de Saquarema",
+      className: "h-12 w-auto",
     },
     {
       src: "/logoSMGS.png",
-      alt:"Logo Secretaria Municipal de Governança e Sustentabilidade",
-      className: "h-12 w-auto"
-    }
+      alt: "Logo Secretaria Municipal de Governança e Sustentabilidade",
+      className: "h-12 w-auto",
+    },
   ];
 
   const [index, setIndex] = useState(0);
@@ -142,42 +142,38 @@ export function Navbar() {
     <header className="bg-white/90 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-50 shadow-md">
       <div className="relative container mx-auto px-4 py-1 sm:py-1 md:py-1 flex items-center justify-between">
         <div className="hidden teste:flex items-center gap-10">
-          
-          <Link
-            href="/"
-            aria-label="Página Inicial"
-          >
+          <Link href="/" aria-label="Página Inicial">
             <AnimatedLogo />
           </Link>
 
           <nav className="flex items-center gap-6">
             <Link
               href="/"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
               Home
             </Link>
             <Link
               href="/sobre"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
               Sobre o Projeto
             </Link>
             <Link
-              href="/cadastro-projetos"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              href="/cadastro-projeto"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
               Cadastro de Projetos
             </Link>
             <Link
               href="/espaco-dos-ods"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
               Espaço dos ODS
             </Link>
-           <Link
+            <Link
               href="/enigmas-do-futuro"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
               Enigmas do Futuro
             </Link>
@@ -185,8 +181,12 @@ export function Navbar() {
         </div>
 
         <div className="teste:hidden w-full">
-          <Link href="/" aria-label="Página Inicial" className="flex justify-center">
-             <AnimatedLogo />
+          <Link
+            href="/"
+            aria-label="Página Inicial"
+            className="flex justify-center"
+          >
+            <AnimatedLogo />
           </Link>
         </div>
 
@@ -214,7 +214,7 @@ export function Navbar() {
             <div className="flex items-center gap-3">
               <Link
                 href="/perfil"
-                className="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-3 text-gray-700 hover:text-[#D7386E]  transition-colors"
               >
                 <UserIcon size={22} />
                 <span className="font-medium">{user.username}</span>
@@ -228,7 +228,7 @@ export function Navbar() {
             </div>
           ) : (
             <Link href="/login">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-orange-500 transition-colors">
+              <button className="bg-[#D7386E]  text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-orange-500 transition-colors">
                 Login
               </button>
             </Link>
@@ -248,28 +248,28 @@ export function Navbar() {
           <nav className="flex flex-col space-y-4 px-6">
             <Link
               href="/"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
               Home
             </Link>
             <Link
               href="/sobre"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
               Sobre o Projeto
             </Link>
             <Link
               href="/cadastro-mei"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
               Cadastro MEIdeSaquá
             </Link>
             <Link
               href="/espaco-mei"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
               Espaço MEI
@@ -282,7 +282,7 @@ export function Navbar() {
               <>
                 <Link
                   href="/perfil"
-                  className="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                  className="flex items-center gap-3 text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   {user.chosenAvatar ? (
@@ -311,7 +311,7 @@ export function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="flex items-center gap-3 text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
                 onClick={() => setIsOpen(false)}
               >
                 <LogIn size={20} /> Efetuar Login

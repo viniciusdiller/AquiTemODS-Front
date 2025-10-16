@@ -13,7 +13,7 @@ export { categories };
 const categories = [
   {
     id: "ODS1",
-    title: "ODS 1 - Erradicação da Pobreza",
+    title: "Artesanato e Criação Manual",
     backgroundimg: "/categorias/fundo_ods1.png",
     tagsinv:
       "artesanato, manualidades, trabalhos manuais, feito à mão, feito a mão, handmade, DIY, do it yourself, bordado, bordados, crochê, croche, tricô, trico, macramê, macrame, fuxico, patchwork, quilt, quiltar, costura criativa, costura, tecido, tecidos, bijuteria, bijouteria, colares, pulseiras, brincos, acessórios, biscuit, cerâmica, ceramica, barro, escultura, modelagem, artes plásticas, artes plasticas, pintura em tecido, pintura em tela, pintura decorativa, velas artesanais, velas decorativas, saboaria artesanal, sabão artesanal, reciclagem criativa, reaproveitamento, decoração artesanal, lembrancinhas, lembranças, souvenirs, trabalhos de barbante, barbante",
@@ -95,42 +95,42 @@ const categories = [
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS13",
     title: "ODS 13 - Ação Contra a Mudança Global do Clima",
     backgroundimg: "/categorias/fundo_ods13.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS14",
     title: "ODS 14 - Vida na Água",
     backgroundimg: "/categorias/fundo_ods14.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS15",
     title: "ODS 15 - Vida Terrestre",
     backgroundimg: "/categorias/fundo_ods15.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS16",
     title: "ODS 16 - Paz, Justiça e Instituições Eficazes",
     backgroundimg: "/categorias/fundo_ods16.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS17",
     title: "ODS 17 - Parcerias e Meios de Implementação",
     backgroundimg: "/categorias/fundo_ods17.png",
     tagsinv:
       "rural, campo, fazenda, agricultura, agronegócio, agro, produtor rural, pecuária, gado, criação de animais, avicultura, piscicultura, horticultura, fruticultura, plantação, colheita, lavoura, insumos agrícolas, sementes, adubo, trator, maquinário agrícola, agropecuária, silvicultura, agroindústria, apicultura, leite, laticínios, agrofloresta, orgânicos, orgânico, produtos naturais",
   },
-    {
+  {
     id: "ODS18",
     title: "ODS 18 - Igualdade Étnico/Racial",
     backgroundimg: "/categorias/fundo_ods18.png",
@@ -178,10 +178,6 @@ export default function HomePage() {
       category.tagsinv.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const showEspacoMei =
-    searchTerm.trim() === "" ||
-    "espaço mei".toLowerCase().includes(searchTerm.toLowerCase());
-
   return (
     <>
       <div className="flex flex-col flex-grow bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-100 to-white pt-8">
@@ -214,16 +210,16 @@ export default function HomePage() {
           >
             <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
               Banco de{" "}
-              <span className="bg-gradient-to-r from-blue-900 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
                 Projetos
               </span>{" "}
               do Rio de Janeiro
             </h2>
             <p className="text-xl font-bold text-gray-700 md:text-gray-600 max-w-2xl mx-auto">
-              O banco de dados digital dos projetos que fazem a economia do estado do Rio de Janeiro acontecer. Conheça
-              o{" "}
-              <span className="bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
-                AquiTemODS
+              O banco de dados digital dos projetos que fazem a economia do
+              estado do Rio de Janeiro acontecer. Conheça o{" "}
+              <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+                AquiTemODS!
               </span>{" "}
             </p>
             <div className="max-w-md mx-auto mt-6">
@@ -238,7 +234,7 @@ export default function HomePage() {
                   className="
                 w-full pl-12 pr-4 py-3
                 rounded-2xl border border-gray-200 bg-white shadow-sm
-                focus:outline-none focus:ring-2 focus:ring-blue-600/70 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:ring-[#D7386E]/70 focus:border-transparent
                 transition-all duration-300 placeholder-gray-400 text-sm
                 hover:shadow-md
               "
@@ -286,7 +282,7 @@ export default function HomePage() {
                         </h3>
                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent group-hover:via-green-500 transition-all duration-300" />
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#3C6AB2] to-transparent group-hover:via-[#D7386E] transition-all duration-300" />
                   </div>
                 </Link>
               </motion.div>
