@@ -177,158 +177,375 @@ const categorias = [
   "ODS 18 - Igualdade Étnico/Racial",
 ];
 
-const tagsPorCategoria: { [key: string]: string[] } = {
-  "Artesanato e Criação Manual": [
-    "Feito a Mão",
-    "Peça Única",
-    "Decoração",
-    "Personalizado",
-    "Presentes",
-    "Crochê",
-    "Biju",
-    "Cerâmica",
-    "Madeira",
-    "Sustentável",
+const odsRelacionadas: { [key: string]: string[] } = {
+  "ODS 1 - Erradicação da Pobreza": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Beleza, Moda e Estética": [
-    "Manicure",
-    "Cabelo",
-    "Maquiagem",
-    "Roupas",
-    "Acessórios",
-    "Depilação",
-    "Massagem",
-    "Estética Facial",
-    "Sobrancelha",
-    "Cosméticos Naturais",
+  "ODS 2 - Fome Zero e Agricultura Sustentável": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Comércio Local e Vendas": [
-    "Entrega Rápida",
-    "Loja Online",
-    "Revendedor",
-    "Produtos Importados",
-    "Eletrônicos",
-    "Materiais",
-    "Varejo",
-    "Atacado",
-    "Promoção",
-    "Frete Grátis",
+  "ODS 3 - Saúde e Bem-estar": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Construção, Reforma e Manutenção": [
-    "Eletricista",
-    "Encanador",
-    "Pintor",
-    "Pedreiro",
-    "Jardinagem",
-    "Montador de Móveis",
-    "Reparos",
-    "Orçamento Grátis",
-    "Piso",
-    "Reforma de Casa",
+  "ODS 4 - Educação de Qualidade": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Festas e Eventos": [
-    "Decoração",
-    "Buffet",
-    "Fotografia",
-    "Aniversário",
-    "Casamento",
-    "Música ao Vivo",
-    "Aluguel de Mesas",
-    "Recreação Infantil",
-    "Eventos Corporativos",
-    "Churrasco",
+  "ODS 5 - Igualdade de Gênero": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Gastronomia e Alimentação": [
-    "Bolo",
-    "Doces",
-    "Comida Caseira",
-    "Marmitex",
-    "Delivery",
-    "Salgados",
-    "Vegetariano",
-    "Vegano",
-    "Cerveja Artesanal",
-    "Petiscos",
+  "ODS 6 - Água Potável e Saneamento": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Saúde, Bem-estar e Fitness": [
-    "Personal Trainer",
-    "Yoga",
-    "Nutricionista",
-    "Psicólogo",
-    "Fisioterapia",
-    "Medicina Natural",
-    "Acupuntura",
-    "Suplementos",
-    "Aulas Online",
-    "Espaço Zen",
+  "ODS 7 - Energia Acessível e Limpa": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Serviços Administrativos e Apoio": [
-    "Contabilidade",
-    "Consultoria",
-    "Secretariado",
-    "Digitalização",
-    "Tradução",
-    "Assessoria",
-    "Finanças",
-    "Currículo",
-    "Escrita",
-    "Organização",
+  "ODS 8 - Trabalho Decente e Crescimento Econômico": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Serviços Automotivos e Reparos": [
-    "Mecânica",
-    "Elétrica",
-    "Borracharia",
-    "Lava Jato",
-    "Funilaria",
-    "Guincho",
-    "Revisão",
-    "Pneu",
-    "Motores",
-    "Acessórios Automotivos",
+  "ODS 9 - Indústria, Inovação e Infraestrutura": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Tecnologia e Serviços Digitais": [
-    "Web Design",
-    "Marketing Digital",
-    "Redes Sociais",
-    "Programação",
-    "Manutenção PC",
-    "Hospedagem",
-    "Apps",
-    "Consultoria TI",
-    "SEO",
-    "Criação de Vídeos",
+  "ODS 10 - Redução das Desigualdades": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Turismo, Cultura e Lazer": [
-    "Guia Turístico",
-    "Passeios",
-    "Praia",
-    "Hospedagem",
-    "Aluguel de Bike",
-    "Artesanato Local",
-    "Aulas de Surf",
-    "Trilhas",
-    "Pousada",
-    "Viagens",
+  "ODS 11 - Cidades e Comunidades Sustentáveis": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
-  "Produtores Rurais e Atividades Agrícolas": [
-    "Produtos Orgânicos",
-    "Horta",
-    "Feira Livre",
-    "Frutas",
-    "Vegetais",
-    "Mel",
-    "Gado",
-    "Plantas Ornamentais",
-    "Leite Fresco",
-    "Ovos Caipiras",
+  "ODS 12 - Consumo e Produção Responsáveis": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 13 - Ação Contra a Mudança Global do Clima": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 14 - Vida na Água": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 15 - Vida Terrestre": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 16 - Paz, Justiça e Instituições Eficazes": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 17 - Parcerias e Meios de Implementação": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
+  ],
+  "ODS 18 - Igualdade Étnico/Racial": [
+    "ODS 1",
+    "ODS 2",
+    "ODS 3",
+    "ODS 4",
+    "ODS 5",
+    "ODS 6 ",
+    "ODS 7",
+    "ODS 8",
+    "ODS 9",
+    "ODS 10",
+    "ODS 11",
+    "ODS 12",
+    "ODS 13",
+    "ODS 14",
+    "ODS 15",
+    "ODS 16",
+    "ODS 17",
+    "ODS 18",
   ],
 };
+
 const { Option } = Select;
 const { TextArea } = Input;
 
 type FlowStep = "initial" | "register" | "update" | "delete" | "submitted";
 
-const CadastroMEIPage: React.FC = () => {
+const CadastroProjetoPaje: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([]);
@@ -345,8 +562,10 @@ const CadastroMEIPage: React.FC = () => {
 
   const handleLogoChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setLogoFileList(fileList);
+
   const handlePortfolioChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setPortfolioFileList(fileList);
+
   const handleCCMEIChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setCcmeiFileList(fileList);
 
@@ -489,14 +708,14 @@ const CadastroMEIPage: React.FC = () => {
       const dataToSend: {
         cnpj: string;
         motivo?: string;
-        nome_responsavel: string;
-        cpf_responsavel: string;
-        emailEstabelecimento: string;
+        prefeitura: string;
+        secretaria: string;
+        emailContato: string;
       } = {
         cnpj: values.cnpj,
-        nome_responsavel: values.nome_responsavel,
-        cpf_responsavel: values.cpf_responsavel,
-        emailEstabelecimento: values.emailEstabelecimento,
+        prefeitura: values.prefeitura,
+        secretaria: values.secretaria,
+        emailContato: values.emailContato,
       };
       if (values.motivo) {
         dataToSend.motivo = values.motivo;
@@ -543,14 +762,15 @@ const CadastroMEIPage: React.FC = () => {
     <>
       <h1 className="text-4xl font-extrabold mb-6 inline-block pb-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
         <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-          PORTAL DO MEI
+          AQUI TEM ODS
         </span>
       </h1>
       <p className="text-gray-700 leading-relaxed text-lg mt-4 mb-8">
-        Bem-vindo à Vitrine de Talentos Locais de Saquarema! Nossa missão é
-        valorizar quem faz a cidade acontecer. Cadastre, atualize ou remova seu
-        negócio quando precisar e faça parte dessa rede que conecta pessoas e
-        fortalece a economia local.
+        Bem-vindo ao portal <strong>Aqui Tem ODS</strong>! Este espaço foi
+        criado para fortalecer iniciativas alinhadas aos Objetivos de
+        Desenvolvimento Sustentável em Saquarema. Aqui, você pode adicionar,
+        atualizar ou remover projetos que contribuem para um futuro mais justo,
+        sustentável e colaborativo.
       </p>
       <section className="flex flex-col border-t pt-6">
         <Form.Item
@@ -566,9 +786,13 @@ const CadastroMEIPage: React.FC = () => {
             onChange={(value) => setFlowStep(value as FlowStep)}
             size="large"
           >
-            <Option value="register">Cadastrar meu MEI na plataforma</Option>
-            <Option value="update">Atualizar uma informação do meu MEI</Option>
-            <Option value="delete">Excluir meu MEI da plataforma</Option>
+            <Option value="register">
+              Cadastrar meu projeto na plataforma
+            </Option>
+            <Option value="update">
+              Atualizar uma informação do meu projeto
+            </Option>
+            <Option value="delete">Excluir meu projeto da plataforma</Option>
           </Select>
         </Form.Item>
       </section>
@@ -586,92 +810,56 @@ const CadastroMEIPage: React.FC = () => {
         {commonTitle("Informações do Responsável")}
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="nome_responsavel" */}
+            {/* CORREÇÃO: name="prefeitura" */}
             <Form.Item
-              name="nome_responsavel"
-              label="Nome Completo do Responsável"
+              name="prefeitura"
+              label="Nome da Prefeitura"
               rules={[
-                { required: true, message: "Insira o nome do responsável!" },
+                { required: true, message: "Insira o nome da Prefeitura!" },
               ]}
             >
-              <Input placeholder="Ex: João da Silva" />
+              <Input placeholder="Ex: Prefeitura Municipal de Saquarema" />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="cpf_responsavel" */}
+            {/* CORREÇÃO: name="secretaria" */}
             <Form.Item
-              name="cpf_responsavel"
-              label="CPF do Responsável"
+              name="secretaria"
+              label="Nome da Secretaria"
               rules={[
-                { required: true, message: "O CPF é obrigatório!" },
                 {
-                  pattern: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-                  message: "CPF incompleto ou inválido!",
+                  required: true,
+                  message: "O Nome da Secretaria é obrigatório!",
                 },
               ]}
             >
               <Input
-                placeholder="000.000.000-00"
-                name="cpf_responsavel"
-                onChange={(e) => handleMaskChange(e, maskCPF)}
+                placeholder="Ex: Secretaria Municipal de Governança e Sustentabilidade"
+                name="secretaria"
               />
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item
-          name="emailEstabelecimento"
-          label="E-mail de Contato Principal"
-          rules={[
-            { required: true, message: "O e-mail é obrigatório!" },
-            {
-              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Formato de e-mail inválido!",
-            },
-          ]}
-        >
-          <Input placeholder="contato@email.com" />
-        </Form.Item>
       </section>
 
       {/* O RESTANTE DO FORMULÁRIO CONTINUA IGUAL */}
-      {/* ... (seções Informações do Negócio, Contato e Localização, Detalhes e Mídia) ... */}
+      {/* ... (seções Informações do Projeto, Contato e Localização, Detalhes e Mídia) ... */}
 
-      {/* --------------------- Informações do Negócio --------------------- */}
+      {/* --------------------- Informações do Projeto --------------------- */}
       <section className="mb-8 border-t pt-4">
-        {commonTitle("Informações do Negócio")}
+        {commonTitle("Informações do Projeto")}
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
-              name="nomeFantasia"
-              label="Nome Fantasia"
+              name="nomeProjeto"
+              label="Nome do Projeto"
               rules={[
-                { required: true, message: "Insira o nome do seu negócio!" },
+                { required: true, message: "Insira o nome do seu Projeto!" },
               ]}
             >
-              <Input placeholder="Ex: Salão da Maria" />
+              <Input placeholder="Ex: Aqui tem Ods" />
             </Form.Item>
           </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="cnpj"
-              label="CNPJ"
-              rules={[
-                { required: true, message: "O CNPJ é obrigatório!" },
-                {
-                  pattern: /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/,
-                  message: "CNPJ incompleto ou inválido!",
-                },
-              ]}
-            >
-              <Input
-                placeholder="00.000.000/0001-00"
-                name="cnpj"
-                onChange={(e) => handleMaskChange(e, maskCNPJ)}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
               name="categoria"
@@ -681,7 +869,7 @@ const CadastroMEIPage: React.FC = () => {
               <Select
                 placeholder="Selecione a categoria principal"
                 onSelect={(value: string) => setSelectedCategory(value)}
-                onChange={() => form.setFieldsValue({ tagsInvisiveis: [] })}
+                onChange={() => form.setFieldsValue({ odsRelacionadas: [] })}
               >
                 {categorias.map((cat) => (
                   <Option key={cat} value={cat}>
@@ -691,46 +879,16 @@ const CadastroMEIPage: React.FC = () => {
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="ccmeiFile"
-              label="Certificado CCMEI"
-              rules={[
-                {
-                  required: true,
-                  message: "O Certificado CCMEI é obrigatório!",
-                },
-                () => ({
-                  validator(_, value) {
-                    if (ccmeiFileList.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Envie o Certificado CCMEI (PDF ou Imagem)!")
-                    );
-                  },
-                }),
-              ]}
-              help="Anexe o Certificado de Condição de Microempreendedor Individual (PDF ou Imagem)."
-            >
-              <Upload
-                customRequest={customUploadAction}
-                fileList={ccmeiFileList}
-                onChange={handleCCMEIChange}
-                listType="text"
-                maxCount={1}
-                accept=".pdf,.jpg,.jpeg,.png"
-              >
-                <Button icon={<UploadOutlined />}>Carregar Arquivo</Button>
-              </Upload>
-            </Form.Item>
-          </Col>
+        </Row>
+        <Row gutter={24}>
+          <Col xs={24} md={12}></Col>
+          <Col xs={24} md={12}></Col>
         </Row>
         {selectedCategory ? (
           <Form.Item
-            name="tagsInvisiveis"
+            name="odsRelacionadas"
             label={`Tags de Busca Sugeridas (${selectedCategory})`}
-            help="Selecione no máximo 5 tags para facilitar a busca do seu negócio."
+            help="Selecione no máximo 5 ODS para facilitar a busca do seu negócio."
             rules={[
               { required: true, message: "Selecione pelo menos uma tag!" },
               {
@@ -744,10 +902,10 @@ const CadastroMEIPage: React.FC = () => {
             <Select
               mode="multiple"
               allowClear
-              placeholder="Selecione até 5 tags"
+              placeholder="Selecione até 5 ODS relacionadas"
               maxTagCount={5}
             >
-              {tagsPorCategoria[selectedCategory]?.map((tag) => (
+              {odsRelacionadas[selectedCategory]?.map((tag) => (
                 <Option key={tag} value={tag}>
                   {tag}
                 </Option>
@@ -756,70 +914,30 @@ const CadastroMEIPage: React.FC = () => {
           </Form.Item>
         ) : (
           <p className="text-gray-600 mb-6 mt-2">
-            *Selecione uma Categoria na seção "Informações do Negócio" para ver
-            as Tags sugeridas.*
+            *Selecione uma Categoria na seção "Informações do Projeto" para ver
+            as ODS sugeridas.*
           </p>
         )}
-        <Form.Item
-          name="cnae"
-          label="CNAE (Atividade Principal)"
-          rules={[
-            { required: true, message: "O CNAE é obrigatório!" },
-            {
-              pattern: /^\d{4}-\d\/\d{2}$/,
-              message: "CNAE incompleto ou inválido!",
-            },
-          ]}
-        >
-          <Input
-            placeholder="0000-0/00"
-            name="cnae"
-            onChange={(e) => handleMaskChange(e, maskCNAE)}
-          />
-        </Form.Item>
       </section>
 
       {/* --------------------- Contato e Localização --------------------- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Contato e Localização")}
         <Form.Item
-          name="contatoEstabelecimento"
-          label="Telefone / WhatsApp do Estabelecimento"
+          name="emailContato"
+          label="E-mail de Contato Principal"
           rules={[
-            { required: true, message: "Insira um contato!" },
+            { required: true, message: "O e-mail é obrigatório!" },
             {
-              pattern: /^\(\d{2}\) \d{5}-\d{4}$/,
-              message: "Telefone incompleto ou inválido!",
+              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Formato de e-mail inválido!",
             },
           ]}
         >
-          <Input
-            placeholder="(22) 99999-9999"
-            name="contatoEstabelecimento"
-            onChange={(e) => handleMaskChange(e, maskPhone)}
-          />
+          <Input placeholder="contato@email.com" />
         </Form.Item>
         <Form.Item name="endereco" label="Endereço Físico (se houver)">
           <Input placeholder="Rua, Bairro, Nº" />
-        </Form.Item>
-        <Form.Item
-          name="areasAtuacao"
-          label="Áreas de Atuação"
-          rules={[
-            { required: true, message: "Selecione pelo menos uma área!" },
-          ]}
-        >
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder="Selecione os bairros que você atende"
-          >
-            {areasAtuacao.map((area) => (
-              <Option key={area} value={area}>
-                {area}
-              </Option>
-            ))}
-          </Select>
         </Form.Item>
       </section>
 
@@ -828,38 +946,38 @@ const CadastroMEIPage: React.FC = () => {
         {commonTitle("Detalhes e Mídia")}
         <Form.Item
           name="descricao"
-          label="Descrição do seu Serviço/Produto"
+          label="Descrição detalhada do seu Projeto"
           rules={[
             {
               required: true,
-              message: "Por favor, descreva seu produto ou serviço!",
+              message: "Por favor, descreva seu projeto!",
             },
           ]}
         >
           <TextArea
             rows={4}
-            placeholder="Fale um pouco sobre o que você faz, quais produtos você vende ou tipo de serviço que realiza. Essa é a informação que os seus futuros clientes irão ver."
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
           />
         </Form.Item>
         <Form.Item
           name="descricaoDiferencial"
-          label="Qual o seu diferencial?"
+          label="Briefing do Projeto"
           rules={[
             {
               required: true,
-              message: "Por favor, informe o seu diferencial!",
+              message: "Por favor, faça um resumo do seu projeto!",
             },
           ]}
         >
           <TextArea
             rows={2}
-            placeholder="Descreva brevemente qual é o atrativo do seu produto ou serviço."
+            placeholder="Descreva brevemente qual é o diferencial do seu projeto."
           />
         </Form.Item>
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            <Form.Item name="website" label="Website (Opcional)">
-              <Input placeholder="Cole o link da sua página" />
+            <Form.Item name="website" label="Site da Prefeitura">
+              <Input placeholder="Cole o link da página da sua Prefeitura" />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -870,7 +988,10 @@ const CadastroMEIPage: React.FC = () => {
         </Row>
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            <Form.Item label="Sua Logo" help="Envie 1 imagem para o perfil.">
+            <Form.Item
+              label="Logo do seu Projeto"
+              help="Envie 1 imagem para ser a logo do seu projeto."
+            >
               <Upload
                 customRequest={customUploadAction}
                 fileList={logoFileList}
@@ -884,7 +1005,7 @@ const CadastroMEIPage: React.FC = () => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item
-              label="Imagens do seu Produto ou Serviço"
+              label="Imagens do seu Projeto"
               help="Envie até 4 imagens."
             >
               <Upload
@@ -953,10 +1074,10 @@ const CadastroMEIPage: React.FC = () => {
 
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="nome_responsavel" */}
+            {/* CORREÇÃO: name="prefeitura" */}
             <Form.Item
-              name="nome_responsavel"
-              label="Nome Completo do Responsável"
+              name="prefeitura"
+              label="Nome da Prefeitura"
               rules={[
                 {
                   required: true,
@@ -964,96 +1085,36 @@ const CadastroMEIPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="Nome Completo" />
+              <Input placeholder="Nome da Prefeitura" />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="cpf_responsavel" */}
+            {/* CORREÇÃO: name="secretaria" */}
             <Form.Item
-              name="cpf_responsavel"
-              label="CPF do Responsável"
+              name="secretaria"
+              label="Nome da Secretaria"
               rules={[
                 {
                   required: true,
-                  message: "O CPF é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-                  message: "CPF inválido!",
+                  message: "O CF é  inválido!",
                 },
               ]}
             >
               <Input
-                placeholder="000.000.000-00"
-                name="cpf_responsavel"
-                onChange={(e) => handleMaskChange(e, maskCPF)}
+                placeholder="Nome da Secretaria"
+                name="secretaria"
+                onChange={(e) => e}
               />
             </Form.Item>
           </Col>
         </Row>
 
         <Row gutter={24}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="cnpj"
-              label="CNPJ do Negócio"
-              rules={[
-                {
-                  required: true,
-                  message: "O CNPJ é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/,
-                  message: "CNPJ inválido!",
-                },
-              ]}
-            >
-              <Input
-                placeholder="00.000.000/0001-00"
-                name="cnpj"
-                onChange={(e) => handleMaskChange(e, maskCNPJ)}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="ccmeiFile"
-              label="Certificado CCMEI Atual"
-              rules={[
-                {
-                  required: true,
-                  message:
-                    "O Certificado CCMEI é obrigatório para identificação!",
-                },
-                // Regra para verificar se há um arquivo carregado
-                () => ({
-                  validator(_, value) {
-                    if (ccmeiFileList.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Envie o Certificado CCMEI (PDF ou Imagem)!")
-                    );
-                  },
-                }),
-              ]}
-              help="Anexe a cópia mais recente do Certificado de Condição de Microempreendedor Individual (PDF/Imagem)."
-            >
-              <Upload
-                customRequest={customUploadAction}
-                fileList={ccmeiFileList}
-                onChange={handleCCMEIChange}
-                listType="text"
-                maxCount={1}
-                accept=".pdf,.jpg,.jpeg,.png"
-              >
-                <Button icon={<UploadOutlined />}>Carregar CCMEI</Button>
-              </Upload>
-            </Form.Item>
-          </Col>
+          <Col xs={24} md={12}></Col>
+          <Col xs={24} md={12}></Col>
         </Row>
         <Form.Item
-          name="emailEstabelecimento"
+          name="emailContato"
           label="E-mail de Contato Principal"
           rules={[
             {
@@ -1072,8 +1133,8 @@ const CadastroMEIPage: React.FC = () => {
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações para Atualizar")}
         <p className="text-gray-600 mb-6 -mt-4">
-          Preencha apenas os campos que deseja alterar. Os campos deixados em
-          branco não serão modificados.
+          Preencha apenas os campos que deseja alterar.{" "}
+          <strong>Os campos deixados em branco não serão modificados.</strong>
         </p>
 
         {/* Adiciona upload de Logo como opcional na atualização */}
@@ -1092,42 +1153,16 @@ const CadastroMEIPage: React.FC = () => {
           </Upload>
         </Form.Item>
 
-        <Row gutter={24}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="contatoEstabelecimento"
-              label="Novo Telefone / WhatsApp"
-              rules={[
-                {
-                  pattern: /^\(\d{2}\) \d{5}-\d{4}$/,
-                  message: "Telefone inválido!",
-                },
-              ]}
-            >
-              <Input
-                placeholder="(22) 99999-9999"
-                name="contatoEstabelecimento"
-                onChange={(e) => handleMaskChange(e, maskPhone)}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item name="locais" label="Novas Áreas de Atuação">
-          <Select mode="multiple" allowClear placeholder="Selecione os bairros">
-            {areasAtuacao.map((area) => (
-              <Option key={area} value={area}>
-                {area}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
         <Form.Item name="descricao" label="Nova Descrição do Serviço/Produto">
-          <TextArea rows={4} />
+          <TextArea
+            rows={4}
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
+          />
         </Form.Item>
         <Form.Item
-          name="tagsInvisiveis"
+          name="odsRelacionadas"
           label="Novas Tags de Busca (Até 5)"
-          help="Selecione até 5 tags. As novas tags substituirão as atuais."
+          help="Selecione até 5 ODS relacionadas. As novas tags substituirão as atuais."
           rules={[
             {
               validator: (_, value) =>
@@ -1143,7 +1178,7 @@ const CadastroMEIPage: React.FC = () => {
             placeholder="Selecione as tags"
             maxTagCount={5}
           >
-            {Object.values(tagsPorCategoria)
+            {Object.values(odsRelacionadas)
               .flat()
               .map((tag) => (
                 <Option key={tag} value={tag}>
@@ -1183,10 +1218,11 @@ const CadastroMEIPage: React.FC = () => {
           ]}
         >
           <Checkbox>
-            Confirmo que as informações são verdadeiras e de minha
-            responsabilidade. Estou ciente de que poderão ser usadas pela
-            Prefeitura para divulgação e apoio ao empreendedorismo em Saquarema,
-            de acordo com a Lei Geral de Proteção de Dados.
+            Confirmo que as informações fornecidas são verdadeiras e de minha
+            responsabilidade. Estou ciente de que poderão ser utilizadas pela
+            Prefeitura de Saquarema para divulgação e fortalecimento de ações
+            relacionadas aos Objetivos de Desenvolvimento Sustentável (ODS), em
+            conformidade com a Lei Geral de Proteção de Dados (LGPD).
           </Checkbox>
         </Form.Item>
       </section>
@@ -1225,103 +1261,51 @@ const CadastroMEIPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               name="nomeResponsavel"
-              label="Nome Completo do Responsável"
+              label="Nome da Prefeitura"
               rules={[
                 {
                   required: true,
-                  message: "O nome é obrigatório para identificação!",
+                  message: "O nome da Prefeitura é neceesário para identificação!",
                 },
               ]}
             >
-              <Input placeholder="Nome Completo" />
+              <Input placeholder="Nome da Prefeitura" />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
             <Form.Item
-              name="cpf"
-              label="CPF do Responsável"
+              name="secretaria"
+              label="Nome da Secretaria"
               rules={[
                 {
                   required: true,
-                  message: "O CPF é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-                  message: "CPF inválido!",
+                  message: "Digite o nome da Secretaria!",
                 },
               ]}
             >
               <Input
-                placeholder="000.000.000-00"
-                name="cpf"
-                onChange={(e) => handleMaskChange(e, maskCPF)}
+                placeholder="Ex: Secretaria Municipal de Governança e Sustentabilidade"
+                name="secretaria"
               />
             </Form.Item>
           </Col>
         </Row>
 
         <Row gutter={24}>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={24}>
             <Form.Item
-              name="cnpj"
-              label="CNPJ do Negócio"
+              name="nomeProjeto"
+              label="Nome do Projeto"
               rules={[
-                {
-                  required: true,
-                  message: "O CNPJ é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/,
-                  message: "CNPJ inválido!",
-                },
+                { required: true, message: "Insira o nome do seu Projeto!" },
               ]}
             >
-              <Input
-                placeholder="00.000.000/0001-00"
-                name="cnpj"
-                onChange={(e) => handleMaskChange(e, maskCNPJ)}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="ccmeiFile"
-              label="Certificado CCMEI"
-              rules={[
-                {
-                  required: true,
-                  message:
-                    "O Certificado CCMEI é obrigatório para identificação!",
-                },
-                // Regra para verificar se há um arquivo carregado (mantido como obrigatório)
-                () => ({
-                  validator(_, value) {
-                    if (ccmeiFileList.length > 0) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Envie o Certificado CCMEI (PDF ou Imagem)!")
-                    );
-                  },
-                }),
-              ]}
-              help="Anexe a cópia mais recente do Certificado de Condição de Microempreendedor Individual (PDF/Imagem)."
-            >
-              <Upload
-                customRequest={customUploadAction}
-                fileList={ccmeiFileList}
-                onChange={handleCCMEIChange}
-                listType="text"
-                maxCount={1}
-                accept=".pdf,.jpg,.jpeg,.png"
-              >
-                <Button icon={<UploadOutlined />}>Carregar CCMEI</Button>
-              </Upload>
+              <Input placeholder="Ex: Aqui tem ODS" />
             </Form.Item>
           </Col>
         </Row>
         <Form.Item
-          name="emailEstabelecimento"
+          name="emailContato"
           label="E-mail de Contato Principal"
           rules={[
             {
@@ -1429,4 +1413,4 @@ const CadastroMEIPage: React.FC = () => {
   );
 };
 
-export default CadastroMEIPage;
+export default CadastroProjetoPaje;

@@ -261,18 +261,18 @@ export function Navbar() {
               Sobre o Projeto
             </Link>
             <Link
-              href="/cadastro-mei"
+              href="/cadastro-projeto"
               className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
-              Cadastro MEIdeSaquá
+              Cadastro de Projetos
             </Link>
             <Link
-              href="/espaco-mei"
+              href="/espaco-dos-ods"
               className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
               onClick={() => setIsOpen(false)}
             >
-              Espaço MEI
+              Espaço dos ODS
             </Link>
             <hr className="border-gray-200" />
 

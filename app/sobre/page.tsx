@@ -1,5 +1,4 @@
-// Espaço dos ODS
-import React from "react";
+// Espaço dos Aqui Tem ODS React from "react";
 
 export default function EspacoODSPage() {
   return (
@@ -17,7 +16,7 @@ export default function EspacoODSPage() {
                   [background-size:100%_4px]"
               >
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-                  Espaço dos ODS
+                  Aqui Tem ODS{" "}
                 </span>
               </h1>
               <p className="text-gray-700 leading-relaxed text-lg">
@@ -42,13 +41,13 @@ export default function EspacoODSPage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="text-3xl font-bold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              O que é o Espaço dos ODS?
+              O que é o Aqui Tem ODS?
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            O Espaço dos ODS é um portfólio digital dedicado a dar visibilidade
-            e a conectar projetos e iniciativas de prefeituras de todo o Brasil
-            que contribuem para o alcance dos 17 Objetivos de Desenvolvimento
+            O Aqui Tem ODS um portfólio digital dedicado a dar visibilidade e a
+            conectar projetos e iniciativas de prefeituras de todo o Brasil que
+            contribuem para o alcance dos 17 Objetivos de Desenvolvimento
             Sustentável (ODS) da ONU.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -69,7 +68,7 @@ export default function EspacoODSPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-[#007a73] mb-3">
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              Quais são os principais recursos do Espaço dos ODS?
+              Quais são os principais recursos do Aqui Tem ODS
             </span>
           </h2>
           <ul className="list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
@@ -121,10 +120,10 @@ export default function EspacoODSPage() {
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg">
-            O Espaço dos ODS é uma plataforma institucional voltada para a
-            gestão pública. O cadastro de projetos é exclusivo para
-            representantes de prefeituras e órgãos municipais que desejam dar
-            visibilidade às suas ações de sustentabilidade.
+            O Aqui Tem ODS uma plataforma institucional voltada para a gestão
+            pública. O cadastro de projetos é exclusivo para representantes de
+            prefeituras e órgãos municipais que desejam dar visibilidade às suas
+            ações de sustentabilidade.
           </p>
         </section>
 
