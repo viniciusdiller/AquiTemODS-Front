@@ -91,14 +91,14 @@ export default function NovaSenha() {
           <div className="mb-4">
             <Link
               href="/login"
-              className="flex items-center gap-2 text-gray-600 hover:text-[#017DB9] transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-[#D7386E] transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Voltar</span>
             </Link>
           </div>
           <Card
-            className="rounded-2xl border border-[#017DB9]/70 bg-white shadow-lg
+            className="rounded-2xl border border-[#D7386E]/70 bg-white shadow-lg
                                  focus:outline-none focus:ring-2 focus:border-transparent
                                  transition-all duration-300 placeholder-gray-400 text-sm
                                  hover:shadow-md"
@@ -132,7 +132,7 @@ export default function NovaSenha() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full hover:bg-[#22c362] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#017DB9]/70 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-full hover:bg-[#22c362] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#D7386E]/70 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>

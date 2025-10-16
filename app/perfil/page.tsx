@@ -216,7 +216,7 @@ export default function PerfilPage() {
                   alt="Avatar"
                   width={96}
                   height={96}
-                  className="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-500 object-cover"
+                  className="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-[#D7386E]  object-cover"
                 />
                 <CardTitle>{user.nomeCompleto}</CardTitle>
               </CardHeader>
@@ -289,7 +289,7 @@ export default function PerfilPage() {
                           onChange={handleUsernameChange}
                           className="mt-1  w-full py-2
                           rounded-2xl border border-gray-200 bg-white shadow-sm
-                          focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400"
+                          focus:ring-2 focus:border-blue-700 transition-all duration-300 placeholder:text-gray-400"
                         />
                       </div>
                       <div>
@@ -300,7 +300,7 @@ export default function PerfilPage() {
                           onChange={(e) => setEditEmail(e.target.value)}
                           className="mt-1  w-full py-2
                           rounded-2xl border border-gray-200 bg-white shadow-sm
-                          focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400"
+                          focus:ring-2 focus:border-blue-700 transition-all duration-300 placeholder:text-gray-400"
                         />
                       </div>
                     </div>
@@ -316,7 +316,7 @@ export default function PerfilPage() {
                       </DialogClose>
                       <Button
                         onClick={handleProfileUpdate}
-                        className="w-fit rounded-full transition-all transform hover:scale-105 hover:bg-green-500 active:scale-95 border-2 border-transparent hover:border-green-700"
+                        className="w-fit rounded-full transition-all transform hover:scale-105  active:scale-95 border-2 border-transparent hover:border-blue-700"
                         disabled={isUpdatingProfile}
                       >
                         {isUpdatingProfile && (
@@ -371,7 +371,7 @@ export default function PerfilPage() {
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           className="mt-1 w-full py-2
                           rounded-2xl border border-gray-200 bg-white shadow-sm
-                          focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400"
+                          focus:ring-2 focus:border-blue-700 transition-all duration-300 placeholder:text-gray-400"
                         />
                       </div>
                       <div>
@@ -384,7 +384,7 @@ export default function PerfilPage() {
                           onChange={(e) => setNewPassword(e.target.value)}
                           className="mt-1  w-full py-2
                           rounded-2xl border border-gray-200 bg-white shadow-sm
-                          focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400"
+                          focus:ring-2 focus:border-blue-700 transition-all duration-300 placeholder:text-gray-400"
                         />
                       </div>
                       <div>
@@ -399,7 +399,7 @@ export default function PerfilPage() {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="mt-1  w-full py-2
                           rounded-2xl border border-gray-200 bg-white shadow-sm
-                          focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400"
+                          focus:ring-2 focus:border-blue-700 transition-all duration-300 placeholder:text-gray-400"
                         />
                       </div>
                     </div>
@@ -415,7 +415,7 @@ export default function PerfilPage() {
                       </DialogClose>
                       <Button
                         onClick={handlePasswordChange}
-                        className="w-fit rounded-full transition-all transform hover:scale-105 hover:bg-green-500 active:scale-95 border-2 border-transparent hover:border-green-700"
+                        className="w-fit rounded-full transition-all transform hover:scale-105 hover:bg-[#3C6AB2]tive:scale-95 border-2 border-transparent hover:border-blue-700"
                         disabled={isChangingPassword}
                       >
                         {isChangingPassword && (
@@ -461,7 +461,7 @@ export default function PerfilPage() {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="w-fit rounded-full  transform hover:scale-105 bg-green-500 active:scale-95 border-2 border-transparent hover:border-green-700">
+                      <AlertDialogCancel className="w-fit rounded-full  transform hover:scale-105 bg-[#3C6AB2]tive:scale-95 border-2 border-transparent hover:border-green-700">
                         Cancelar
                       </AlertDialogCancel>
                       <AlertDialogAction
