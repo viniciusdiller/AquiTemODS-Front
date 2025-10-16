@@ -23,19 +23,19 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+// CORREÇÃO: Importe a nova função da API
+import { getPendingAdminRequests } from "@/lib/api";
 
 const { Text } = Typography;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Configuração de rótulos e ordem dos campos
 const fieldConfig: { [key: string]: { label: string; order: number } } = {
-
   projetoId: { label: "ID", order: 1 },
-  ODS: { label: "ODS", order: 4 },
+  ods: { label: "ODS", order: 4 },
   prefeitura: { label: "Prefeitura", order: 2 },
   nomeProjeto: { label: "Nome do Projeto", order: 10 },
-  emailProjeto: { label: "Email", order: 20 },
+  emailContato: { label: "Email", order: 20 },
   endereco: { label: "Endereço", order: 22 },
   descricao: { label: "Descrição", order: 30 },
   descricaoDiferencial: { label: "Diferencial", order: 31 },
@@ -44,22 +44,22 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   instagram: { label: "Instagram", order: 41 },
   logoUrl: { label: "Logo Atual", order: 42 },
   logo: { label: "Nova Logo", order: 42 },
-  projetoImg: { label: "Portfólio Atual", order: 44 },
-  projetos: { label: "Novo Portfólio", order: 44 },
+  imagens: { label: "Portfólio", order: 44 },
+  produtos: { label: "Novo Portfólio", order: 44 },
   status: { label: "Status Atual", order: 5 },
-
   createdAt: { label: "Data de Criação", order: 100 },
   updatedAt: { label: "Última Atualização", order: 101 },
 };
 
-interface projetoImg {
+// CORREÇÃO: Interfaces precisam bater com os dados do backend
+interface Imagens {
   url: string;
 }
 
 interface Projeto {
-  projetoID: number;
+  projetoId: number;
   nomeProjeto: string;
-  emailProjeto: string;
+  emailContato: string;
   prefeitura: string;
   ods: string[];
   odsRelacionadas: string;
@@ -68,8 +68,7 @@ interface Projeto {
   website?: string;
   instagram?: string;
   logoUrl?: string;
-
-  projetoImg?: projetoImg[];
+  imagens?: Imagens[];
   dados_atualizacao?: any;
   [key: string]: any;
 }
@@ -88,9 +87,7 @@ const AdminDashboard: React.FC = () => {
     exclusoes: [],
   });
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Projeto | null>(
-    null
-  );
+  const [selectedItem, setSelectedItem] = useState<Projeto | null>(null);
   const router = useRouter();
 
   const getFullImageUrl = (path: string): string => {
@@ -103,9 +100,10 @@ const AdminDashboard: React.FC = () => {
   const renderValue = (
     key: string,
     value: any,
-    nomeFantasia: string
+    nomeProjeto: string
   ): React.ReactNode => {
-    if ((key === "projetoImg" || key === "projetos") && Array.isArray(value)) {
+    // CORREÇÃO: Checar pela chave 'imagens'
+    if (key === "imagens" && Array.isArray(value)) {
       const imagesUrls = value
         .map((item) => (typeof item === "string" ? item : item.url))
         .map(getFullImageUrl)
@@ -133,7 +131,7 @@ const AdminDashboard: React.FC = () => {
       return (
         <Image
           src={getFullImageUrl(value)}
-          alt={`Logo de ${nomeFantasia}`}
+          alt={`Logo de ${nomeProjeto}`}
           width={150}
         />
       );
@@ -155,11 +153,8 @@ const AdminDashboard: React.FC = () => {
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/api/admin/pending`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Falha ao buscar dados.");
-      const pendingData = await response.json();
+      // CORREÇÃO: Use a nova função centralizada da API
+      const pendingData = await getPendingAdminRequests(token);
       setData(pendingData);
     } catch (error: any) {
       message.error(error.message);
@@ -217,8 +212,9 @@ const AdminDashboard: React.FC = () => {
                 ]}
               >
                 <List.Item.Meta
-                  title={item.nomeFantasia}
-                  description={`CNPJ: ${item.cnpj}`}
+                  // CORREÇÃO: Use os campos corretos do objeto 'Projeto'
+                  title={item.nomeProjeto}
+                  description={`Prefeitura: ${item.prefeitura}`}
                 />
               </List.Item>
             )}
@@ -243,7 +239,8 @@ const AdminDashboard: React.FC = () => {
 
       {selectedItem && (
         <Modal
-          title={`Detalhes de ${selectedItem.nomeFantasia}`}
+          // CORREÇÃO: Use o campo correto para o título
+          title={`Detalhes de ${selectedItem.nomeProjeto}`}
           visible={modalVisible}
           onCancel={() => setModalVisible(false)}
           width={800}
@@ -285,7 +282,7 @@ const AdminDashboard: React.FC = () => {
                   key={key}
                   label={fieldConfig[key]?.label ?? key}
                 >
-                  {renderValue(key, value, selectedItem.nomeFantasia)}
+                  {renderValue(key, value, selectedItem.nomeProjeto)}
                 </Descriptions.Item>
               ))}
 
@@ -306,7 +303,7 @@ const AdminDashboard: React.FC = () => {
                         <div key={key}>
                           <Text strong>{fieldConfig[key]?.label ?? key}:</Text>
                           <div className="pl-4 mt-1">
-                            {renderValue(key, value, selectedItem.nomeFantasia)}
+                            {renderValue(key, value, selectedItem.nomeProjeto)}
                           </div>
                         </div>
                       ))}

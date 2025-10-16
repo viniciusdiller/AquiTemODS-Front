@@ -2,9 +2,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function fetchApi(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
+
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (options.headers && "Authorization" in options.headers) {
     headers["Authorization"] = (options.headers as Record<string, string>)[
@@ -86,13 +89,33 @@ export const deleteUserAccount = (token: string) =>
     },
   });
 
-export const getAllEstablishments = () => fetchApi("/api/estabelecimentos");
+export const getAllProjetos = () => fetchApi("/api/projetos");
 
-export const getEstablishmentById = (id: string) =>
-  fetchApi(`/api/estabelecimentos/${id}`);
+export const getProjetoById = (id: string) => fetchApi(`/api/projetos/${id}`);
+
+export const cadastrarProjeto = (data: FormData) =>
+  fetchApi("/api/projetos", {
+    method: "POST",
+    body: data,
+  });
+
+export const solicitarAtualizacaoProjeto = (id: string, data: FormData) =>
+  fetchApi(`/api/projetos/solicitar-atualizacao/${id}`, {
+    method: "PUT",
+    body: data,
+  });
+
+export const solicitarExclusaoProjeto = (
+  id: string,
+  data: { motivo?: string }
+) =>
+  fetchApi(`/api/projetos/solicitar-exclusao/${id}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 
 export const getReviewsByEstablishment = (id: string) =>
-  fetchApi(`/api/avaliacoes/estabelecimento/${id}`);
+  fetchApi(`/api/avaliacoes/projetos/${id}`);
 
 export const submitReview = (data: any, token: string) =>
   fetchApi("/api/avaliacoes", {
@@ -117,6 +140,14 @@ export const resetPassword = (data: { token: string; newPassword: string }) =>
 export const deleteReview = (id: number, token: string) =>
   fetchApi(`/api/avaliacoes/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+export const getPendingAdminRequests = (token: string) =>
+  fetchApi("/api/admin/pending", {
+    method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },

@@ -20,142 +20,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  cadastrarProjeto,
+  solicitarAtualizacaoProjeto,
+  solicitarExclusaoProjeto,
+} from "@/lib/api";
 
-// --- FUNÇÕES DE MÁSCARA ---
-const maskCNAE = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{4})(\d)/, "$1-$2")
-    .replace(/(-\d{1})(\d{2})/, "$1/$2")
-    .replace(/(\/\d{2})\d+?$/, "$1");
-};
-
-const maskCPF = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{2})/, "$1-$2")
-    .replace(/(-\d{2})\d+?$/, "$1");
-};
-
-const maskCNPJ = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{2})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1/$2")
-    .replace(/(\d{4})(\d)/, "$1-$2")
-    .replace(/(-\d{2})\d+?$/, "$1");
-};
-
-const maskPhone = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2")
-    .replace(/(-\d{4})\d+?$/, "$1");
-};
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const api = {
-  cadastrarProjeto: async (formData: FormData) => {
-    const response = await fetch(`${API_URL}/api/estabelecimentos`, {
-      method: "POST",
-      body: formData,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Falha ao cadastrar.");
-    }
-    return response.json();
-  },
-
-  atualizarProjeto: async (formData: FormData) => {
-    const response = await fetch(
-      `${API_URL}/api/estabelecimentos/solicitar-atualizacao`,
-      {
-        method: "PUT",
-        body: formData,
-      }
-    );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Falha ao enviar atualização.");
-    }
-    return response.json();
-  },
-
-  excluirProjeto: async (data: { cnpj: string; motivo?: string }) => {
-    const response = await fetch(
-      `${API_URL}/api/estabelecimentos/solicitar-exclusao`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Falha ao solicitar exclusão.");
-    }
-    return response.json();
-  },
-};
-
-const areasAtuacao = [
-  "Entrega",
-  "Retirada",
-  "Entrega e Retirada",
-  "Água Branca",
-  "Alvorada",
-  "Areal",
-  "Asfalto Velho",
-  "Aterrado",
-  "Bacaxá",
-  "Barra Nova",
-  "Barreira",
-  "Basiléa",
-  "Bicuíba",
-  "Bonsucesso",
-  "Boqueirão",
-  "Caixa d'Água",
-  "Centro (Saquarema)",
-  "Condado de Bacaxá",
-  "Coqueiral",
-  "Bairro de Fátima",
-  "Engenho Grande",
-  "Gravatá",
-  "Guarani",
-  "Ipitangas",
-  "Itaúna",
-  "Jaconé",
-  "Jardim",
-  "Jardim Ipitangas",
-  "Leigos",
-  "Madressilva",
-  "Mombaça",
-  "Morro dos Pregos",
-  "Palmital",
-  "Parque Marina",
-  "Porto da Roça I",
-  "Porto da Roça II",
-  "Porto Novo",
-  "Raia",
-  "Retiro",
-  "Rio d'Areia",
-  "Rio Mole",
-  "Sampaio Correia",
-  "São Geraldo",
-  "Serra de Mato Grosso",
-  "Tinguí",
-  "Verde Vale",
-  "Vilatur",
-  "Outro município",
-];
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",
   "ODS 2 - Fome Zero e Agricultura Sustentável",
@@ -550,7 +420,6 @@ const CadastroProjetoPaje: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([]);
   const [portfolioFileList, setPortfolioFileList] = useState<UploadFile[]>([]);
-  const [ccmeiFileList, setCcmeiFileList] = useState<UploadFile[]>([]);
   const [flowStep, setFlowStep] = useState<FlowStep>("initial");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [submittedMessage, setSubmittedMessage] = useState({
@@ -565,9 +434,6 @@ const CadastroProjetoPaje: React.FC = () => {
 
   const handlePortfolioChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setPortfolioFileList(fileList);
-
-  const handleCCMEIChange = ({ fileList }: { fileList: UploadFile[] }) =>
-    setCcmeiFileList(fileList);
 
   useEffect(() => {
     // Se ainda estiver a verificar o estado de login, não faz nada
@@ -604,7 +470,6 @@ const CadastroProjetoPaje: React.FC = () => {
     form.resetFields();
     setLogoFileList([]);
     setPortfolioFileList([]);
-    setCcmeiFileList([]);
     setFlowStep("initial");
   };
 
@@ -629,20 +494,16 @@ const CadastroProjetoPaje: React.FC = () => {
 
       portfolioFileList.forEach((file) => {
         if (file.originFileObj) {
-          formData.append("produtos", file.originFileObj);
+          formData.append("imagens", file.originFileObj);
         }
       });
 
-      if (ccmeiFileList.length > 0 && ccmeiFileList[0].originFileObj) {
-        formData.append("ccmei", ccmeiFileList[0].originFileObj);
-      }
-
-      await api.cadastrarProjeto(formData);
+      await cadastrarProjeto(formData);
 
       setSubmittedMessage({
         title: "Cadastro realizado com sucesso!",
         subTitle:
-          "Sua solicitação foi recebida. Em breve seu negócio estará visível na plataforma para toda Saquarema.",
+          "Sua solicitação foi recebida. Em breve seu projeto estará visível na plataforma para todo o Brasil.",
       });
       setFlowStep("submitted");
     } catch (error: any) {
@@ -657,9 +518,16 @@ const CadastroProjetoPaje: React.FC = () => {
   const handleUpdateSubmit = async (values: any) => {
     setLoading(true);
     try {
+      const { projetoId, ...updateData } = values; // Extrai o ID do projeto
+      if (!projetoId) {
+        message.error("O ID do projeto é obrigatório para a atualização.");
+        setLoading(false);
+        return;
+      }
+
       const formData = new FormData();
 
-      Object.entries(values).forEach(([key, value]) => {
+      Object.entries(updateData).forEach(([key, value]) => {
         if (value && key !== "portfolio" && key !== "logo") {
           if (key === "locais" && Array.isArray(value)) {
             formData.append("areasAtuacao", value.join(", "));
@@ -671,21 +539,17 @@ const CadastroProjetoPaje: React.FC = () => {
         }
       });
 
-      // 2. DEPOIS, ADICIONA OS ARQUIVOS
       if (logoFileList.length > 0 && logoFileList[0].originFileObj) {
         formData.append("logo", logoFileList[0].originFileObj);
       }
 
       portfolioFileList.forEach((file) => {
         if (file.originFileObj) {
-          formData.append("produtos", file.originFileObj);
+          formData.append("imagens", file.originFileObj);
         }
       });
 
-      // --- CORREÇÃO FIM ---
-
-      await api.atualizarProjeto(formData);
-
+      await solicitarAtualizacaoProjeto(projetoId, formData);
       setSubmittedMessage({
         title: "Atualização enviada com sucesso!",
         subTitle:
@@ -704,24 +568,16 @@ const CadastroProjetoPaje: React.FC = () => {
   const handleDeleteSubmit = async (values: any) => {
     setLoading(true);
     try {
-      // ALTERAR ISSO AQUI AINDA
-      const dataToSend: {
-        cnpj: string;
-        motivo?: string;
-        prefeitura: string;
-        secretaria: string;
-        emailContato: string;
-      } = {
-        cnpj: values.cnpj,
-        prefeitura: values.prefeitura,
-        secretaria: values.secretaria,
-        emailContato: values.emailContato,
-      };
-      if (values.motivo) {
-        dataToSend.motivo = values.motivo;
+      const { projetoId, motivo } = values; // Extrai o ID e o motivo
+      if (!projetoId) {
+        message.error("O ID do projeto é obrigatório para a exclusão.");
+        setLoading(false);
+        return;
       }
 
-      await api.excluirProjeto(dataToSend);
+      // ALTERADO: Chama a nova função da API apenas com os dados necessários
+      await solicitarExclusaoProjeto(projetoId, { motivo });
+
       setSubmittedMessage({
         title: "Solicitação de exclusão recebida!",
         subTitle:
@@ -862,7 +718,7 @@ const CadastroProjetoPaje: React.FC = () => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item
-              name="categoria"
+              name="ods" // <-- CORRIGIDO
               label="Categoria Principal"
               rules={[{ required: true, message: "Selecione uma categoria!" }]}
             >
@@ -1087,6 +943,18 @@ const CadastroProjetoPaje: React.FC = () => {
             >
               <Input placeholder="Nome da Prefeitura" />
             </Form.Item>
+            <Form.Item
+              name="projetoId"
+              label="ID do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o ID do seu Projeto para atualização!",
+                },
+              ]}
+            >
+              <Input placeholder="Insira o ID do Projeto que você deseja atualizar" />
+            </Form.Item>
           </Col>
           <Col xs={24} md={12}>
             {/* CORREÇÃO: name="secretaria" */}
@@ -1265,11 +1133,26 @@ const CadastroProjetoPaje: React.FC = () => {
               rules={[
                 {
                   required: true,
-                  message: "O nome da Prefeitura é neceesário para identificação!",
+                  message:
+                    "O nome da Prefeitura é neceesário para identificação!",
                 },
               ]}
             >
               <Input placeholder="Nome da Prefeitura" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={24}>
+            <Form.Item
+              name="projetoId"
+              label="ID do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o ID do seu Projeto para exclusão!",
+                },
+              ]}
+            >
+              <Input placeholder="Insira o ID do Projeto que você deseja excluir" />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
