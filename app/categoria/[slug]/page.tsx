@@ -13,8 +13,8 @@ import {
 import { Spin, Empty, Button, Input } from "antd";
 import ModernCarousel from "@/components/ModernCarousel";
 import { getProjetosByOds } from "@/lib/api";
+import FormattedDescription from "@/components/FormattedDescription";
 
-// --- DADOS DAS CATEGORIAS (para títulos, imagens de fundo, etc.) ---
 const categories = [
   {
     id: "ODS1",
@@ -277,7 +277,9 @@ export default function CategoryPage() {
                         {projeto.nomeProjeto}
                       </h3>
                       <p className="text-gray-600 my-2 text-sm break-words flex-grow">
-                        {projeto.descricaoDiferencial}
+                        <FormattedDescription
+                          text={projeto.descricaoDiferencial}
+                        />
                       </p>
                       <div className="flex items-start gap-2 text-sm text-gray-500 mt-auto pt-2 border-t border-gray-100">
                         <EnvironmentOutlined className="mt-1 flex-shrink-0 text-gray-400" />

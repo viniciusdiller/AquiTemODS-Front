@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
+import FormattedDescription from "@/components/FormattedDescription";
 
 // --- Componentes de UI (Mantidos do seu código original) ---
 
@@ -328,7 +329,7 @@ function ProjetoPageContent() {
                   </div>
                 </div>
                 <p className="text-gray-700 leading-relaxed md:pl-2">
-                  {projeto.descricaoDiferencial}
+                  <FormattedDescription text={projeto.descricaoDiferencial} />
                 </p>
                 <div className="hidden quinhentos:flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
                   <div className="flex items-center gap-6">
@@ -429,8 +430,8 @@ function ProjetoPageContent() {
                 Sobre o Projeto
               </h3>
               <div>
-                <p className="text-gray-700 leading-relaxed md:pl-2">
-                  {projeto.descricao}
+                <p className="text-gray-700 leading-relaxed md:pl-2 break-all">
+                  <FormattedDescription text={projeto.descricao} />
                 </p>
               </div>
               <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
