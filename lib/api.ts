@@ -96,6 +96,9 @@ export const getProjetosByOds = (ods: string) =>
 
 export const getProjetoById = (id: string) => fetchApi(`/api/projetos/${id}`);
 
+export const getProjetoByNome = (nome: string) =>
+  fetchApi(`/api/projetos/nome/${encodeURIComponent(nome)}`);
+
 export const cadastrarProjeto = (data: FormData) =>
   fetchApi("/api/projetos", {
     method: "POST",

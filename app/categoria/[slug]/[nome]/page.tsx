@@ -4,19 +4,17 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Star,
-  MapPin,
-  Phone,
-  PhoneForwarded,
+  Globe,
   Instagram,
   Trash2,
+  SearchX,
 } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
 import "leaflet/dist/leaflet.css";
-import { categories } from "@/app/page";
 import Image from "next/image";
 import {
-  getProjetoById,
+  getProjetoByNome,
   getReviewsByEstablishment,
   deleteReview,
 } from "@/lib/api";
@@ -42,8 +40,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button"; // Importe o componente de botão
-import { SearchX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
+
+// --- Componentes de UI (Mantidos do seu código original) ---
 
 const CustomStarIcon = ({
   fillPercentage = "100%",
@@ -85,7 +85,6 @@ const CustomStarIcon = ({
 
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
-
   return (
     <div className="flex items-center">
       {[...Array(totalStars)].map((_, index) => {
@@ -96,40 +95,32 @@ const StarRating = ({ rating }: { rating: number }) => {
         } else if (starValue - 1 < rating && starValue > rating) {
           fillPercentage = `${(rating - index) * 100}%`;
         }
-
         return <CustomStarIcon key={index} fillPercentage={fillPercentage} />;
       })}
     </div>
   );
 };
+
+// --- Funções Auxiliares (Mantidas e Adaptadas) ---
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const normalizeImagePath = (filePath: string) => {
   if (!filePath) return "";
   let normalized = filePath.replace(/\\/g, "/");
-
   const uploadsIndex = normalized.indexOf("uploads/");
   if (uploadsIndex !== -1) {
     normalized = normalized.substring(uploadsIndex);
   }
-
   if (normalized.startsWith("/")) {
     normalized = normalized.substring(1);
   }
-
   return normalized;
 };
 
-const REVIEWS_PER_PAGE = 4;
-
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-    },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 };
 
 const itemVariants = {
@@ -137,17 +128,13 @@ const itemVariants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut" as const,
-    },
+    transition: { duration: 0.5, ease: "easeOut" as const },
   },
 };
 
 function AnimatedSection({ children }: { children: React.ReactNode }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-
   return (
     <motion.section
       ref={ref}
@@ -161,74 +148,56 @@ function AnimatedSection({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function MeiDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const [meiDetails, setMeiDetails] = useState<any>(null);
+// --- Componente de Conteúdo da Página (Lógica Principal) ---
+
+function ProjetoPageContent() {
+  const params = useParams();
+  const { user } = useAuth();
+
+  const categorySlug = params.slug as string;
+  const nomeDoProjeto = decodeURIComponent(params.nome as string);
+
+  const [projeto, setProjeto] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [animateReviews, setAnimateReviews] = useState(false);
-  const [locaisExpandidos, setLocaisExpandidos] = useState(false);
-  const { user } = useAuth();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
-  const [portfolioImages, setPortfolioImages] = useState<any[]>([]);
 
-  const fetchMeiData = async () => {
-    const meiId = params.slug;
-
-    if (!meiId) return;
+  const fetchProjetoData = async () => {
+    if (!nomeDoProjeto) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const detailsData = await getProjetoById(meiId);
-      const reviewsData = await getReviewsByEstablishment(meiId);
+      // 1. Busca os dados completos do projeto (incluindo as avaliações)
+      const detailsData = await getProjetoByNome(nomeDoProjeto);
 
-      setMeiDetails(detailsData);
-      setReviews(reviewsData);
-      setRating(detailsData.media || 0);
-      if (detailsData.produtosImg && Array.isArray(detailsData.produtosImg)) {
-        const portfolioItems = detailsData.produtosImg.map(
-          (image: any, index: number) => {
-            const normalizedUrl = normalizeImagePath(image.url);
-            return {
-              id: `${detailsData.estabelecimentoId}-${index}`,
-              img: `${API_URL}/${normalizedUrl}`,
-            };
-          }
-        );
-
-        setPortfolioImages(portfolioItems);
+      // 2. Verifica se os dados são válidos
+      if (detailsData && detailsData.projetoId) {
+        // 3. Define os dois estados USANDO OS DADOS QUE JÁ CHEGARAM
+        setProjeto(detailsData);
+        setReviews(detailsData.avaliacoes || []); // Pega as avaliações do objeto principal
       } else {
-        setPortfolioImages([]);
+        // Se não encontrou, limpa os estados
+        setProjeto(null);
+        setReviews([]);
       }
-
-      setAnimateReviews(true);
     } catch (error) {
-      console.error("Falha ao buscar dados do MEI:", error);
-      setMeiDetails(null);
+      console.error("Falha ao buscar dados do Projeto:", error);
+      setProjeto(null);
     }
   };
 
   useEffect(() => {
     const initialFetch = async () => {
       setIsLoading(true);
-      await fetchMeiData();
+      await fetchProjetoData();
       setIsLoading(false);
     };
     initialFetch();
-  }, [params.slug]);
-
-  useEffect(() => {
-    setAnimateReviews(false);
-    const timer = setTimeout(() => {
-      setAnimateReviews(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [currentPage]);
+  }, [nomeDoProjeto]);
 
   if (isLoading) {
     return (
@@ -238,17 +207,17 @@ export default function MeiDetailPage({
     );
   }
 
-  if (!meiDetails) {
+  if (!projeto) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-4 bg-gray-50">
         <div className="bg-white p-8 rounded-2xl shadow-md">
           <SearchX className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Estabelecimento Não Encontrado
+            Projeto Não Encontrado
           </h2>
           <p className="text-gray-600 mb-6 max-w-sm">
-            O MEI que você está procurando não existe, foi removido ou o link
-            está incorreto.
+            O projeto que você está procurando não existe, foi removido ou o
+            link está incorreto.
           </p>
           <Button
             asChild
@@ -261,23 +230,6 @@ export default function MeiDetailPage({
     );
   }
 
-  const categoryInfo = categories.find(
-    (cat) => cat.title === meiDetails.categoria
-  );
-  const categorySlug = categoryInfo ? categoryInfo.id : "";
-
-  const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
-  const paginatedReviews = reviews.slice(
-    (currentPage - 1) * REVIEWS_PER_PAGE,
-    currentPage * REVIEWS_PER_PAGE
-  );
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
   const handleDeleteClick = (avaliacaoId: number) => {
     if (!user?.token) {
       toast.error("Você precisa estar logado para excluir um comentário.");
@@ -287,36 +239,43 @@ export default function MeiDetailPage({
     setIsDeleteDialogOpen(true);
   };
 
-  // Função que executa a exclusão após a confirmação
   const handleConfirmDelete = async () => {
     if (!reviewToDelete || !user?.token) {
-      // Se não houver ID ou token, apenas fecha o diálogo
       setIsDeleteDialogOpen(false);
       return;
     }
-
     try {
       await deleteReview(reviewToDelete, user.token);
       toast.success("Comentário excluído com sucesso!");
       setReviews(reviews.filter((r) => r.avaliacoesId !== reviewToDelete));
     } catch (error: any) {
-      console.error("Erro ao excluir avaliação:", error);
       toast.error(error.message || "Não foi possível excluir o comentário.");
     } finally {
-      // Garante que o diálogo feche após a operação
       setIsDeleteDialogOpen(false);
       setReviewToDelete(null);
     }
   };
 
-  const tagsInvisiveisString = meiDetails.tagsInvisiveis || "";
+  // Adaptação das variáveis para o layout
+  const rating = projeto.media || 0;
+  const portfolioImages = (projeto.projetoImg || []).map(
+    (image: any, index: number) => ({
+      id: `${projeto.projetoId}-${index}`,
+      img: `${API_URL}/${normalizeImagePath(image.url)}`,
+    })
+  );
+  const odsTags = (projeto.odsRelacionadas || "")
+    .split(",")
+    .map((tag: string) => tag.trim())
+    .filter(Boolean);
 
-  const tagsList: string[] = tagsInvisiveisString
-    ? (tagsInvisiveisString as string)
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag.length > 0)
-    : [];
+  const REVIEWS_PER_PAGE = 4;
+  const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
+  const paginatedReviews = reviews.slice(
+    (currentPage - 1) * REVIEWS_PER_PAGE,
+    currentPage * REVIEWS_PER_PAGE
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2]">
       <motion.header
@@ -334,13 +293,12 @@ export default function MeiDetailPage({
               <ArrowLeft className="w-4 h-4" />
               <span className="font-medium">Voltar</span>
             </Link>
-            <h1 className="absolute left-1/2 -translate-x-1/2 text-md font-semibold text-gray-800 truncate ml-3 break-words max-w-[60%] sm:max-w-[70%] md:max-w-[50%] lg:max-w-[40%]">
-              {meiDetails.nomeFantasia}
+            <h1 className="absolute left-1/2 -translate-x-1/2 text-md font-semibold text-gray-800 truncate ml-3 break-words max-w-[60%]">
+              {projeto.nomeProjeto}
             </h1>
           </div>
         </div>
       </motion.header>
-
       <motion.main
         className="w-full p-4 md:p-6"
         variants={containerVariants}
@@ -356,8 +314,8 @@ export default function MeiDetailPage({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="md:col-span-2 flex flex-col">
                 <div className="mb-6 text-center md:text-left">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E]  pl-3">
-                    {meiDetails.nomeFantasia}
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
+                    {projeto.nomeProjeto}
                   </h2>
                   <div className="flex items-center justify-center md:justify-start gap-2">
                     <StarRating rating={rating} />
@@ -370,52 +328,51 @@ export default function MeiDetailPage({
                   </div>
                 </div>
                 <p className="text-gray-700 leading-relaxed md:pl-2">
-                  {meiDetails.descricao}
+                  {projeto.descricao}
                 </p>
                 <div className="hidden quinhentos:flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
                   <div className="flex items-center gap-6">
-                    <a
-                      href={meiDetails.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors hover:cursor-pointer"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
-                        <Instagram size={18} strokeWidth={2} />
-                      </div>
-                      <span className="text-sm font-medium">Instagram</span>
-                    </a>
-                    <a
-                      href={`https://wa.me/55${meiDetails.contatoEstabelecimento.replace(
-                        /\D/g,
-                        ""
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-gray-600 hover:text-[#22c362] transition-colors"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
-                        <PhoneForwarded size={18} strokeWidth={2} />
-                      </div>
-                      <span className="text-sm font-medium">WhatsApp</span>
-                    </a>
+                    {projeto.instagram && (
+                      <a
+                        href={projeto.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors hover:cursor-pointer"
+                      >
+                        <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
+                          <Instagram size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium">Instagram</span>
+                      </a>
+                    )}
+                    {projeto.website && (
+                      <a
+                        href={projeto.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
+                      >
+                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Globe size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium">Website</span>
+                      </a>
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <TagsAnimate tags={tagsList} />
+                    <TagsAnimate tags={odsTags} />
                   </div>
                 </div>
               </div>
               <div className="flex items-center justify-center md:col-span-1">
-                <div className="max-w-48 mas-h-48 md:max-w-56 md:max-h-56 desktop:max-h-64 desktop:max-w-64 bg-white rounded-2xl flex items-center justify-center p-4">
+                <div className="max-w-48 mas-h-48 md:max-w-56 md:max-h-56 bg-white rounded-2xl flex items-center justify-center p-4">
                   <TiltImage
                     src={
-                      (meiDetails.logoUrl &&
-                        `${API_URL}/${normalizeImagePath(
-                          meiDetails.logoUrl
-                        )}`) ||
-                      "/LogoExploraMonocromática.png"
+                      (projeto.logoUrl &&
+                        `${API_URL}/${normalizeImagePath(projeto.logoUrl)}`) ||
+                      "/placeholder-logo.png"
                     }
-                    alt={`Logo de ${meiDetails.nomeFantasia}`}
+                    alt={`Logo de ${projeto.nomeProjeto}`}
                     width={500}
                     height={500}
                     className="w-full h-full object-contain"
@@ -424,34 +381,35 @@ export default function MeiDetailPage({
               </div>
               <div className="quinhentos:hidden flex flex-col items-center justify-center gap-6 mt-6 col-span-full">
                 <div className="flex items-center gap-6">
-                  <a
-                    href={meiDetails.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
-                      <Instagram size={18} strokeWidth={2} />
-                    </div>
-                    <span className="text-sm font-medium">Instagram</span>
-                  </a>
-                  <a
-                    href={`https://wa.me/${meiDetails.contatoEstabelecimento.replace(
-                      /\D/g,
-                      ""
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-gray-600 hover:text-[#22c362] transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
-                      <PhoneForwarded size={18} strokeWidth={2} />
-                    </div>
-                    <span className="text-sm font-medium">WhatsApp</span>
-                  </a>
+                  {projeto.instagram && (
+                    <a
+                      href={projeto.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
+                        <Instagram size={18} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium">Instagram</span>
+                    </a>
+                  )}
+                  {projeto.website && (
+                    <a
+                      href={projeto.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Globe size={18} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium">Website</span>
+                    </a>
+                  )}
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                  <TagsAnimate tags={tagsList} />
+                  <TagsAnimate tags={odsTags} />
                 </div>
               </div>
             </div>
@@ -462,7 +420,7 @@ export default function MeiDetailPage({
             variants={itemVariants}
           >
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E]  pl-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
                 Portfólio
               </h3>
               <p className="text-sm text-gray-600">
@@ -476,12 +434,12 @@ export default function MeiDetailPage({
 
           <AnimatedSection>
             <div className="bg-white p-6 rounded-3xl shadow-md md:mx-auto md:max-w-[85%]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E]  pl-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E] pl-3">
                 Avaliações
               </h3>
               <AvaliacaoModalButton
-                estabelecimentoId={meiDetails.estabelecimentoId}
-                onReviewSubmit={fetchMeiData}
+                estabelecimentoId={projeto.projetoId.toString()}
+                onReviewSubmit={fetchProjetoData}
               />
               <div className="space-y-4">
                 {reviews.length > 0 ? (
@@ -490,15 +448,10 @@ export default function MeiDetailPage({
                       {paginatedReviews
                         .slice()
                         .reverse()
-                        .map((review, index) => (
+                        .map((review) => (
                           <div
                             key={review.avaliacoesId}
-                            className={`flex gap-4 py-2 items-start border bt-1px rounded-3xl shadow-lg transition-all duration-500 ease-out ${
-                              animateReviews
-                                ? "opacity-100 translate-y-0"
-                                : "opacity-0 translate-y-4"
-                            }`}
-                            style={{ transitionDelay: `${index * 50}ms` }}
+                            className="flex gap-4 py-2 items-start border-b"
                           >
                             <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0 my-auto ml-4">
                               <Image
@@ -509,15 +462,14 @@ export default function MeiDetailPage({
                                 className="rounded-full w-full h-full object-cover"
                               />
                             </div>
-
                             <div>
                               <div className="flex items-center gap-2">
                                 <p className="font-semibold text-gray-800 ">
                                   {review.usuario.nomeCompleto}
                                   {user &&
-                                    user.usuarioId === review.usuarioId && (
+                                    user.usuarioId ===
+                                      review.usuario.usuarioId && (
                                       <button
-                                        // Altere esta linha
                                         onClick={() =>
                                           handleDeleteClick(review.avaliacoesId)
                                         }
@@ -543,36 +495,33 @@ export default function MeiDetailPage({
                       <div className="pt-4 flex justify-end rounded-lg">
                         <Pagination>
                           <PaginationContent>
-                            {[...Array(totalPages)].map((_, i) => {
-                              const pageNumber = i + 1;
-                              return (
-                                <PaginationItem key={i}>
-                                  <PaginationLink
-                                    href="#"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      handlePageChange(pageNumber);
-                                    }}
-                                    isActive={currentPage === pageNumber}
-                                    className={
-                                      currentPage === pageNumber
-                                        ? "bg-[#D7386E]  text-white hover:bg-gradient-to-br from-[#D7386E] to-[#3C6AB2]"
-                                        : ""
-                                    }
-                                  >
-                                    {pageNumber}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              );
-                            })}
+                            {[...Array(totalPages)].map((_, i) => (
+                              <PaginationItem key={i}>
+                                <PaginationLink
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentPage(i + 1);
+                                  }}
+                                  isActive={currentPage === i + 1}
+                                  className={
+                                    currentPage === i + 1
+                                      ? "bg-[#D7386E] text-white"
+                                      : ""
+                                  }
+                                >
+                                  {i + 1}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ))}
                           </PaginationContent>
                         </Pagination>
                       </div>
                     )}
                   </>
                 ) : (
-                  <p className="text-gray-500">
-                    Ainda não há avaliações para este local.
+                  <p className="text-gray-500 text-center py-4">
+                    Ainda não há avaliações para este projeto.
                   </p>
                 )}
               </div>
@@ -591,14 +540,14 @@ export default function MeiDetailPage({
                   <AlertDialogFooter>
                     <AlertDialogCancel
                       onClick={() => setReviewToDelete(null)}
-                      className="rounded-full border-2 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-105 active:scale-95 px-4 py-2"
+                      className="rounded-full"
                     >
                       Cancelar
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleConfirmDelete}
                       asChild
-                      className="rounded-full bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-105 active:scale-95 px-4 py-2"
+                      className="rounded-full bg-red-600 hover:bg-red-700 text-white"
                     >
                       <button>Sim, excluir</button>
                     </AlertDialogAction>
@@ -610,5 +559,20 @@ export default function MeiDetailPage({
         </div>
       </motion.main>
     </div>
+  );
+}
+
+// --- Componente Wrapper com Suspense ---
+export default function ProjetoPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <p>Carregando...</p>
+        </div>
+      }
+    >
+      <ProjetoPageContent />
+    </Suspense>
   );
 }

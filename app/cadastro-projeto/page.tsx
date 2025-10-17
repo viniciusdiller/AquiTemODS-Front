@@ -1117,9 +1117,9 @@ const CadastroProjetoPaje: React.FC = () => {
       autoComplete="off"
     >
       <section className="mb-8 border-t pt-4">
-        {commonTitle("Exclusão de Cadastro MEI")}
+        {commonTitle("Exclusão de Cadastro Projeto")}
         <p className="text-red-700 bg-red-50 p-4 rounded-md mb-6 -mt-2">
-          <b>Atenção:</b> Esta ação é permanente e removerá seu negócio da nossa
+          <b>Atenção:</b> Esta ação é permanente e removerá seu Projeto da nossa
           plataforma. Para voltar, será necessário um novo cadastro. Para
           prosseguir, confirme sua identidade.
         </p>
@@ -1240,7 +1240,7 @@ const CadastroProjetoPaje: React.FC = () => {
           loading={loading}
           style={{ height: 45, fontSize: "1rem" }}
         >
-          Confirmar Exclusão MEI
+          Confirmar Exclusão de Projeto
         </Button>
       </Form.Item>
     </Form>

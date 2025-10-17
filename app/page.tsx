@@ -13,7 +13,7 @@ export { categories };
 const categories = [
   {
     id: "ODS1",
-    title: "Artesanato e Criação Manual",
+    title: "ODS 1 - Erradicação da Pobreza",
     backgroundimg: "/categorias/fundo_ods1.png",
     tagsinv:
       "artesanato, manualidades, trabalhos manuais, feito à mão, feito a mão, handmade, DIY, do it yourself, bordado, bordados, crochê, croche, tricô, trico, macramê, macrame, fuxico, patchwork, quilt, quiltar, costura criativa, costura, tecido, tecidos, bijuteria, bijouteria, colares, pulseiras, brincos, acessórios, biscuit, cerâmica, ceramica, barro, escultura, modelagem, artes plásticas, artes plasticas, pintura em tecido, pintura em tela, pintura decorativa, velas artesanais, velas decorativas, saboaria artesanal, sabão artesanal, reciclagem criativa, reaproveitamento, decoração artesanal, lembrancinhas, lembranças, souvenirs, trabalhos de barbante, barbante",

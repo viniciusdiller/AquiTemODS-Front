@@ -121,7 +121,6 @@ export default function CategoryPage() {
   const params = useParams();
   const slug = (params.slug as string)?.toUpperCase();
   const router = useRouter();
-
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -261,7 +260,9 @@ export default function CategoryPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredProjetos.map((projeto, index) => (
                   <Link
-                    href={`/categoria/${slug}/Projeto/?id=${projeto.projetoId}`}
+                    href={`/categoria/${slug}/${encodeURIComponent(
+                      projeto.nomeProjeto
+                    )}`}
                     key={projeto.projetoId}
                     className="block"
                   >
