@@ -16,7 +16,7 @@ import "leaflet/dist/leaflet.css";
 import { categories } from "@/app/page";
 import Image from "next/image";
 import {
-  getEstablishmentById,
+  getProjetoById,
   getReviewsByEstablishment,
   deleteReview,
 } from "@/lib/api";
@@ -184,7 +184,7 @@ export default function MeiDetailPage({
     if (!meiId) return;
 
     try {
-      const detailsData = await getEstablishmentById(meiId);
+      const detailsData = await getProjetoById(meiId);
       const reviewsData = await getReviewsByEstablishment(meiId);
 
       setMeiDetails(detailsData);

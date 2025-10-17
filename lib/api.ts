@@ -91,6 +91,9 @@ export const deleteUserAccount = (token: string) =>
 
 export const getAllProjetos = () => fetchApi("/api/projetos");
 
+export const getProjetosByOds = (ods: string) =>
+  fetchApi(`/api/projetos/categoria/${encodeURIComponent(ods)}`);
+
 export const getProjetoById = (id: string) => fetchApi(`/api/projetos/${id}`);
 
 export const cadastrarProjeto = (data: FormData) =>
