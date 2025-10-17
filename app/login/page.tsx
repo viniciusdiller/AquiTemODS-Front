@@ -101,14 +101,14 @@ export default function LoginPage() {
           <div className="mb-4">
             <Link
               href="/"
-              className="flex items-center gap-2 text-gray-600 hover:text-[#017DB9] transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-[#3C6AB2] transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Voltar</span>
             </Link>
           </div>
           <Card
-            className="rounded-2xl border border-[#017DB9]/70 bg-white shadow-lg
+            className="rounded-2xl border border-[#3C6AB2]/70 bg-white shadow-lg
                       focus:outline-none focus:ring-2 focus:border-transparent
                       transition-all duration-300 placeholder-gray-400 text-sm
                       hover:shadow-md"
@@ -136,7 +136,7 @@ export default function LoginPage() {
                     disabled={isLoading}
                     className="w-full py-2
                       rounded-2xl border border-gray-200 bg-white shadow-sm
-                      focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400
+                      focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300 placeholder:text-gray-400
                       "
                   />
                 </div>
@@ -153,7 +153,7 @@ export default function LoginPage() {
                       disabled={isLoading}
                       className="w-full py-2 pr-10
                       rounded-2xl border border-gray-200 bg-white shadow-sm
-                      focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300 placeholder:text-gray-400
+                      focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300 placeholder:text-gray-400
                       "
                     />
                     <button
@@ -173,7 +173,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="hover:bg-[#22c362] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#017DB9]/70 w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="hover:bg-[#D7386E] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#3C6AB2]/70 w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
@@ -186,7 +186,7 @@ export default function LoginPage() {
                 </Button>
                 <Link href="/cadastro" className=" text-gray-600 ">
                   Novo por aqui?{" "}
-                  <strong className="underline hover:text-[#017DB9]">
+                  <strong className="underline hover:text-[#D7386E]">
                     {" "}
                     Cadastre-se
                   </strong>
@@ -197,7 +197,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center text-sm">
             <Link
               href="/esqueci-senha"
-              className="underline text-gray-600 hover:text-[#017DB9]"
+              className="underline text-gray-600 hover:text-[#D7386E]"
             >
               Esqueceu sua senha?
             </Link>

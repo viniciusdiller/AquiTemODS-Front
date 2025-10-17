@@ -94,6 +94,7 @@ const AdminLoginPage: React.FC = () => {
                   loading={loading}
                   block
                   size="large"
+                  style={{ backgroundColor: "#808080", borderColor: "#1D4ED8" }}
                 >
                   Entrar
                 </Button>

@@ -137,14 +137,14 @@ export default function Cadastro() {
           <div className="mb-4">
             <Link
               href="/login"
-              className="flex items-center gap-2 text-gray-600 hover:text-[#017DB9] transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-[#3C6AB2] transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Voltar</span>
             </Link>
           </div>
           <Card
-            className="rounded-2xl border border-[#017DB9]/70 bg-white shadow-lg
+            className="rounded-2xl border border-[#3C6AB2]/70 bg-white shadow-lg
                                  focus:outline-none focus:ring-2 focus:border-transparent
                                  transition-all duration-300 placeholder-gray-400 text-sm
                                  hover:shadow-md"
@@ -167,7 +167,7 @@ export default function Cadastro() {
                     value={username}
                     onChange={handleUsernameChange}
                     disabled={isLoading}
-                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300"
+                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -180,7 +180,7 @@ export default function Cadastro() {
                     value={nome_completo_user}
                     onChange={handleNomeCompletoChange}
                     disabled={isLoading}
-                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300"
+                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -193,7 +193,7 @@ export default function Cadastro() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300"
+                    className="w-full py-2 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -207,7 +207,7 @@ export default function Cadastro() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
-                      className="w-full py-2 pr-10 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#22c362]/70 transition-all duration-300"
+                      className="w-full py-2 pr-10 rounded-2xl placeholder:text-gray-400 border border-gray-200 bg-white shadow-sm focus:ring-2 focus:border-[#3C6AB2]/70 transition-all duration-300"
                     />
                     <button
                       type="button"
@@ -226,7 +226,7 @@ export default function Cadastro() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full hover:bg-[#22c362] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#017DB9]/70 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-full hover:bg-[#D7386E] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#3C6AB2]/70 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
