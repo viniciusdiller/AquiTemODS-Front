@@ -114,6 +114,7 @@ interface Projeto {
   nomeProjeto: string;
   descricaoDiferencial: string;
   endereco: string;
+  prefeitura: string;
   ods: string;
 }
 
@@ -280,7 +281,9 @@ export default function CategoryPage() {
                       </p>
                       <div className="flex items-start gap-2 text-sm text-gray-500 mt-auto pt-2 border-t border-gray-100">
                         <EnvironmentOutlined className="mt-1 flex-shrink-0 text-gray-400" />
-                        <span className="break-words">{projeto.endereco}</span>
+                        <span className="break-words">
+                          {projeto.prefeitura}
+                        </span>
                       </div>
                     </motion.div>
                   </Link>

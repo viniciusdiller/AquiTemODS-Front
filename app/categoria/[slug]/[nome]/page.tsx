@@ -328,7 +328,7 @@ function ProjetoPageContent() {
                   </div>
                 </div>
                 <p className="text-gray-700 leading-relaxed md:pl-2">
-                  {projeto.descricao}
+                  {projeto.descricaoDiferencial}
                 </p>
                 <div className="hidden quinhentos:flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
                   <div className="flex items-center gap-6">
@@ -355,7 +355,9 @@ function ProjetoPageContent() {
                         <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
                           <Globe size={18} strokeWidth={2} />
                         </div>
-                        <span className="text-sm font-medium">Website</span>
+                        <span className="text-sm font-medium">
+                          {projeto.prefeitura}
+                        </span>
                       </a>
                     )}
                   </div>
@@ -404,16 +406,60 @@ function ProjetoPageContent() {
                       <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
                         <Globe size={18} strokeWidth={2} />
                       </div>
-                      <span className="text-sm font-medium">Website</span>
+                      <span className="text-sm font-medium">
+                        {projeto.prefeitura}
+                      </span>
                     </a>
                   )}
                 </div>
+
                 <div className="flex flex-wrap justify-center gap-2">
                   <TagsAnimate tags={odsTags} />
                 </div>
               </div>
             </div>
           </motion.section>
+
+          {projeto.linkProjeto && ( // Só mostra esta secção se houver um link
+            <motion.section
+              className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4" // Mantém o estilo
+              variants={itemVariants} // Mantém a animação
+            >
+              <h3 className="text-2xl font-bold text-gray-900 border-l-4 border-[#D7386E] pl-3">
+                Sobre o Projeto
+              </h3>
+              <div>
+                <p className="text-gray-700 leading-relaxed md:pl-2">
+                  {projeto.descricao}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-link flex-shrink-0 text-[#3C6AB2]" // Usa uma das suas cores
+                >
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                <a
+                  href={projeto.linkProjeto}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium break-all" // Estilo do link
+                >
+                  {projeto.linkProjeto}
+                </a>
+              </div>
+            </motion.section>
+          )}
 
           <motion.section
             className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-6"

@@ -719,43 +719,59 @@ const CadastroProjetoPaje: React.FC = () => {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col xs={24} md={12}></Col>
-          <Col xs={24} md={12}></Col>
-        </Row>
-        {selectedCategory ? (
-          <Form.Item
-            name="odsRelacionadas"
-            label={`Tags de Busca Sugeridas (${selectedCategory})`}
-            help="Selecione no máximo 5 ODS para facilitar a busca do seu negócio."
-            rules={[
-              { required: true, message: "Selecione pelo menos uma tag!" },
-              {
-                validator: (_, value) =>
-                  value && value.length > 5
-                    ? Promise.reject(new Error("Selecione no máximo 5 tags!"))
-                    : Promise.resolve(),
-              },
-            ]}
-          >
-            <Select
-              mode="multiple"
-              allowClear
-              placeholder="Selecione até 5 ODS relacionadas"
-              maxTagCount={5}
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="linkProjeto"
+              label="Link do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Por favor, insira o link do projeto!",
+                },
+              ]}
             >
-              {odsRelacionadas[selectedCategory]?.map((tag) => (
-                <Option key={tag} value={tag}>
-                  {tag}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        ) : (
-          <p className="text-gray-600 mb-6 mt-2">
-            *Selecione uma Categoria na seção "Informações do Projeto" para ver
-            as ODS sugeridas.*
-          </p>
-        )}
+              <Input placeholder="Ex: link para um vídeo, site, rede social, etc." />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            {selectedCategory ? (
+              <Form.Item
+                name="odsRelacionadas"
+                label={`Tags de Busca Sugeridas (${selectedCategory})`}
+                help="Selecione no máximo 5 ODS para facilitar a busca do seu negócio."
+                rules={[
+                  { required: true, message: "Selecione pelo menos uma tag!" },
+                  {
+                    validator: (_, value) =>
+                      value && value.length > 5
+                        ? Promise.reject(
+                            new Error("Selecione no máximo 5 tags!")
+                          )
+                        : Promise.resolve(),
+                  },
+                ]}
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Selecione até 5 ODS relacionadas"
+                  maxTagCount={5}
+                >
+                  {odsRelacionadas[selectedCategory]?.map((tag) => (
+                    <Option key={tag} value={tag}>
+                      {tag}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            ) : (
+              <p className="text-gray-600 mb-6 mt-2">
+                *Selecione uma Categoria na seção "Informações do Projeto" para
+                ver as ODS sugeridas.*
+              </p>
+            )}
+          </Col>
+        </Row>
       </section>
 
       {/* --------------------- Contato e Localização --------------------- */}
