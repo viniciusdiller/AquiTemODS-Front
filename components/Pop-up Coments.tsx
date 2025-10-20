@@ -10,10 +10,10 @@ import { contemPalavrao } from "@/lib/profanityFilter";
 import { removeEmojis, containsEmoji } from "@/lib/utils";
 
 const AvaliacaoModalButton = ({
-  estabelecimentoId,
+  projetoId,
   onReviewSubmit,
 }: {
-  estabelecimentoId: number;
+  projetoId: number;
   onReviewSubmit?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +40,7 @@ const AvaliacaoModalButton = ({
       <SpringModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        estabelecimentoId={estabelecimentoId}
+        projetoId={projetoId}
         onReviewSubmit={onReviewSubmit}
       />
     </div>
@@ -50,12 +50,12 @@ const AvaliacaoModalButton = ({
 const SpringModal = ({
   isOpen,
   setIsOpen,
-  estabelecimentoId,
+  projetoId,
   onReviewSubmit,
 }: {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  estabelecimentoId: number;
+  projetoId: number;
   onReviewSubmit?: () => void;
 }) => {
   const [rating, setRating] = useState(0);
@@ -93,8 +93,8 @@ const SpringModal = ({
     const reviewData = {
       nota: rating,
       comentario: comment,
-      estabelecimento: {
-        estabelecimentoId: estabelecimentoId,
+      projeto: {
+        projetoId: projetoId,
       },
     };
 

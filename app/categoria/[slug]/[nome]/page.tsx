@@ -485,7 +485,7 @@ function ProjetoPageContent() {
                 Avaliações
               </h3>
               <AvaliacaoModalButton
-                estabelecimentoId={projeto.projetoId.toString()}
+                projetoId={projeto.projetoId.toString()}
                 onReviewSubmit={fetchProjetoData}
               />
               <div className="space-y-4">
