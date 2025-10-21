@@ -35,6 +35,7 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   projetoId: { label: "ID", order: 1 },
   ods: { label: "ODS", order: 4 },
   prefeitura: { label: "Prefeitura", order: 2 },
+  secretaria: { label: "Secretaria", order: 3 },
   nomeProjeto: { label: "Nome do Projeto", order: 10 },
   emailContato: { label: "Email", order: 20 },
   endereco: { label: "Endereço", order: 22 },
@@ -46,8 +47,8 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   logoUrl: { label: "Logo Atual", order: 42 },
   logo: { label: "Nova Logo", order: 42 },
   projetoImg: { label: "Portfólio Atual", order: 43 },
-  imagens: { label: "Novo Portfólio", order: 45 },
   status: { label: "Status Atual", order: 5 },
+  motivo: { label: "Motivo da Exclusão", order: 1000 },
   motivoExclusao: { label: "Motivo da Exclusão", order: 6 },
   createdAt: { label: "Data de Criação", order: 100 },
   updatedAt: { label: "Última Atualização", order: 101 },
@@ -88,12 +89,18 @@ const AdminDashboard: React.FC = () => {
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
     const normalizedPath = path.replace(/\\/g, "/");
-    const cleanPath = normalizedPath.startsWith("/") ? normalizedPath.substring(1) : normalizedPath;
+    const cleanPath = normalizedPath.startsWith("/")
+      ? normalizedPath.substring(1)
+      : normalizedPath;
     return `${API_URL}/${cleanPath}`;
   };
 
   const renderValue = (key: string, value: any): React.ReactNode => {
-    if ((key === "projetoImg" || key === "imagens") && Array.isArray(value) && value.length > 0) {
+    if (
+      (key === "projetoImg" || key === "imagens") &&
+      Array.isArray(value) &&
+      value.length > 0
+    ) {
       const imagesUrls = value
         .map((item) => (typeof item === "string" ? item : item.url))
         .map(getFullImageUrl)
@@ -110,11 +117,16 @@ const AdminDashboard: React.FC = () => {
       );
     }
 
-    if ((key === "logoUrl" || key === "logo") && typeof value === "string" && value) {
+    if (
+      (key === "logoUrl" || key === "logo") &&
+      typeof value === "string" &&
+      value
+    ) {
       return <Image src={getFullImageUrl(value)} alt="Logo" width={150} />;
     }
 
-    if (typeof value === "object" && value !== null) return JSON.stringify(value);
+    if (typeof value === "object" && value !== null)
+      return JSON.stringify(value);
 
     return String(value);
   };
@@ -174,8 +186,17 @@ const AdminDashboard: React.FC = () => {
           <List
             dataSource={listData}
             renderItem={(item) => (
-              <List.Item actions={[<Button type="link" onClick={() => showModal(item)}>Detalhes</Button>]}>
-                <List.Item.Meta title={item.nomeProjeto} description={`Prefeitura: ${item.prefeitura}`} />
+              <List.Item
+                actions={[
+                  <Button type="link" onClick={() => showModal(item)}>
+                    Detalhes
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={item.nomeProjeto}
+                  description={`Prefeitura: ${item.prefeitura}`}
+                />
               </List.Item>
             )}
           />
@@ -189,7 +210,9 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="p-8">
       <Spin spinning={loading}>
-        <Title level={2} className="mb-6">Painel de Administração</Title>
+        <Title level={2} className="mb-6">
+          Painel de Administração
+        </Title>
         <Row gutter={[16, 16]}>
           {renderList("Novos Cadastros", data.cadastros)}
           {renderList("Atualizações", data.atualizacoes)}
@@ -204,24 +227,26 @@ const AdminDashboard: React.FC = () => {
           onCancel={() => setModalVisible(false)}
           width={800}
           footer={[
-            <Button key="reject" onClick={() => handleAction("reject")} icon={<CloseOutlined />} danger>Recusar</Button>,
-            <Button key="confirm" type="primary" onClick={() => handleAction("approve")} icon={<CheckOutlined />}>Confirmar</Button>,
+            <Button
+              key="reject"
+              onClick={() => handleAction("reject")}
+              icon={<CloseOutlined />}
+              danger
+            >
+              Recusar
+            </Button>,
+            <Button
+              key="confirm"
+              type="primary"
+              onClick={() => handleAction("approve")}
+              icon={<CheckOutlined />}
+            >
+              Confirmar
+            </Button>,
           ]}
         >
-          {selectedItem.status === 'pendente_exclusao' && selectedItem.dados_atualizacao?.motivoExclusao && (
-            <Alert
-              message="Solicitação de Exclusão"
-              description={<Text>{selectedItem.dados_atualizacao.motivoExclusao}</Text>}
-              type="error"
-              showIcon
-              icon={<ExclamationCircleOutlined />}
-              className="mb-4"
-            />
-          )}
-
           <Title level={4}>Dados do Projeto</Title>
           <Descriptions bordered column={1} size="small">
-            
             {selectedItem.logoUrl && (
               <Descriptions.Item label={fieldConfig.logoUrl.label}>
                 {renderValue("logoUrl", selectedItem.logoUrl)}
@@ -229,52 +254,103 @@ const AdminDashboard: React.FC = () => {
             )}
 
             {selectedItem.projetoImg && selectedItem.projetoImg.length > 0 && (
-               <Descriptions.Item label={fieldConfig.projetoImg.label}>
-                  {renderValue("projetoImg", selectedItem.projetoImg)}
-               </Descriptions.Item>
+              <Descriptions.Item label={fieldConfig.projetoImg.label}>
+                {renderValue("projetoImg", selectedItem.projetoImg)}
+              </Descriptions.Item>
             )}
-            
-            {Object.entries(selectedItem)
-              .filter(([key]) => 
-                key !== "dados_atualizacao" &&
-                key !== "logoUrl" &&
-                key !== "projetoImg" &&
-                key !== "status"
-              )
-              .sort(([keyA], [keyB]) => (fieldConfig[keyA]?.order ?? 999) - (fieldConfig[keyB]?.order ?? 999))
-              .map(([key, value]) => (
-                value && <Descriptions.Item key={key} label={fieldConfig[key]?.label ?? key}>
-                  {renderValue(key, value)}
-                </Descriptions.Item>
-              ))}
-          </Descriptions>
 
-          {selectedItem.status === 'pendente_atualizacao' && selectedItem.dados_atualizacao && Object.keys(selectedItem.dados_atualizacao).length > 0 && (
-            <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: "#e6f7ff" }}>
-              <Title level={4} className="text-blue-800">Dados para Atualizar</Title>
-              <Descriptions bordered column={1} size="small" className="mt-2">
-                {Object.entries(selectedItem.dados_atualizacao)
-                  .filter(([key]) => key !== "imagens" && key !== "motivoExclusao")
-                  .sort(([keyA], [keyB]) => (fieldConfig[keyA]?.order ?? 999) - (fieldConfig[keyB]?.order ?? 999))
-                  .map(([key, value]) => (
-                    <Descriptions.Item key={key} label={fieldConfig[key]?.label ?? `Novo ${key}`}>
+            {Object.entries(selectedItem)
+              .filter(
+                ([key]) =>
+                  key !== "dados_atualizacao" &&
+                  key !== "logoUrl" &&
+                  key !== "projetoImg" &&
+                  key !== "status"
+              )
+              .sort(
+                ([keyA], [keyB]) =>
+                  (fieldConfig[keyA]?.order ?? 999) -
+                  (fieldConfig[keyB]?.order ?? 999)
+              )
+              .map(
+                ([key, value]) =>
+                  value && (
+                    <Descriptions.Item
+                      key={key}
+                      label={fieldConfig[key]?.label ?? key}
+                    >
                       {renderValue(key, value)}
                     </Descriptions.Item>
-                  ))}
-              </Descriptions>
-
-              {selectedItem.dados_atualizacao.imagens && (
-                <div className="mt-4">
-                  <Title level={5} style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: '8px' }}>
-                    {fieldConfig.imagens.label}
-                  </Title>
-                   <div className="pt-2">
-                     {renderValue("imagens", selectedItem.dados_atualizacao.imagens)}
-                   </div>
-                </div>
+                  )
               )}
-            </div>
-          )}
+          </Descriptions>
+
+          {selectedItem.status === "pendente_exclusao" &&
+            selectedItem.dados_atualizacao && (
+              <div
+                className="mt-6 p-4 rounded-lg"
+                style={{ backgroundColor: "#fff1f0" }}
+              >
+                {" "}
+                {/* Cor alterada para combinar com o tema 'error' */}
+                <Title level={4} className="text-red-700">
+                  Dados da Solicitação de Exclusão
+                </Title>{" "}
+                {/* Cor alterada */}
+                <Descriptions bordered column={1} size="small" className="mt-2">
+                  {Object.entries(selectedItem.dados_atualizacao)
+                    .filter(
+                      ([key]) => key !== "projetoId" && key !== "confirmacao"
+                    )
+                    .sort(
+                      ([keyA], [keyB]) =>
+                        (fieldConfig[keyA]?.order ?? 999) -
+                        (fieldConfig[keyB]?.order ?? 999)
+                    )
+                    .map(([key, value]) => (
+                      <Descriptions.Item
+                        key={key}
+                        label={fieldConfig[key]?.label ?? key}
+                      >
+                        {/* Trata o motivo opcional diretamente aqui */}
+                        {key === "motivo"
+                          ? renderValue(key, value || "Motivo não informado")
+                          : renderValue(key, value)}
+                      </Descriptions.Item>
+                    ))}
+                </Descriptions>
+              </div>
+            )}
+
+          {selectedItem.status === "pendente_atualizacao" &&
+            selectedItem.dados_atualizacao &&
+            Object.keys(selectedItem.dados_atualizacao).length > 0 && (
+              <div
+                className="mt-6 p-4 rounded-lg"
+                style={{ backgroundColor: "#e6f7ff" }}
+              >
+                <Title level={4} className="text-blue-800">
+                  Dados para Atualizar
+                </Title>
+                <Descriptions bordered column={1} size="small" className="mt-2">
+                  {Object.entries(selectedItem.dados_atualizacao)
+                    .filter(([key]) => key !== "motivoExclusao")
+                    .sort(
+                      ([keyA], [keyB]) =>
+                        (fieldConfig[keyA]?.order ?? 999) -
+                        (fieldConfig[keyB]?.order ?? 999)
+                    )
+                    .map(([key, value]) => (
+                      <Descriptions.Item
+                        key={key}
+                        label={fieldConfig[key]?.label ?? `Novo ${key}`}
+                      >
+                        {renderValue(key, value)}
+                      </Descriptions.Item>
+                    ))}
+                </Descriptions>
+              </div>
+            )}
         </Modal>
       )}
     </div>

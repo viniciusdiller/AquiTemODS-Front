@@ -550,15 +550,38 @@ const CadastroProjetoPaje: React.FC = () => {
   const handleDeleteSubmit = async (values: any) => {
     setLoading(true);
     try {
-      const { projetoId, motivo } = values; // Extrai o ID e o motivo
-      if (!projetoId) {
-        message.error("O ID do projeto é obrigatório para a exclusão.");
+      const {
+        projetoId,
+        nomeProjeto,
+        motivo,
+        prefeitura,
+        secretaria,
+        emailContato,
+      } = values;
+
+      if (
+        !projetoId ||
+        !nomeProjeto ||
+        !motivo ||
+        !prefeitura ||
+        !secretaria ||
+        !emailContato
+      ) {
+        message.error("Todos os campos do formulário são obrigatórios.");
         setLoading(false);
         return;
       }
 
-      // ALTERADO: Chama a nova função da API apenas com os dados necessários
-      await solicitarExclusaoProjeto(projetoId, { motivo });
+      const dadosParaEnviar = {
+        projetoId,
+        nomeProjeto,
+        motivo,
+        prefeitura,
+        secretaria,
+        emailContato,
+      };
+
+      await solicitarExclusaoProjeto(projetoId, dadosParaEnviar);
 
       setSubmittedMessage({
         title: "Solicitação de exclusão recebida!",
@@ -1126,7 +1149,7 @@ const CadastroProjetoPaje: React.FC = () => {
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
-              name="nomeResponsavel"
+              name="prefeitura"
               label="Nome da Prefeitura"
               rules={[
                 {
@@ -1203,7 +1226,7 @@ const CadastroProjetoPaje: React.FC = () => {
         </Form.Item>
         {/* --------------------- FIM DA IDENTIFICAÇÃO OBRIGATÓRIA --------------------- */}
 
-        <Form.Item name="motivo" label="Motivo da exclusão (Opcional)">
+        <Form.Item name="motivo" label="Motivo da exclusão">
           <TextArea
             rows={3}
             placeholder="Sua opinião é importante para nós. Se puder, nos diga por que está saindo."

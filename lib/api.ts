@@ -111,10 +111,7 @@ export const solicitarAtualizacaoProjeto = (id: string, data: FormData) =>
     body: data,
   });
 
-export const solicitarExclusaoProjeto = (
-  id: string,
-  data: { motivo?: string }
-) =>
+export const solicitarExclusaoProjeto = (id: string, data: any) =>
   fetchApi(`/api/projetos/solicitar-exclusao/${id}`, {
     method: "POST",
     body: JSON.stringify(data),
