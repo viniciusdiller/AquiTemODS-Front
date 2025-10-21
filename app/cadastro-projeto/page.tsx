@@ -397,7 +397,7 @@ const { TextArea } = Input;
 
 type FlowStep = "initial" | "register" | "update" | "delete" | "submitted";
 
-const CadastroProjetoPaje: React.FC = () => {
+const CadastroProjetoPage: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([]);
@@ -446,6 +446,10 @@ const CadastroProjetoPaje: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     form.setFieldsValue({ [name]: maskFn(value) });
+  };
+  const maskId = (value: string) => {
+    return value
+      .replace(/\D/g, "");
   };
 
   const resetAll = () => {
@@ -967,16 +971,25 @@ const CadastroProjetoPaje: React.FC = () => {
               <Input placeholder="Nome da Prefeitura" />
             </Form.Item>
             <Form.Item
-              name="projetoId"
-              label="ID do Projeto"
-              rules={[
-                {
-                  required: true,
-                  message: "Insira o ID do seu Projeto para atualização!",
-                },
-              ]}
-            >
-              <Input placeholder="Insira o ID do Projeto que você deseja atualizar" />
+            name="projetoId"
+            label="ID do Projeto"
+            rules={[
+              {
+                required: true,
+                message: "Insira o ID do seu Projeto para atualização!",
+              },
+            ]}
+          >
+                <Input
+                placeholder="Insira o ID do Projeto que você deseja atualizar"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => {
+                  const valorLimpo = maskId(e.target.value);
+                  form.setFieldsValue({ projetoId: valorLimpo });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1168,16 +1181,25 @@ const CadastroProjetoPaje: React.FC = () => {
           </Col>
           <Col xs={24} md={24}>
             <Form.Item
-              name="projetoId"
-              label="ID do Projeto"
-              rules={[
-                {
-                  required: true,
-                  message: "Insira o ID do seu Projeto para exclusão!",
-                },
-              ]}
-            >
-              <Input placeholder="Insira o ID do Projeto que você deseja excluir" />
+            name="projetoId"
+            label="ID do Projeto"
+            rules={[
+              {
+                required: true,
+                message: "Insira o ID do seu Projeto para exclusão!",
+              },
+            ]}
+          >
+              <Input
+                placeholder="Insira o ID do Projeto que você deseja excluir"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => {
+                  const valorLimpo = maskId(e.target.value);
+                  form.setFieldsValue({ projetoId: valorLimpo });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1321,4 +1343,4 @@ const CadastroProjetoPaje: React.FC = () => {
   );
 };
 
-export default CadastroProjetoPaje;
+export default CadastroProjetoPage;
