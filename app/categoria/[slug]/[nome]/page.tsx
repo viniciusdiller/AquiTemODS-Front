@@ -3,11 +3,12 @@
 import Link from "next/link";
 import {
   ArrowLeft,
-  Star,
+  Loader2,
   Globe,
   Instagram,
   Trash2,
   SearchX,
+  CalendarDays,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
@@ -15,8 +16,8 @@ import "leaflet/dist/leaflet.css";
 import Image from "next/image";
 import {
   getProjetoByNome,
-  getReviewsByEstablishment,
   deleteReview,
+  formatarDataParaMesAno,
 } from "@/lib/api";
 import AvaliacaoModalButton from "@/components/Pop-up Coments";
 import {
@@ -43,8 +44,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import FormattedDescription from "@/components/FormattedDescription";
-
-// --- Componentes de UI (Mantidos do seu código original) ---
 
 const CustomStarIcon = ({
   fillPercentage = "100%",
@@ -172,16 +171,12 @@ function ProjetoPageContent() {
     }
 
     try {
-      // 1. Busca os dados completos do projeto (incluindo as avaliações)
       const detailsData = await getProjetoByNome(nomeDoProjeto);
 
-      // 2. Verifica se os dados são válidos
       if (detailsData && detailsData.projetoId) {
-        // 3. Define os dois estados USANDO OS DADOS QUE JÁ CHEGARAM
         setProjeto(detailsData);
-        setReviews(detailsData.avaliacoes || []); // Pega as avaliações do objeto principal
+        setReviews(detailsData.avaliacoes || []);
       } else {
-        // Se não encontrou, limpa os estados
         setProjeto(null);
         setReviews([]);
       }
@@ -202,8 +197,16 @@ function ProjetoPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p>Carregando...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md w-full">
+          <Loader2 className="mx-auto h-16 w-16 text-blue-600 animate-spin mb-4" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            A carregar dados do MEI...
+          </h1>
+          <p className="text-gray-600">
+            A preparar os detalhes para si. Por favor, aguarde um momento.
+          </p>
+        </div>
       </div>
     );
   }
@@ -326,7 +329,25 @@ function ProjetoPageContent() {
                     <span className="text-gray-500 text-sm">
                       ({reviews.length} avaliações)
                     </span>
+                    {projeto.createdAt && (
+                      <div className="hidden sm:flex items-center text-sm text-gray-500 border-l-2 border-gray-300 pl-4">
+                        <CalendarDays className="h-4 w-4 mr-2" />
+                        <span>
+                          Membro desde {/* <<< 2. USE A NOVA FUNÇÃO AQUI */}
+                          {formatarDataParaMesAno(projeto.createdAt)}
+                        </span>
+                      </div>
+                    )}
                   </div>
+                  {projeto.createdAt && (
+                    <div className="flex items-center text-sm text-gray-500 border-l-2 border-gray-300 pl-4 mt-4 sm:hidden">
+                      <CalendarDays className="h-4 w-4 mr-2" />
+                      <span>
+                        Membro desde {/* <<< 2. USE A NOVA FUNÇÃO AQUI */}
+                        {formatarDataParaMesAno(projeto.createdAt)}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <p className="text-gray-700 leading-relaxed md:pl-2">
                   <FormattedDescription text={projeto.descricaoDiferencial} />
