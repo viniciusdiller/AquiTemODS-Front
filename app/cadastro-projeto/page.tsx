@@ -448,8 +448,7 @@ const CadastroProjetoPage: React.FC = () => {
     form.setFieldsValue({ [name]: maskFn(value) });
   };
   const maskId = (value: string) => {
-    return value
-      .replace(/\D/g, "");
+    return value.replace(/\D/g, "");
   };
 
   const resetAll = () => {
@@ -728,11 +727,11 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               name="ods" // <-- CORRIGIDO
-              label="Categoria Principal"
+              label="ODS principal do Projeto"
               rules={[{ required: true, message: "Selecione uma categoria!" }]}
             >
               <Select
-                placeholder="Selecione a categoria principal"
+                placeholder="Selecione a ODS principal do Projeto"
                 onSelect={(value: string) => setSelectedCategory(value)}
                 onChange={() => form.setFieldsValue({ odsRelacionadas: [] })}
               >
@@ -764,8 +763,8 @@ const CadastroProjetoPage: React.FC = () => {
             {selectedCategory ? (
               <Form.Item
                 name="odsRelacionadas"
-                label={`Tags de Busca Sugeridas (${selectedCategory})`}
-                help="Selecione no máximo 5 ODS para facilitar a busca do seu negócio."
+                label={`Outras ODS relacionadas`}
+                help="Selecione no máximo 5 ODS que também tenham relação ao seu projeto."
                 rules={[
                   { required: true, message: "Selecione pelo menos uma tag!" },
                   {
@@ -806,7 +805,7 @@ const CadastroProjetoPage: React.FC = () => {
         {commonTitle("Contato e Localização")}
         <Form.Item
           name="emailContato"
-          label="E-mail de Contato Principal"
+          label="E-mail de Contato do projeto"
           rules={[
             { required: true, message: "O e-mail é obrigatório!" },
             {
@@ -824,7 +823,22 @@ const CadastroProjetoPage: React.FC = () => {
 
       {/* --------------------- Detalhes e Mídia --------------------- */}
       <section className="mb-8 border-t pt-5">
-        {commonTitle("Detalhes e Mídia")}
+        {commonTitle("Descrição do Projeto")}
+        <Form.Item
+          name="descricaoDiferencial"
+          label="Briefing do Projeto"
+          rules={[
+            {
+              required: true,
+              message: "Por favor, faça um resumo do seu projeto!",
+            },
+          ]}
+        >
+          <TextArea
+            rows={2}
+            placeholder="Descreva brevemente o que é o seu projeto."
+          />
+        </Form.Item>
         <Form.Item
           name="descricao"
           label="Descrição detalhada do seu Projeto"
@@ -838,21 +852,6 @@ const CadastroProjetoPage: React.FC = () => {
           <TextArea
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
-          />
-        </Form.Item>
-        <Form.Item
-          name="descricaoDiferencial"
-          label="Briefing do Projeto"
-          rules={[
-            {
-              required: true,
-              message: "Por favor, faça um resumo do seu projeto!",
-            },
-          ]}
-        >
-          <TextArea
-            rows={2}
-            placeholder="Descreva brevemente qual é o diferencial do seu projeto."
           />
         </Form.Item>
         <Row gutter={24}>
@@ -949,10 +948,10 @@ const CadastroProjetoPage: React.FC = () => {
       autoComplete="off"
     >
       <section className="mb-8 border-t pt-4">
-        {commonTitle("Identificação do Negócio")}
+        {commonTitle("Identificação do Projeto")}
         <p className="text-gray-600 mb-6 -mt-4">
           Para iniciar a atualização, confirme os dados de identificação do
-          negócio e do responsável.
+          projeto.
         </p>
 
         <Row gutter={24}>
@@ -971,16 +970,16 @@ const CadastroProjetoPage: React.FC = () => {
               <Input placeholder="Nome da Prefeitura" />
             </Form.Item>
             <Form.Item
-            name="projetoId"
-            label="ID do Projeto"
-            rules={[
-              {
-                required: true,
-                message: "Insira o ID do seu Projeto para atualização!",
-              },
-            ]}
-          >
-                <Input
+              name="projetoId"
+              label="ID do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o ID do seu Projeto para atualização!",
+                },
+              ]}
+            >
+              <Input
                 placeholder="Insira o ID do Projeto que você deseja atualizar"
                 type="text"
                 inputMode="numeric"
@@ -1019,7 +1018,7 @@ const CadastroProjetoPage: React.FC = () => {
         </Row>
         <Form.Item
           name="emailContato"
-          label="E-mail de Contato Principal"
+          label="E-mail de Contato do projeto"
           rules={[
             {
               required: true,
@@ -1058,7 +1057,7 @@ const CadastroProjetoPage: React.FC = () => {
           </Upload>
         </Form.Item>
 
-        <Form.Item name="descricao" label="Nova Descrição do Serviço/Produto">
+        <Form.Item name="descricao" label="Nova Descrição do projeto">
           <TextArea
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
@@ -1181,15 +1180,15 @@ const CadastroProjetoPage: React.FC = () => {
           </Col>
           <Col xs={24} md={24}>
             <Form.Item
-            name="projetoId"
-            label="ID do Projeto"
-            rules={[
-              {
-                required: true,
-                message: "Insira o ID do seu Projeto para exclusão!",
-              },
-            ]}
-          >
+              name="projetoId"
+              label="ID do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o ID do seu Projeto para exclusão!",
+                },
+              ]}
+            >
               <Input
                 placeholder="Insira o ID do Projeto que você deseja excluir"
                 type="text"
@@ -1236,7 +1235,7 @@ const CadastroProjetoPage: React.FC = () => {
         </Row>
         <Form.Item
           name="emailContato"
-          label="E-mail de Contato Principal"
+          label="E-mail de Contato do projeto"
           rules={[
             {
               required: true,

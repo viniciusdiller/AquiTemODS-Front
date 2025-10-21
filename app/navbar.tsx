@@ -22,6 +22,11 @@ const AnimatedLogo = () => {
       className: "h-10 w-auto",
     },
     {
+      src: "/Logo-Lab-ISA.jpeg",
+      alt: "Logo LAB-ISA",
+      className: "h-10 w-auto",
+    },
+    {
       src: "/logo2sq.png",
       alt: "Logo Prefeitura de Saquarema",
       className: "h-12 w-auto",
