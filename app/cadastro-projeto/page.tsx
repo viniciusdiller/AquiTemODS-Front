@@ -875,6 +875,7 @@ const CadastroProjetoPaje: React.FC = () => {
                 onChange={handleLogoChange}
                 listType="picture"
                 maxCount={1}
+                accept="image/png, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Logo</Button>
               </Upload>
@@ -892,6 +893,7 @@ const CadastroProjetoPaje: React.FC = () => {
                 listType="picture"
                 multiple
                 maxCount={4}
+                accept="image/png, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Portfólio</Button>
               </Upload>
@@ -1037,6 +1039,7 @@ const CadastroProjetoPaje: React.FC = () => {
             onChange={handleLogoChange}
             listType="picture"
             maxCount={1}
+            accept="image/png, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Nova Logo</Button>
           </Upload>
@@ -1088,6 +1091,7 @@ const CadastroProjetoPaje: React.FC = () => {
             listType="picture"
             multiple
             maxCount={4}
+            accept="image/png, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Novas Imagens</Button>
           </Upload>
