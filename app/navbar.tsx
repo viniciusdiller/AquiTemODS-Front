@@ -22,7 +22,7 @@ const AnimatedLogo = () => {
       className: "h-10 w-auto",
     },
     {
-      src: "/Logo-Lab-ISA.jpeg",
+      src: "/Logo-Lab-ISA.png",
       alt: "Logo LAB-ISA",
       className: "h-10 w-auto",
     },
