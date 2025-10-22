@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     description:
       "Seu guia completo para explorar e conhecer os projetos que movimentam a economia do Rio de Janeiro.",
     url: "https://explora-saqua.vercel.app/",
-    siteName: "MeideSaquá",
+    siteName: "AquiTemODS",
     images: [
       {
         url: "/logo_aquitemods.png",
         width: 1200,
         height: 630,
-        alt: "MeideSaquá Logo",
+        alt: "AquiTemODS Logo",
       },
     ],
     type: "website",
