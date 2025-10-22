@@ -192,7 +192,7 @@ export default function HomePage() {
           <Link href="/" target="about:blank">
             <Image
               src="/Logo_aquitemods.png"
-              alt="Logo MeideSaqua"
+              alt="Logo Aqui Tem ODS"
               width={2660}
               height={898}
               className="md:block mx-auto h-14 sm:h-20 w-auto mb-5 milecem:h-24"
