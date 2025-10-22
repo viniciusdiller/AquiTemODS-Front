@@ -27,13 +27,19 @@ export default function EnigmasDoFuturoPage() {
             </div>
 
             <div className="mt-8 md:mt-0 md:w-1/3 flex-shrink-0">
-              <img
-                src="/logo_jogo_ods.jpeg"
-                alt="Logo do jogo Enigmas do Futuro"
-                width={400}
-                height={400}
-                className="w-full h-auto rounded-2xl shadow-md"
-              />
+              <a
+                href="https://enigma-do-futuro.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="/logo_jogo_ods.jpeg"
+                  alt="Logo do jogo Enigmas do Futuro"
+                  width={400}
+                  height={400}
+                  className="w-full h-auto rounded-2xl shadow-md"
+                />
+              </a>
             </div>
           </div>
         </section>
