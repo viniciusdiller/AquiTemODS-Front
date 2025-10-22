@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { categories } from "@/app/page"; 
+import { categories } from "@/app/page";
 
 // A interface para os slides agora usa a estrutura das suas categorias
 interface Slide {
@@ -82,10 +82,10 @@ export default function ModernCarousel({
         {displaySlides.map((slide, idx) => (
           <div key={idx} className="min-w-full h-full relative flex-shrink-0">
             <Image
-              src={slide.backgroundimg || "/placeholder.jpg"}
+              src={slide.backgroundimg || "/logo_aquitemods.png"}
               alt={slide.title}
               fill
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full object-right"
               sizes="100vw"
               priority={idx === 0}
             />
