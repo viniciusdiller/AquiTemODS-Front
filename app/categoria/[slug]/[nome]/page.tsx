@@ -44,6 +44,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import FormattedDescription from "@/components/FormattedDescription";
+import OdsTag from "@/components/ui/OdsTag";
 
 const CustomStarIcon = ({
   fillPercentage = "100%",
@@ -268,6 +269,7 @@ function ProjetoPageContent() {
       img: `${API_URL}/${normalizeImagePath(image.url)}`,
     })
   );
+
   const odsTags = (projeto.odsRelacionadas || "")
     .split(",")
     .map((tag: string) => tag.trim())
@@ -384,6 +386,15 @@ function ProjetoPageContent() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    {projeto.ods &&
+                      (() => {
+                        const odsString = String(projeto.ods);
+                        const match = odsString.match(/\d+/);
+                        const odsNumber = match ? match[0] : null;
+                        return odsNumber ? (
+                          <OdsTag odsNumber={odsNumber} />
+                        ) : null;
+                      })()}
                     <TagsAnimate tags={odsTags} />
                   </div>
                 </div>
@@ -435,6 +446,17 @@ function ProjetoPageContent() {
                   )}
                 </div>
 
+                <div>
+                  {projeto.ods &&
+                    (() => {
+                      const odsString = String(projeto.ods);
+                      const match = odsString.match(/\d+/);
+                      const odsNumber = match ? match[0] : null;
+                      return odsNumber ? (
+                        <OdsTag odsNumber={odsNumber} />
+                      ) : null;
+                    })()}
+                </div>
                 <div className="flex flex-wrap justify-center gap-2">
                   <TagsAnimate tags={odsTags} />
                 </div>

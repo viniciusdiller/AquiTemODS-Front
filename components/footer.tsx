@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 const address = "R. Cel. Madureira, 77 - Centro, Saquarema - RJ";
 const encodedAddress = encodeURIComponent(address);
@@ -41,7 +41,7 @@ const Footer = () => {
                   aquitemods@gmail.com
                 </a>
               </li>
-              <li>
+              <li className="flex items-center justify-center gap-3 hover:text-[#D7386E] transition-colors">
                 <a
                   href={googleMapsUrl}
                   target="_blank"
