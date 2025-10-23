@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react"; // Using icons for a c
 
 const slides = [
   { src: "/ODS-Roda.png", alt: "ODS" },
-  { src: "/odss.png", alt: "ODS" },
-  { src: "/ODS-1.png", alt: "ODS" },
+  { src: "/ods-fundo-azul.png", alt: "ODS" },
+  { src: "/ods capa.jpeg", alt: "ODS" },
 ];
 
 export default function ImageCarousel() {

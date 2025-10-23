@@ -18,13 +18,16 @@ export default function SobrePage() {
                     [background-position:0_100%]
                     [background-size:100%_4px]"
               >
-                <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
+                <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent ">
                   Aqui Tem ODS
                 </span>
               </h1>
               <p className="text-gray-700 leading-relaxed text-lg">
-                O <strong>Aqui Tem ODS</strong> é um espaço de mobilização,
-                aprendizado e conexão em torno dos{" "}
+                O{" "}
+                <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-semibold">
+                  AquitemODS{" "}
+                </span>{" "}
+                é um espaço de mobilização, aprendizado e conexão em torno dos{" "}
                 <strong>Objetivos de Desenvolvimento Sustentável</strong>. Nosso
                 propósito é transformar ideias em ações concretas que promovam
                 um futuro mais justo, inclusivo e sustentável para todos.
@@ -54,11 +57,14 @@ export default function SobrePage() {
           </p>
 
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            No <strong>Aqui Tem ODS</strong>, você encontra cursos, oficinas,
-            eventos e oportunidades voltadas para o fortalecimento de
-            competências, empreendedorismo sustentável e inovação social. O
-            objetivo é empoderar pessoas e comunidades a contribuírem com os 18
-            ODS, de forma prática e transformadora.
+            No{" "}
+            <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-semibold">
+              AquitemODS{" "}
+            </span>
+            , você encontra cursos, oficinas, eventos e oportunidades voltadas
+            para o fortalecimento de competências, empreendedorismo sustentável
+            e inovação social. O objetivo é empoderar pessoas e comunidades a
+            contribuírem com os 18 ODS, de forma prática e transformadora.
           </p>
 
           <p className="text-gray-700 leading-relaxed text-lg mt-4">

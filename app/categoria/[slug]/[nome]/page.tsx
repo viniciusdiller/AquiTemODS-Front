@@ -202,10 +202,10 @@ function ProjetoPageContent() {
         <div className="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md w-full">
           <Loader2 className="mx-auto h-16 w-16 text-blue-600 animate-spin mb-4" />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            A carregar dados do MEI...
+            A carregar dados do Projeto...
           </h1>
           <p className="text-gray-600">
-            A preparar os detalhes para si. Por favor, aguarde um momento.
+            A preparar os detalhes do Projeto. Por favor, aguarde um momento.
           </p>
         </div>
       </div>
