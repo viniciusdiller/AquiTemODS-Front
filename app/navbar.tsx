@@ -279,6 +279,13 @@ export function Navbar() {
             >
               Espaço dos ODS
             </Link>
+            <Link
+              href="/enigmas-do-futuro"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
+              onClick={() => setIsOpen(false)}
+            >
+              Enigmas do Futuro
+            </Link>
             <hr className="border-gray-200" />
 
             {isLoading ? (

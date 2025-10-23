@@ -88,34 +88,35 @@ export default function SobrePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Exemplo de Curso */}
             <Link
-              href="https://brasil.un.org/pt-br/sdgs"
+              href="https://www.escolavirtual.gov.br/curso/719"
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center"
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <Image
-                  src="/Cursos/ODS18.png"
-                  alt="ODS 18 - Parcerias e meios de implementação"
+                  src="/Cursos/curso1.png"
+                  alt="curso1"
                   width={400}
                   height={300}
                   className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Conheça os 18 Objetivos de Desenvolvimento Sustentável
+                Agenda para o desenvolvimento sustentável: conceitos,
+                mobilização e articulação
               </p>
             </Link>
 
             <Link
-              href="https://www.un.org/sustainabledevelopment/education/"
+              href="https://www.escolavirtual.gov.br/curso/841"
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center"
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <Image
-                  src="/Cursos/EducacaoODS.jpg"
+                  src="/Cursos/curso2.png"
                   alt="Educação para o Desenvolvimento Sustentável"
                   width={400}
                   height={300}
@@ -123,19 +124,20 @@ export default function SobrePage() {
                 />
               </div>
               <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Educação para o Desenvolvimento Sustentável
+                Agenda 2030 para o desenvolvimento sustentável: desafios para a
+                implementação
               </p>
             </Link>
 
             <Link
-              href="https://sebrae.com.br/sites/PortalSebrae/cursosonline/empreendedorismo-sustentavel,0f2c9b8a6a28bb610VgnVCM1000004c00210aRCRD"
+              href="https://www.escolaaberta3setor.org.br/sebrades-cursos/esg-e-os-objetivos-do-desenvolvimento-sustentavel/"
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center"
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <Image
-                  src="/Cursos/EmpreendedorismoSustentavel.jpg"
+                  src="/Cursos/curso3.jpg"
                   alt="Empreendedorismo Sustentável"
                   width={400}
                   height={300}
@@ -143,19 +145,19 @@ export default function SobrePage() {
                 />
               </div>
               <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Empreendedorismo Sustentável
+                ESG e os Objetivos do Desenvolvimento Sustentável
               </p>
             </Link>
 
             <Link
-              href="https://www.pactoglobal.org.br/ods"
+              href="https://procids.ufms.br/curso-multiplicadores-dos-ods/"
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center"
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <Image
-                  src="/Cursos/PactoGlobal.jpg"
+                  src="/Cursos/curso4.png"
                   alt="Pacto Global e os ODS no Brasil"
                   width={400}
                   height={300}
@@ -163,7 +165,7 @@ export default function SobrePage() {
                 />
               </div>
               <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Pacto Global e os ODS no Brasil
+                Curso Multiplicadores dos ODS
               </p>
             </Link>
           </div>
