@@ -226,7 +226,7 @@ export default function CategoryPage() {
             className="text-white/90 mt-2 text-sm md:text-base max-w-2xl mx-auto"
             style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.7)" }}
           >
-            Explore os projetos de Saquarema que contribuem para este ODS.
+            Explore os projetos do Rio de Janeiro que contribuem para este ODS.
           </motion.p>
         </div>
       </header>
