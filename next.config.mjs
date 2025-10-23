@@ -21,6 +21,13 @@ const nextConfig = {
   experimental: {
     allowedDevOrigins: ["http://172.16.32.199:3000"],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/uploads/:path*",
+        destination: "http://localhost:3301/uploads/:path*",
+      },
+    ];
+  },
 };
-
 export default nextConfig;
