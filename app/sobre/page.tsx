@@ -30,16 +30,14 @@ export default function EspacoODSPage() {
                 <strong>Prefeitura Municipal de Saquarema</strong>, idealizada
                 pela{" "}
                 <strong>Secretaria de Governança e Sustentabilidade </strong>{" "}
-                como produto do
+                como produto do{" "}
                 <strong>
-                  <strong>
-                    Laboratório de Inovação e Sustentabilidade Aplicada – Lab
-                  </strong>
+                  Laboratório de Inovação e Sustentabilidade Aplicada – Lab ISA.
                 </strong>
               </p>
               <p className="text-gray-700 leading-relaxed text-lg">
                 A plataforma nasce com o propósito de reunir, sistematizar e
-                divulgar boas práticas de gestão pública municipal alinhadas aos
+                divulgar boas práticas de gestão pública municipal alinhadas aos{" "}
                 <strong>
                   Objetivos de Desenvolvimento Sustentável (ODS) da Agenda 2030
                   da ONU
@@ -107,7 +105,7 @@ export default function EspacoODSPage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="text-2xl font-semibold mb-3">
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              Objetivo e proposta
+              Objetivo e Proposta
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -143,7 +141,7 @@ export default function EspacoODSPage() {
             </li>
             <li>
               {" "}
-              Engajar cidadãos, escolas, universidades e organizações locais na
+              Engajar cidadãos, escolas, universidades e organizações locais na{" "}
               <strong>Agenda 2030</strong>;
             </li>
             <li>
@@ -157,7 +155,7 @@ export default function EspacoODSPage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="text-2xl font-semibold text-[#007a73] mb-3">
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              Importância para a Gestão Pública e para a sociedade
+              Importância para a Gestão Pública e para a Sociedade
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -188,13 +186,13 @@ export default function EspacoODSPage() {
               integração entre secretarias e setores;
             </li>
             <li>
-              {" "}
-              <strong>formação de um acervo público de boas práticas</strong>,
+              A <strong>formação de um acervo público de boas práticas</strong>,
               que serve como referência para gestores de outros municípios;
             </li>
             <li>
-              A valorização das ações já existentes, muitas vezes invisíveis à
-              sociedade, que contribuem para um futuro mais sustentável.
+              <strong>A valorização das ações já existentes</strong>, muitas
+              vezes invisíveis à sociedade, que contribuem para um futuro mais
+              sustentável.
             </li>
           </ul>
 

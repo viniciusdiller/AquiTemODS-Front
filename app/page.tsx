@@ -216,8 +216,8 @@ export default function HomePage() {
               do Rio de Janeiro
             </h2>
             <p className="text-xl font-bold text-gray-700 md:text-gray-600 max-w-2xl mx-auto">
-              O banco de dados digital dos projetos que fazem a economia do
-              estado do Rio de Janeiro acontecer. Conheça o{" "}
+              O ponto de encontro entre inovação, gestão e sustentabilidade.
+              Conheça o{" "}
               <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
                 AquiTemODS!
               </span>{" "}
