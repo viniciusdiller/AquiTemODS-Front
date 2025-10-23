@@ -126,7 +126,7 @@ export default function Cadastro() {
           <div className="text-center mb-6">
             <Link href="/" passHref>
               <Image
-                src="/logo_aquitemods.png"
+                src="/Logo_aquitemods.png"
                 alt="Logo AquiTemODS"
                 width={150}
                 height={150}
