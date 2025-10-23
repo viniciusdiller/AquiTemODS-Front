@@ -230,7 +230,7 @@ export default function HomePage() {
                 />
                 <input
                   type="text"
-                  placeholder="Pesquisar por categoria..."
+                  placeholder="Pesquisar por ODS..."
                   className="
                 w-full pl-12 pr-4 py-3
                 rounded-2xl border border-gray-200 bg-white shadow-sm
@@ -316,7 +316,7 @@ export default function HomePage() {
 
         <div className="mt-auto pt-10 pb-24">
           <div className="text-center text-gray-600 mb-3">
-            <h3>Gostaria que seu Projeto aparecesse na Banco?</h3>
+            <h3>Gostaria que seu Projeto aparecesse na Banca?</h3>
           </div>
           <ButtonWrapper />
           <FaleConoscoButton />

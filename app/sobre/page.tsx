@@ -1,5 +1,6 @@
 // Espaço dos Aqui Tem ODS React from "react";
 import CarouselSobre from "@/components/CarouselSobre";
+import { Heart } from "lucide-react";
 
 export default function EspacoODSPage() {
   return (
@@ -25,18 +26,26 @@ export default function EspacoODSPage() {
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
                   AquitemODS{" "}
                 </span>
-                é uma iniciativa da Prefeitura Municipal de Saquarema,
-                idealizada pela Secretaria de Governança e Sustentabilidade como
-                produto do Laboratório de Inovação e Sustentabilidade Aplicada –
-                Lab ISA.
+                é uma iniciativa da{" "}
+                <strong>Prefeitura Municipal de Saquarema</strong>, idealizada
+                pela{" "}
+                <strong>Secretaria de Governança e Sustentabilidade </strong>{" "}
+                como produto do
+                <strong>
+                  <strong>
+                    Laboratório de Inovação e Sustentabilidade Aplicada – Lab
+                  </strong>
+                </strong>
               </p>
               <p className="text-gray-700 leading-relaxed text-lg">
                 A plataforma nasce com o propósito de reunir, sistematizar e
                 divulgar boas práticas de gestão pública municipal alinhadas aos
-                Objetivos de Desenvolvimento Sustentável (ODS) da Agenda 2030 da
-                ONU, promovendo o compartilhamento de experiências e o
-                fortalecimento da cultura da sustentabilidade e da inovação no
-                setor público.
+                <strong>
+                  Objetivos de Desenvolvimento Sustentável (ODS) da Agenda 2030
+                  da ONU
+                </strong>{" "}
+                promovendo o compartilhamento de experiências e o fortalecimento
+                da cultura da sustentabilidade e da inovação no setor público.
               </p>
               <p className="text-gray-700 leading-relaxed text-lg">
                 Mais do que um banco de projetos, o {""}
@@ -66,10 +75,11 @@ export default function EspacoODSPage() {
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               AquitemODS{" "}
             </span>{" "}
-            é um desdobramento direto dos Seminários Saquarema 2030, realizados
-            pela Prefeitura de Saquarema com o objetivo de discutir caminhos
-            para uma cidade mais sustentável, inovadora e preparada para os
-            desafios do futuro.
+            é um{" "}
+            <strong>desdobramento direto dos Seminários Saquarema 2030</strong>,
+            realizados pela Prefeitura de Saquarema com o objetivo de discutir
+            caminhos para uma cidade mais sustentável, inovadora e preparada
+            para os desafios do futuro.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             A primeira edição do Seminário Saquarema 2030, em maio de 2023,
@@ -120,17 +130,25 @@ export default function EspacoODSPage() {
             Além disso, a plataforma visa:
           </p>
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
-            <li>Incentivar o intercâmbio de experiências entre municípios; </li>
-            <li>Estimular a gestão baseada em evidências e resultados;</li>
-            <li>Fortalecer a transparência e o controle social; </li>
+            <li>
+              Incentivar o{" "}
+              <strong>intercâmbio de experiências entre municípios</strong>;{" "}
+            </li>
+            <li>
+              Estimular a <strong>gestão baseada em evidências</strong> e
+              resultados;
+            </li>
+            <li>
+              Fortalecer a <strong>transparência e o controle social</strong>;{" "}
+            </li>
             <li>
               {" "}
               Engajar cidadãos, escolas, universidades e organizações locais na
-              Agenda 2030;
+              <strong>Agenda 2030</strong>;
             </li>
             <li>
-              Promover a integração de políticas públicas sob a ótica da
-              sustentabilidade, inovação e inclusão.
+              Promover a <strong>integração de políticas públicas </strong> sob
+              a ótica da sustentabilidade, inovação e inclusão.
             </li>
           </ul>
         </section>
@@ -161,18 +179,18 @@ export default function EspacoODSPage() {
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               {" "}
-              A mensuração de resultados de políticas públicas sob o prisma da
-              sustentabilidade;{" "}
+              A <strong>mensuração de resultados </strong> de políticas públicas
+              sob o prisma da sustentabilidade;{" "}
             </li>
             <li>
               {" "}
-              O fortalecimento da governança local, com integração entre
-              secretarias e setores;
+              O <strong>fortalecimento da governança local</strong>, com
+              integração entre secretarias e setores;
             </li>
             <li>
               {" "}
-              A formação de um acervo público de boas práticas, que serve como
-              referência para gestores de outros municípios;
+              <strong>formação de um acervo público de boas práticas</strong>,
+              que serve como referência para gestores de outros municípios;
             </li>
             <li>
               A valorização das ações já existentes, muitas vezes invisíveis à
@@ -209,29 +227,32 @@ export default function EspacoODSPage() {
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               {" "}
-              Ampliação do engajamento dos gestores públicos com a Agenda 2030;{" "}
+              <strong>Ampliação do engajamento</strong> dos gestores públicos
+              com a Agenda 2030;{" "}
             </li>
             <li>
               {" "}
-              Disseminação de conhecimento técnico e metodológico entre
-              municípios;
+              <strong>Disseminação de conhecimento</strong> técnico e
+              metodológico entre municípios;
             </li>
             <li>
               {" "}
-              Fortalecimento da cultura de inovação e sustentabilidade dentro da
-              administração pública;
+              <strong>
+                Fortalecimento da cultura de inovação e sustentabilidade
+              </strong>{" "}
+              dentro da administração pública;
             </li>
             <li>
-              Maior articulação intersetorial, integrando políticas de educação,
-              meio ambiente, economia e governança;
+              <strong>Maior articulação intersetorial</strong>, integrando
+              políticas de educação, meio ambiente, economia e governança;
             </li>
             <li>
-              Aproximação entre governo e sociedade civil, com foco em soluções
-              colaborativas e participativas;
+              <strong>Aproximação entre governo e sociedade civil</strong>, com
+              foco em soluções colaborativas e participativas;
             </li>
             <li>
-              Monitoramento de resultados e acompanhamento do avanço dos ODS em
-              nível municipal.
+              <strong>Monitoramento de resultados</strong> e acompanhamento do
+              avanço dos ODS em nível municipal.
             </li>
           </ul>
         </section>
@@ -278,26 +299,26 @@ export default function EspacoODSPage() {
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               {" "}
-              <span className="text-[#FB9D24] font-semibold">ODS 11</span> —
-              Cidades e Comunidades Sustentáveis: planejamento urbano e
-              qualidade de vida.
-            </li>
-            <li>
-              <span className="text-[#3F7E44] font-semibold">ODS 13</span> —
-              Ação Contra a Mudança do Clima: práticas ambientais e soluções
-              inovadoras.
+              <span className="text-[#18486B] font-semibold">ODS 17</span>
+              <strong> — Parcerias e Meios de Implementação:</strong> cooperação
+              e redes intersetoriais
             </li>
             <li>
               {" "}
-              <span className="text-[#00689D] font-semibold">ODS 16</span> —
-              Paz, Justiça e Instituições Eficazes: transparência e governança
-              pública.
+              <span className="text-[#00689D] font-semibold">ODS 16</span>{" "}
+              <strong>— Paz, Justiça e Instituições Eficazes:</strong>{" "}
+              transparência e governança pública.
             </li>
             <li>
               {" "}
-              <span className="text-[#18486B] font-semibold">ODS 17</span> —
-              Parcerias e Meios de Implementação: cooperação e redes
-              intersetoriais
+              <span className="text-[#FB9D24] font-semibold">ODS 11</span>{" "}
+              <strong>— Cidades e Comunidades Sustentáveis:</strong>{" "}
+              planejamento urbano e qualidade de vida.
+            </li>
+            <li>
+              <span className="text-[#3F7E44] font-semibold">ODS 13</span>
+              <strong> — Ação Contra a Mudança do Clima:</strong> práticas
+              ambientais e soluções inovadoras.
             </li>
           </ul>
 
@@ -319,22 +340,24 @@ export default function EspacoODSPage() {
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               AquitemODS
             </span>
-            , Saquarema reafirma seu papel como cidade inovadora e comprometida
-            com o desenvolvimento sustentável. Cada ação catalogada na
-            plataforma representa um passo em direção a um futuro melhor — um
-            futuro em que políticas públicas, tecnologia e cidadania caminham
-            juntas.
+            , Saquarema reafirma seu papel como{" "}
+            <strong>
+              cidade inovadora e comprometida com o desenvolvimento sustentável.
+            </strong>{" "}
+            Cada ação catalogada na plataforma representa um passo em direção a
+            um futuro melhor — um futuro em que políticas públicas, tecnologia e
+            cidadania caminham juntas.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             Porque, em Saquarema, sustentabilidade não é discurso: é prática, é
             inovação, é compromisso.
           </p>
-          <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            E é por isso que —{" "}
+          <p className="text-gray-700 leading-relaxed text-lg mt-4 flex">
+            E é por isso que —{""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               AquitemODS.
             </span>{" "}
-            💚
+            <Heart size={24} className="inline fill-[#D7386E] text-[#D7386E]" />
           </p>
         </section>
 
@@ -355,7 +378,7 @@ export default function EspacoODSPage() {
                   alt="Logo do Aqui Tem ODS"
                   width={400}
                   height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-auto object-cover transform duration-300"
                 />
               </div>
               <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">

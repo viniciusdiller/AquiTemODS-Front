@@ -10,7 +10,7 @@ const ButtonWrapper: React.FC = () => {
   return (
     <div className="flex items-center justify-center my-auto -mb-10">
       {/* 3. Passe o link desejado como prop para o componente */}
-      <NeumorphismButton href="/../cadastro-mei" />
+      <NeumorphismButton href="/../cadastro-projeto" />
     </div>
   );
 };
