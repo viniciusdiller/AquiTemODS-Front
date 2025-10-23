@@ -13,7 +13,6 @@ import {
 import { Spin, Empty, Button, Input } from "antd";
 import ModernCarousel from "@/components/ModernCarousel";
 import { getProjetosByOds } from "@/lib/api";
-import FormattedDescription from "@/components/FormattedDescription";
 
 const categories = [
   {
@@ -255,10 +254,9 @@ export default function CategoryPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
             {filteredProjetos.length > 0 ? (
               // Grid para os projetos, com 2 colunas em telas médias e acima
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="max-h-[50vh] overflow-y-auto px-2 space-y-4 pb-1 milecem:grid milecem:grid-cols-2 milecem:gap-4 milecem:space-y-0">
                 {filteredProjetos.map((projeto, index) => (
                   <Link
                     href={`/categoria/${slug}/${encodeURIComponent(
@@ -311,7 +309,7 @@ export default function CategoryPage() {
                 Explore outras categorias de ODS
               </p>
             </motion.div>
-            <div className="w-full h-[400px] rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+            <div className="w-full h-[300px] md:h-[500px] rounded-2xl shadow-lg overflow-hidden border border-blue-600">
               <ModernCarousel currentCategoryId={category.id} />
             </div>
           </div>

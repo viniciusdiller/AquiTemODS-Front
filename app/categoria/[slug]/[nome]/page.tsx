@@ -405,7 +405,7 @@ function ProjetoPageContent() {
                     src={
                       (projeto.logoUrl &&
                         `${API_URL}/${normalizeImagePath(projeto.logoUrl)}`) ||
-                      "/placeholder-logo.png"
+                      "/logo_aquitemods.png"
                     }
                     alt={`Logo de ${projeto.nomeProjeto}`}
                     width={500}
