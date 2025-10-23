@@ -1,4 +1,5 @@
 // Espaço dos Aqui Tem ODS React from "react";
+import CarouselSobre from "@/components/CarouselSobre";
 
 export default function EspacoODSPage() {
   return (
@@ -6,7 +7,7 @@ export default function EspacoODSPage() {
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
         {/* --- CABEÇALHO --- */}
         <section className="mb-8">
-          <div className="md:flex md:items-start md:gap-8 lg:gap-12">
+          <div className="md:flex md:items-center md:gap-8 lg:gap-12">
             <div className="md:w-2/3">
               <h1
                 className=" text-4xl font-extrabold mb-6 inline-block pb-2
@@ -47,15 +48,8 @@ export default function EspacoODSPage() {
                 desenvolvimento sustentável de Saquarema e de outros municípios.
               </p>
             </div>
-
             <div className="mt-8 md:mt-0 md:w-1/3 flex-shrink-0">
-              <img
-                src="/Logo_aquitemods.png"
-                alt="Logo dos Objetivos de Desenvolvimento Sustentável"
-                width={400}
-                height={400}
-                className="w-full h-auto rounded-2xl shadow-md mt-10"
-              />
+              <CarouselSobre />
             </div>
           </div>
         </section>
