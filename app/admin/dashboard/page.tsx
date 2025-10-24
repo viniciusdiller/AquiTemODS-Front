@@ -14,9 +14,12 @@ import {
   Empty,
   Typography,
   Image,
-  Alert, // Já estava importado, ótimo!
-  Avatar, // Importando Avatar
-  Table, // Importando Table
+  Alert,
+  Avatar,
+  Table,
+  Form, // NOVO: Importa o Form
+  Input, // NOVO: Importa o Input
+  Select,
 } from "antd";
 import {
   UserAddOutlined,
@@ -24,13 +27,20 @@ import {
   DeleteOutlined,
   CheckOutlined,
   CloseOutlined,
-  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
 
 const { Text, Title } = Typography;
 const { Column } = Table; // Para a tabela de diff
+const { TextArea } = Input; // NOVO: Para o campo de descrição
+const { Option } = Select;
+
+enum StatusProjeto {
+  PENDENTE_APROVACAO = "pendente_aprovacao",
+  PENDENTE_ATUALIZACAO = "pendente_atualizacao",
+  PENDENTE_EXCLUSAO = "pendente_exclusao",
+}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -62,6 +72,27 @@ interface PendingData {
   atualizacoes: Projeto[];
   exclusoes: Projeto[];
 }
+
+const categorias = [
+  "ODS 1 - Erradicação da Pobreza",
+  "ODS 2 - Fome Zero e Agricultura Sustentável",
+  "ODS 3 - Saúde e Bem-estar",
+  "ODS 4 - Educação de Qualidade",
+  "ODS 5 - Igualdade de Gênero",
+  "ODS 6 - Água Potável e Saneamento",
+  "ODS 7 - Energia Acessível e Limpa",
+  "ODS 8 - Trabalho Decente e Crescimento Econômico",
+  "ODS 9 - Indústria, Inovação e Infraestrutura",
+  "ODS 10 - Redução das Desigualdades",
+  "ODS 11 - Cidades e Comunidades Sustentáveis",
+  "ODS 12 - Consumo e Produção Responsáveis",
+  "ODS 13 - Ação Contra a Mudança Global do Clima",
+  "ODS 14 - Vida na Água",
+  "ODS 15 - Vida Terrestre",
+  "ODS 16 - Paz, Justiça e Instituições Eficazes",
+  "ODS 17 - Parcerias e Meios de Implementação",
+  "ODS 18 - Igualdade Étnico/Racial",
+];
 
 const fieldConfig: { [key: string]: { label: string; order: number } } = {
   projetoId: { label: "ID", order: 1 },
@@ -98,6 +129,10 @@ const AdminDashboard: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<Projeto | null>(null);
   const router = useRouter();
   const [isActionLoading, setIsActionLoading] = useState(false);
+
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [editForm] = Form.useForm();
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
@@ -147,6 +182,10 @@ const AdminDashboard: React.FC = () => {
 
     if (typeof value === "object" && value !== null)
       return JSON.stringify(value);
+
+    if (key === "odsRelacionadas" && Array.isArray(value)) {
+      return value.join(", ");
+    }
 
     return String(value);
   };
@@ -214,6 +253,71 @@ const AdminDashboard: React.FC = () => {
   const showModal = (item: Projeto) => {
     setSelectedItem(item);
     setModalVisible(true);
+  };
+
+  const handleOpenEditModal = () => {
+    if (!selectedItem) return;
+
+    let dataToEdit = {};
+
+    if (selectedItem.status === StatusProjeto.PENDENTE_APROVACAO) {
+      dataToEdit = { ...selectedItem };
+    } else if (selectedItem.status === StatusProjeto.PENDENTE_ATUALIZACAO) {
+      // Mescla os dados: base é o item original, atualizações são aplicadas por cima
+      dataToEdit = { ...selectedItem, ...selectedItem.dados_atualizacao };
+    }
+
+    // Converte 'odsRelacionadas' de string para array, se necessário
+    if (typeof (dataToEdit as any).odsRelacionadas === "string") {
+      (dataToEdit as any).odsRelacionadas = (dataToEdit as any).odsRelacionadas
+        .split(",")
+        .map((s: string) => s.trim());
+    }
+
+    editForm.setFieldsValue(dataToEdit);
+    setIsEditModalVisible(true);
+  };
+
+  // NOVO: Função para submeter a edição
+  const handleEditAndApprove = async (values: any) => {
+    if (!selectedItem) return;
+
+    setIsEditLoading(true);
+    const token = localStorage.getItem("admin_token");
+
+    // Converte 'odsRelacionadas' de array para string
+    if (Array.isArray(values.odsRelacionadas)) {
+      values.odsRelacionadas = values.odsRelacionadas.join(", ");
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/admin/edit-and-approve/${selectedItem.projetoId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values), // Envia os dados editados do formulário
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+
+      message.success(result.message || "Projeto editado e aprovado!");
+
+      // Fecha ambos os modais
+      setIsEditModalVisible(false);
+      setModalVisible(false);
+      setSelectedItem(null);
+
+      fetchData(); // Recarrega os dados do dashboard
+    } catch (error: any) {
+      message.error(error.message || "Falha ao editar e aprovar.");
+    } finally {
+      setIsEditLoading(false);
+    }
   };
 
   // ## MELHORIA: Renderiza a tabela de comparação (Diff) ##
@@ -383,17 +487,41 @@ const AdminDashboard: React.FC = () => {
               danger
               loading={isActionLoading}
             >
-              Recusar
-            </Button>,
-            <Button
-              key="confirm"
-              type="primary"
-              onClick={() => handleAction("approve")}
-              icon={<CheckOutlined />}
-              loading={isActionLoading}
-            >
-              Confirmar
-            </Button>,
+              Recusar{" "}
+            </Button>, // Só mostra botões de aprovação se não for exclusão
+            selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO ? (
+              <Button
+                key="approve_direct"
+                onClick={() => handleAction("approve")}
+                icon={<CheckOutlined />}
+                loading={isActionLoading}
+              >
+                Aprovar Direto{" "}
+              </Button>
+            ) : (
+              // Botão de "Confirmar Exclusão"
+              <Button
+                key="approve_delete"
+                type="primary"
+                danger
+                onClick={() => handleAction("approve")}
+                icon={<CheckOutlined />}
+                loading={isActionLoading}
+              >
+                Confirmar Exclusão{" "}
+              </Button>
+            ), // Só mostra "Editar" se não for exclusão
+            selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO && (
+              <Button
+                key="edit_and_approve"
+                type="primary"
+                onClick={handleOpenEditModal} // <-- AQUI ESTÁ A MÁGICA
+                icon={<EditOutlined />}
+                loading={isActionLoading}
+              >
+                Editar{" "}
+              </Button>
+            ),
           ]}
         >
           <Title level={4}>Dados do Projeto</Title>
@@ -453,6 +581,175 @@ const AdminDashboard: React.FC = () => {
           )}
         </Modal>
       )}
+
+      <Modal
+        title="Editar e Aprovar Projeto"
+        open={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        width={900}
+        footer={[
+          <Button key="cancel" onClick={() => setIsEditModalVisible(false)}>
+            Cancelar
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isEditLoading}
+            onClick={() => editForm.submit()} // Aciona o onFinish do Form
+          >
+            Salvar e Aprovar
+          </Button>,
+        ]}
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleEditAndApprove}
+          autoComplete="off"
+        >
+          <Spin spinning={isEditLoading}>
+            <Title level={5} className="mt-4">
+              Informações Principais
+            </Title>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="nomeProjeto"
+                  label="Nome do Projeto"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="ods"
+                  label="ODS Principal"
+                  rules={[{ required: true }]}
+                >
+                  <Select placeholder="Selecione a ODS principal">
+                    {categorias.map((cat) => (
+                      <Option key={cat} value={cat}>
+                        {cat}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="prefeitura"
+                  label="Prefeitura"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="secretaria"
+                  label="Secretaria"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Title level={5} className="mt-4">
+              Contato e Links
+            </Title>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="emailContato"
+                  label="Email de Contato"
+                  rules={[{ required: true, type: "email" }]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="linkProjeto"
+                  label="Link do Projeto"
+                  rules={[{ required: true, type: "url" }]}
+                >
+                  <Input placeholder="http://..." />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="website"
+                  label="Website"
+                  rules={[{ type: "url" }]}
+                >
+                  <Input placeholder="http://..." />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="instagram"
+                  label="Instagram"
+                  rules={[{ type: "url" }]}
+                >
+                  <Input placeholder="http://instagram.com/..." />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item name="endereco" label="Endereço">
+              <Input />
+            </Form.Item>
+
+            <Title level={5} className="mt-4">
+              Detalhes
+            </Title>
+            <Form.Item
+              name="descricaoDiferencial"
+              label="Briefing (Descrição Curta)"
+              rules={[{ required: true }]}
+            >
+              <TextArea rows={2} />
+            </Form.Item>
+            <Form.Item
+              name="descricao"
+              label="Descrição Completa"
+              rules={[{ required: true }]}
+            >
+              <TextArea rows={5} />
+            </Form.Item>
+            <Form.Item name="odsRelacionadas" label="ODS Relacionadas">
+              <Select
+                mode="multiple"
+                placeholder="Selecione as ODS relacionadas"
+              >
+                {/* Lista simplificada de todas as ODS */}
+                {categorias
+                  .map((cat) => cat.split(" - ")[0])
+                  .filter(
+                    (v, i, a) => a.indexOf(v) === i && !v.startsWith("ODS 18")
+                  )
+                  .map((ods) => (
+                    <Option key={ods} value={ods}>
+                      {ods}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+            <Alert
+              message="Aviso sobre Arquivos"
+              description="A 'Nova Logo' e as 'Novas Imagens' enviadas pelo usuário (visíveis na tela anterior) serão aprovadas automaticamente junto com estas edições. Não é possível adicionar novos arquivos nesta tela."
+              type="warning"
+              showIcon
+              className="mt-4"
+            />
+          </Spin>
+        </Form>
+      </Modal>
     </div>
   );
 };
