@@ -14,7 +14,9 @@ import {
   Empty,
   Typography,
   Image,
-  Alert,
+  Alert, // Já estava importado, ótimo!
+  Avatar, // Importando Avatar
+  Table, // Importando Table
 } from "antd";
 import {
   UserAddOutlined,
@@ -28,8 +30,38 @@ import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
 
 const { Text, Title } = Typography;
+const { Column } = Table; // Para a tabela de diff
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Objeto para os ícones dos cards
+const listIcons: { [key: string]: React.ReactNode } = {
+  "Novos Cadastros": <UserAddOutlined style={{ color: "#52c41a" }} />,
+  Atualizações: <EditOutlined style={{ color: "#1890ff" }} />,
+  Exclusões: <DeleteOutlined style={{ color: "#f5222d" }} />,
+};
+
+// ... (fieldConfig, interfaces Imagens, Projeto, PendingData permanecem iguais) ...
+interface Imagens {
+  url: string;
+}
+
+interface Projeto {
+  projetoId: number;
+  nomeProjeto: string;
+  prefeitura: string;
+  logoUrl?: string;
+  projetoImg?: Imagens[];
+  dados_atualizacao?: any;
+  status: string;
+  [key: string]: any;
+}
+
+interface PendingData {
+  cadastros: Projeto[];
+  atualizacoes: Projeto[];
+  exclusoes: Projeto[];
+}
 
 const fieldConfig: { [key: string]: { label: string; order: number } } = {
   projetoId: { label: "ID", order: 1 },
@@ -53,27 +85,7 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   createdAt: { label: "Data de Criação", order: 100 },
   updatedAt: { label: "Última Atualização", order: 101 },
 };
-
-interface Imagens {
-  url: string;
-}
-
-interface Projeto {
-  projetoId: number;
-  nomeProjeto: string;
-  prefeitura: string;
-  logoUrl?: string;
-  projetoImg?: Imagens[];
-  dados_atualizacao?: any;
-  status: string;
-  [key: string]: any;
-}
-
-interface PendingData {
-  cadastros: Projeto[];
-  atualizacoes: Projeto[];
-  exclusoes: Projeto[];
-}
+// ...
 
 const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -97,6 +109,11 @@ const AdminDashboard: React.FC = () => {
   };
 
   const renderValue = (key: string, value: any): React.ReactNode => {
+    // Adicionando um fallback para valores nulos ou vazios
+    if (value === null || value === undefined || value === "") {
+      return <Text type="secondary">Não informado</Text>;
+    }
+
     if (
       (key === "projetoImg" || key === "imagens") &&
       Array.isArray(value) &&
@@ -108,13 +125,15 @@ const AdminDashboard: React.FC = () => {
         .filter(Boolean);
 
       return (
-        <Row gutter={[8, 8]}>
-          {imagesUrls.map((imageUrl, index) => (
-            <Col key={index}>
-              <Image src={imageUrl} alt={`Imagem ${index + 1}`} width={80} />
-            </Col>
-          ))}
-        </Row>
+        <Image.PreviewGroup>
+          <Row gutter={[8, 8]}>
+            {imagesUrls.map((imageUrl, index) => (
+              <Col key={index}>
+                <Image src={imageUrl} alt={`Imagem ${index + 1}`} width={80} />
+              </Col>
+            ))}
+          </Row>
+        </Image.PreviewGroup>
       );
     }
 
@@ -133,6 +152,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   const fetchData = useCallback(async () => {
+    // ... (lógica de fetchData inalterada) ...
     setLoading(true);
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -155,6 +175,7 @@ const AdminDashboard: React.FC = () => {
   }, [fetchData]);
 
   const handleAction = async (action: "approve" | "reject") => {
+    // ... (lógica de handleAction inalterada) ...
     if (!selectedItem) return;
 
     setIsActionLoading(true);
@@ -195,9 +216,115 @@ const AdminDashboard: React.FC = () => {
     setModalVisible(true);
   };
 
+  // ## MELHORIA: Renderiza a tabela de comparação (Diff) ##
+  const renderDiffTable = (
+    status: "pendente_atualizacao" | "pendente_exclusao",
+    alertType: "info" | "error",
+    title: string,
+    keysToFilter: string[] = []
+  ) => {
+    if (
+      !selectedItem ||
+      selectedItem.status !== status ||
+      !selectedItem.dados_atualizacao
+    ) {
+      return null;
+    }
+
+    // Mapa de chaves (como já tínhamos)
+    const keyMap: { [newKey: string]: { oldKey: string; labelKey: string } } = {
+      logo: { oldKey: "logoUrl", labelKey: "logo" },
+      imagens: { oldKey: "projetoImg", labelKey: "projetoImg" },
+    };
+
+    // Prepara os dados para a tabela
+    const diffData = Object.entries(selectedItem.dados_atualizacao)
+      .filter(([key]) => !keysToFilter.includes(key)) // Usa o novo parâmetro
+      .map(([key, newValue]) => {
+        const mapping = keyMap[key];
+        const oldKey = mapping ? mapping.oldKey : key;
+        const labelKey = mapping ? mapping.labelKey : key;
+
+        const oldValue = selectedItem[oldKey];
+        const fieldLabel = fieldConfig[labelKey]?.label ?? `Novo ${key}`;
+
+        let finalLabel = fieldLabel;
+        if (labelKey === "projetoImg") finalLabel = "Portfólio";
+        if (labelKey === "logo") finalLabel = "Logo";
+
+        // Ajusta o label de 'motivo' se for o caso de exclusão
+        if (key === "motivo") finalLabel = "Motivo da Exclusão";
+
+        return {
+          key: oldKey,
+          newKey: key,
+          field: finalLabel,
+          oldValue: oldValue,
+          newValue: newValue,
+        };
+      })
+      .sort(
+        (a, b) =>
+          (fieldConfig[a.newKey]?.order ?? 999) -
+          (fieldConfig[b.newKey]?.order ?? 999)
+      );
+
+    // Define a cor do título com base no tipo de alerta
+    const titleColor = alertType === "info" ? "#0050b3" : "#d4380d"; // Cor de erro do Antd
+
+    return (
+      <Alert
+        type={alertType} // Parâmetro
+        showIcon
+        className="mt-6"
+        style={{ overflow: "hidden" }}
+        message={
+          <Title level={4} style={{ margin: 0, color: titleColor }}>
+            {title} {/* Parâmetro */}
+          </Title>
+        }
+        description={
+          <Table
+            dataSource={diffData}
+            pagination={false}
+            size="middle"
+            bordered
+            className="mt-4"
+            scroll={{ x: true }}
+          >
+            {/* As colunas permanecem exatamente iguais */}
+            <Column title="Campo" dataIndex="field" key="field" width={150} />
+            <Column
+              title="Valor Antigo"
+              dataIndex="oldValue"
+              key="oldValue"
+              width={400} // Usando os valores que ajustamos
+              render={(value, record: any) => renderValue(record.key, value)}
+            />
+            <Column
+              title="Valor Novo"
+              dataIndex="newValue"
+              key="newValue"
+              width={450} // Usando os valores que ajustamos
+              render={(value, record: any) => renderValue(record.newKey, value)}
+            />
+          </Table>
+        }
+      />
+    );
+  };
+
+  // ## MELHORIA: Adiciona ícones e avatares aos cards e listas ##
   const renderList = (title: string, listData: Projeto[]) => (
     <Col xs={24} md={12} lg={8}>
-      <Card title={`${title} (${listData.length})`}>
+      <Card
+        title={
+          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {listIcons[title]}
+            {title} ({listData.length})
+          </span>
+        }
+      >
         {listData.length > 0 ? (
           <List
             dataSource={listData}
@@ -210,6 +337,12 @@ const AdminDashboard: React.FC = () => {
                 ]}
               >
                 <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      src={getFullImageUrl(item.logoUrl || "")}
+                      icon={listIcons[title]} // Icone de fallback
+                    />
+                  }
                   title={item.nomeProjeto}
                   description={`Prefeitura: ${item.prefeitura}`}
                 />
@@ -241,7 +374,7 @@ const AdminDashboard: React.FC = () => {
           title={`Detalhes de ${selectedItem.nomeProjeto}`}
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
-          width={800}
+          width={1000}
           footer={[
             <Button
               key="reject"
@@ -292,7 +425,8 @@ const AdminDashboard: React.FC = () => {
               )
               .map(
                 ([key, value]) =>
-                  value && (
+                  // Removemos a checagem 'value &&' para exibir campos "Não informado"
+                  fieldConfig[key] && ( // Apenas renderiza se estiver no config
                     <Descriptions.Item
                       key={key}
                       label={fieldConfig[key]?.label ?? key}
@@ -303,72 +437,20 @@ const AdminDashboard: React.FC = () => {
               )}
           </Descriptions>
 
-          {selectedItem.status === "pendente_exclusao" &&
-            selectedItem.dados_atualizacao && (
-              <div
-                className="mt-6 p-4 rounded-lg"
-                style={{ backgroundColor: "#fff1f0" }}
-              >
-                {" "}
-                {/* Cor alterada para combinar com o tema 'error' */}
-                <Title level={4} className="text-red-700">
-                  Dados da Solicitação de Exclusão
-                </Title>{" "}
-                {/* Cor alterada */}
-                <Descriptions bordered column={1} size="small" className="mt-2">
-                  {Object.entries(selectedItem.dados_atualizacao)
-                    .filter(
-                      ([key]) => key !== "projetoId" && key !== "confirmacao"
-                    )
-                    .sort(
-                      ([keyA], [keyB]) =>
-                        (fieldConfig[keyA]?.order ?? 999) -
-                        (fieldConfig[keyB]?.order ?? 999)
-                    )
-                    .map(([key, value]) => (
-                      <Descriptions.Item
-                        key={key}
-                        label={fieldConfig[key]?.label ?? key}
-                      >
-                        {/* Trata o motivo opcional diretamente aqui */}
-                        {key === "motivo"
-                          ? renderValue(key, value || "Motivo não informado")
-                          : renderValue(key, value)}
-                      </Descriptions.Item>
-                    ))}
-                </Descriptions>
-              </div>
-            )}
+          {renderDiffTable(
+            "pendente_exclusao",
+            "error",
+            "Solicitação de Exclusão",
+            ["projetoId", "confirmacao"] // Campos do form de exclusão que não queremos mostrar
+          )}
 
-          {selectedItem.status === "pendente_atualizacao" &&
-            selectedItem.dados_atualizacao &&
-            Object.keys(selectedItem.dados_atualizacao).length > 0 && (
-              <div
-                className="mt-6 p-4 rounded-lg"
-                style={{ backgroundColor: "#e6f7ff" }}
-              >
-                <Title level={4} className="text-blue-800">
-                  Dados para Atualizar
-                </Title>
-                <Descriptions bordered column={1} size="small" className="mt-2">
-                  {Object.entries(selectedItem.dados_atualizacao)
-                    .filter(([key]) => key !== "motivoExclusao")
-                    .sort(
-                      ([keyA], [keyB]) =>
-                        (fieldConfig[keyA]?.order ?? 999) -
-                        (fieldConfig[keyB]?.order ?? 999)
-                    )
-                    .map(([key, value]) => (
-                      <Descriptions.Item
-                        key={key}
-                        label={fieldConfig[key]?.label ?? `Novo ${key}`}
-                      >
-                        {renderValue(key, value)}
-                      </Descriptions.Item>
-                    ))}
-                </Descriptions>
-              </div>
-            )}
+          {/* Chamada para a tabela de ATUALIZAÇÃO */}
+          {renderDiffTable(
+            "pendente_atualizacao",
+            "info",
+            "Dados para Atualizar",
+            ["motivoExclusao"] // Campos do form de atualização que não queremos mostrar
+          )}
         </Modal>
       )}
     </div>

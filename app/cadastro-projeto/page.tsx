@@ -999,7 +999,7 @@ const CadastroProjetoPage: React.FC = () => {
               rules={[
                 {
                   required: true,
-                  message: "O CF é  inválido!",
+                  message: "É necessário preencher este campo!",
                 },
               ]}
             >
