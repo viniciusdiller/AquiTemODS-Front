@@ -187,3 +187,36 @@ export function formatarDataParaMesAno(dateString: string): string {
     year: "numeric",
   }).format(data);
 }
+
+export const getAllActiveProjetos = async (token: string) => {
+  const response = await fetch(`${API_URL}/api/admin/projetos-ativos`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Falha ao buscar projetos ativos");
+  }
+  return response.json();
+};
+
+export const adminUpdateProjeto = async (
+  id: number,
+  data: any,
+  token: string
+) => {
+  const response = await fetch(`${API_URL}/api/admin/projeto/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha ao atualizar projeto");
+  }
+  return response.json();
+};

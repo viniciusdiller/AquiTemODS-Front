@@ -27,13 +27,17 @@ import {
   DeleteOutlined,
   CheckOutlined,
   CloseOutlined,
+  DatabaseOutlined,
 } from "@ant-design/icons";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
+import AdminProjetoModal from "@/components/AdminProjetoModal";
+import { Projeto } from "@/types/Interface-Projeto"; // (Precisa criar ou ajustar este type)
 
 const { Text, Title } = Typography;
-const { Column } = Table; // Para a tabela de diff
-const { TextArea } = Input; // NOVO: Para o campo de descrição
+const { Column } = Table;
+const { TextArea } = Input;
 const { Option } = Select;
 
 enum StatusProjeto {
@@ -50,22 +54,6 @@ const listIcons: { [key: string]: React.ReactNode } = {
   Atualizações: <EditOutlined style={{ color: "#1890ff" }} />,
   Exclusões: <DeleteOutlined style={{ color: "#f5222d" }} />,
 };
-
-// ... (fieldConfig, interfaces Imagens, Projeto, PendingData permanecem iguais) ...
-interface Imagens {
-  url: string;
-}
-
-interface Projeto {
-  projetoId: number;
-  nomeProjeto: string;
-  prefeitura: string;
-  logoUrl?: string;
-  projetoImg?: Imagens[];
-  dados_atualizacao?: any;
-  status: string;
-  [key: string]: any;
-}
 
 interface PendingData {
   cadastros: Projeto[];
@@ -131,8 +119,6 @@ const AdminDashboard: React.FC = () => {
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isEditLoading, setIsEditLoading] = useState(false);
-  const [editForm] = Form.useForm();
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
@@ -257,37 +243,23 @@ const AdminDashboard: React.FC = () => {
 
   const handleOpenEditModal = () => {
     if (!selectedItem) return;
-
-    let dataToEdit = {};
-
-    if (selectedItem.status === StatusProjeto.PENDENTE_APROVACAO) {
-      dataToEdit = { ...selectedItem };
-    } else if (selectedItem.status === StatusProjeto.PENDENTE_ATUALIZACAO) {
-      // Mescla os dados: base é o item original, atualizações são aplicadas por cima
-      dataToEdit = { ...selectedItem, ...selectedItem.dados_atualizacao };
-    }
-
-    // Converte 'odsRelacionadas' de string para array, se necessário
-    if (typeof (dataToEdit as any).odsRelacionadas === "string") {
-      (dataToEdit as any).odsRelacionadas = (dataToEdit as any).odsRelacionadas
-        .split(",")
-        .map((s: string) => s.trim());
-    }
-
-    editForm.setFieldsValue(dataToEdit);
     setIsEditModalVisible(true);
   };
 
-  // NOVO: Função para submeter a edição
-  const handleEditAndApprove = async (values: any) => {
+  const handleEditAndApproveSubmit = async (values: any) => {
     if (!selectedItem) return;
 
-    setIsEditLoading(true);
-    const token = localStorage.getItem("admin_token");
+    // A lógica de submit (fetch) permanece aqui por enquanto
+    // (ou pode ser movida para o AdminProjetoModal, como fizemos na Etapa 3)
+    // Vamos seguir o que fizemos na Etapa 3, onde a lógica de submit está no modal.
+    // Esta função será passada como prop.
 
-    // Converte 'odsRelacionadas' de array para string
-    if (Array.isArray(values.odsRelacionadas)) {
-      values.odsRelacionadas = values.odsRelacionadas.join(", ");
+    setIsActionLoading(true); // Reutiliza o estado de loading
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
+      message.error("Autenticação expirada.");
+      setIsActionLoading(false);
+      return;
     }
 
     try {
@@ -299,27 +271,25 @@ const AdminDashboard: React.FC = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(values), // Envia os dados editados do formulário
+          body: JSON.stringify(values),
         }
       );
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
 
-      message.success(result.message || "Projeto editado e aprovado!");
-
+      // A mensagem de sucesso é mostrada pelo modal
       // Fecha ambos os modais
       setIsEditModalVisible(false);
       setModalVisible(false);
       setSelectedItem(null);
-
-      fetchData(); // Recarrega os dados do dashboard
+      fetchData(); // Recarrega os dados
     } catch (error: any) {
-      message.error(error.message || "Falha ao editar e aprovar.");
+      setIsActionLoading(false); // Garante que o loading pare em caso de erro
+      throw error; // Lança o erro para o modal (AdminProjetoModal) tratar
     } finally {
-      setIsEditLoading(false);
+      setIsActionLoading(false);
     }
   };
-
   // ## MELHORIA: Renderiza a tabela de comparação (Diff) ##
   const renderDiffTable = (
     status: "pendente_atualizacao" | "pendente_exclusao",
@@ -463,9 +433,19 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="p-8">
       <Spin spinning={loading}>
-        <Title level={2} className="mb-6">
-          Painel de Administração
-        </Title>
+        <div className="flex justify-between items-center mb-6">
+          <Title level={2} className="m-0">
+            Painel de Administração
+          </Title>
+          {/* --- BOTÃO NOVO ADICIONADO AQUI --- */}
+          <Link href="/admin/projetos-ativos" passHref>
+            <Button type="primary" icon={<DatabaseOutlined />} size="large">
+              Gerenciar Projetos Ativos
+            </Button>
+          </Link>
+        </div>
+        {/* --- FIM DO BOTÃO NOVO --- */}
+
         <Row gutter={[16, 16]}>
           {renderList("Novos Cadastros", data.cadastros)}
           {renderList("Atualizações", data.atualizacoes)}
@@ -479,6 +459,7 @@ const AdminDashboard: React.FC = () => {
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           width={1000}
+          // O footer JÁ ESTÁ CORRETO (da nossa modificação anterior)
           footer={[
             <Button
               key="reject"
@@ -487,8 +468,8 @@ const AdminDashboard: React.FC = () => {
               danger
               loading={isActionLoading}
             >
-              Recusar{" "}
-            </Button>, // Só mostra botões de aprovação se não for exclusão
+              Recusar
+            </Button>,
             selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO ? (
               <Button
                 key="approve_direct"
@@ -496,10 +477,9 @@ const AdminDashboard: React.FC = () => {
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
               >
-                Aprovar Direto{" "}
+                Aprovar Direto
               </Button>
             ) : (
-              // Botão de "Confirmar Exclusão"
               <Button
                 key="approve_delete"
                 type="primary"
@@ -508,22 +488,23 @@ const AdminDashboard: React.FC = () => {
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
               >
-                Confirmar Exclusão{" "}
+                Confirmar Exclusão
               </Button>
-            ), // Só mostra "Editar" se não for exclusão
+            ),
             selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO && (
               <Button
                 key="edit_and_approve"
                 type="primary"
-                onClick={handleOpenEditModal} // <-- AQUI ESTÁ A MÁGICA
+                onClick={handleOpenEditModal} // <-- Isso abre o modal de edição
                 icon={<EditOutlined />}
                 loading={isActionLoading}
               >
-                Editar{" "}
+                Editar e Aprovar
               </Button>
             ),
           ]}
         >
+          {/* ... (Conteúdo do Modal: Descriptions e renderDiffTable permanecem iguais) ... */}
           <Title level={4}>Dados do Projeto</Title>
           <Descriptions bordered column={1} size="small">
             {selectedItem.logoUrl && (
@@ -553,8 +534,7 @@ const AdminDashboard: React.FC = () => {
               )
               .map(
                 ([key, value]) =>
-                  // Removemos a checagem 'value &&' para exibir campos "Não informado"
-                  fieldConfig[key] && ( // Apenas renderiza se estiver no config
+                  fieldConfig[key] && (
                     <Descriptions.Item
                       key={key}
                       label={fieldConfig[key]?.label ?? key}
@@ -569,187 +549,33 @@ const AdminDashboard: React.FC = () => {
             "pendente_exclusao",
             "error",
             "Solicitação de Exclusão",
-            ["projetoId", "confirmacao"] // Campos do form de exclusão que não queremos mostrar
+            ["projetoId", "confirmacao"]
           )}
 
-          {/* Chamada para a tabela de ATUALIZAÇÃO */}
           {renderDiffTable(
             "pendente_atualizacao",
             "info",
             "Dados para Atualizar",
-            ["motivoExclusao"] // Campos do form de atualização que não queremos mostrar
+            ["motivoExclusao"]
           )}
         </Modal>
       )}
 
-      <Modal
-        title="Editar e Aprovar Projeto"
-        open={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
-        width={900}
-        footer={[
-          <Button key="cancel" onClick={() => setIsEditModalVisible(false)}>
-            Cancelar
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            loading={isEditLoading}
-            onClick={() => editForm.submit()} // Aciona o onFinish do Form
-          >
-            Salvar e Aprovar
-          </Button>,
-        ]}
-      >
-        <Form
-          form={editForm}
-          layout="vertical"
-          onFinish={handleEditAndApprove}
-          autoComplete="off"
-        >
-          <Spin spinning={isEditLoading}>
-            <Title level={5} className="mt-4">
-              Informações Principais
-            </Title>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="nomeProjeto"
-                  label="Nome do Projeto"
-                  rules={[{ required: true }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="ods"
-                  label="ODS Principal"
-                  rules={[{ required: true }]}
-                >
-                  <Select placeholder="Selecione a ODS principal">
-                    {categorias.map((cat) => (
-                      <Option key={cat} value={cat}>
-                        {cat}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="prefeitura"
-                  label="Prefeitura"
-                  rules={[{ required: true }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="secretaria"
-                  label="Secretaria"
-                  rules={[{ required: true }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Title level={5} className="mt-4">
-              Contato e Links
-            </Title>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="emailContato"
-                  label="Email de Contato"
-                  rules={[{ required: true, type: "email" }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="linkProjeto"
-                  label="Link do Projeto"
-                  rules={[{ required: true, type: "url" }]}
-                >
-                  <Input placeholder="http://..." />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="website"
-                  label="Website"
-                  rules={[{ type: "url" }]}
-                >
-                  <Input placeholder="http://..." />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="instagram"
-                  label="Instagram"
-                  rules={[{ type: "url" }]}
-                >
-                  <Input placeholder="http://instagram.com/..." />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Form.Item name="endereco" label="Endereço">
-              <Input />
-            </Form.Item>
-
-            <Title level={5} className="mt-4">
-              Detalhes
-            </Title>
-            <Form.Item
-              name="descricaoDiferencial"
-              label="Briefing (Descrição Curta)"
-              rules={[{ required: true }]}
-            >
-              <TextArea rows={2} />
-            </Form.Item>
-            <Form.Item
-              name="descricao"
-              label="Descrição Completa"
-              rules={[{ required: true }]}
-            >
-              <TextArea rows={5} />
-            </Form.Item>
-            <Form.Item name="odsRelacionadas" label="ODS Relacionadas">
-              <Select
-                mode="multiple"
-                placeholder="Selecione as ODS relacionadas"
-              >
-                {/* Lista simplificada de todas as ODS */}
-                {categorias
-                  .map((cat) => cat.split(" - ")[0])
-                  .filter(
-                    (v, i, a) => a.indexOf(v) === i && !v.startsWith("ODS 18")
-                  )
-                  .map((ods) => (
-                    <Option key={ods} value={ods}>
-                      {ods}
-                    </Option>
-                  ))}
-              </Select>
-            </Form.Item>
-            <Alert
-              message="Aviso sobre Arquivos"
-              description="A 'Nova Logo' e as 'Novas Imagens' enviadas pelo usuário (visíveis na tela anterior) serão aprovadas automaticamente junto com estas edições. Não é possível adicionar novos arquivos nesta tela."
-              type="warning"
-              showIcon
-              className="mt-4"
-            />
-          </Spin>
-        </Form>
-      </Modal>
+      {/* --- NOVO: MODAL DE EDIÇÃO --- */}
+      <AdminProjetoModal
+        projeto={selectedItem}
+        visible={isEditModalVisible}
+        onClose={(shouldRefresh) => {
+          setIsEditModalVisible(false);
+          if (shouldRefresh) {
+            setModalVisible(false); // Fecha o modal de detalhes também
+            setSelectedItem(null);
+            fetchData();
+          }
+        }}
+        mode="edit-and-approve"
+        onEditAndApprove={handleEditAndApproveSubmit}
+      />
     </div>
   );
 };
