@@ -39,7 +39,7 @@ const { TabPane } = Tabs;
 const { useBreakpoint } = Grid;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const PAGE_SIZE = 6; // 2. DEFINIR TAMANHO DA PÁGINA (ex: 6 projetos por página)
+const PAGE_SIZE = 6;
 
 const getFullImageUrl = (path: string): string => {
   if (!path) return "";
@@ -56,7 +56,7 @@ const ProjetosAtivosPage: React.FC = () => {
   const [filteredProjetos, setFilteredProjetos] = useState<Projeto[]>([]);
   const [selectedItem, setSelectedItem] = useState<Projeto | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // 3. ESTADO DA PÁGINA ATUAL
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const screens = useBreakpoint();
 
@@ -92,7 +92,7 @@ const ProjetosAtivosPage: React.FC = () => {
         p.secretaria.toLowerCase().includes(lowerCaseValue)
     );
     setFilteredProjetos(filtered);
-    setCurrentPage(1); // Reseta a página ao buscar
+    setCurrentPage(1);
   };
 
   const openEditModal = (projeto: Projeto) => {
@@ -166,7 +166,7 @@ const ProjetosAtivosPage: React.FC = () => {
       <Search
         placeholder="Buscar por nome, prefeitura ou secretaria..."
         onSearch={handleSearch}
-        onChange={(e) => handleSearch(e.target.value)} // Busca em tempo real
+        onChange={(e) => handleSearch(e.target.value)}
         enterButton
         size="large"
         className="mb-6"
@@ -202,9 +202,10 @@ const ProjetosAtivosPage: React.FC = () => {
                             hoverable
                             actions={[
                               <Button
-                                type="link"
+                                type="text"
                                 icon={<EditOutlined />}
                                 onClick={() => openEditModal(projeto)}
+                                className="hover:!bg-blue-500 hover:!text-white"
                               >
                                 Editar
                               </Button>,
@@ -220,9 +221,10 @@ const ProjetosAtivosPage: React.FC = () => {
                                 okButtonProps={{ danger: true }}
                               >
                                 <Button
-                                  type="link"
+                                  type="text"
                                   danger
                                   icon={<DeleteOutlined />}
+                                  className="hover:!bg-red-500 hover:!text-white"
                                 >
                                   Excluir
                                 </Button>

@@ -2,12 +2,15 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "./navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { ConditionalFooter } from "@/components/ConditionalFooter";
-import AccessibilityFeatures from "@/components/AccessibilityFeatures";
 import AccessibilityStyles from "@/components/AccessibilityStyles"; // 1. IMPORTE O NOVO COMPONENTE
+import { ConditionalNavbar } from "@/components/ConditionalNavbar";
+import { ConditionalAccessibility } from "@/components/ConditionalAccessibility";
+
+import { ConfigProvider } from "antd";
+import ptBR from "antd/locale/pt_BR";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,7 +27,7 @@ export const metadata: Metadata = {
     title: "Aqui Tem ODS",
     description:
       "Seu guia completo para explorar e conhecer os projetos que movimentam a economia do Rio de Janeiro.",
-    url: "https://explora-saqua.vercel.app/",
+    url: "https://aquitemods.saquarema.rj.gov.br/",
     siteName: "AquiTemODS",
     images: [
       {
@@ -46,18 +49,29 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <AccessibilityStyles /> {/* 2. ADICIONE O COMPONENTE DE ESTILOS AQUI */}
+        <AccessibilityStyles />
       </head>
       <body
         className={`${poppins.variable} bg-white flex flex-col min-h-screen`}
       >
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <ConditionalFooter />
-          <Toaster richColors />
-          <AccessibilityFeatures />
-        </AuthProvider>
+        <ConfigProvider
+          locale={ptBR}
+          theme={{
+            token: {
+              colorPrimary: "#D7386E",
+
+              colorLink: "#3C6AB2",
+            },
+          }}
+        >
+          <AuthProvider>
+            <ConditionalNavbar />
+            <main className="flex-grow">{children}</main>
+            <ConditionalFooter />
+            <Toaster richColors />
+            <ConditionalAccessibility />
+          </AuthProvider>
+        </ConfigProvider>
       </body>
     </html>
   );

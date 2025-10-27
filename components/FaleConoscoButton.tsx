@@ -17,7 +17,7 @@ const FaleConoscoButton = () => {
         <TooltipTrigger asChild>
           <Link
             href="mailto:aquitemods@gmail.com"
-            className="hidden sm:flex fixed bottom-8 left-8 z-50 p-4 bg-[#D7386E]  text-white rounded-full shadow-lg hover:bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] transition-colors duration-300 items-center justify-center"
+            className="hidden sm:flex fixed bottom-5 left-8 z-50 p-3 bg-[#D7386E]  text-white rounded-full shadow-lg hover:bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] transition-colors duration-300 items-center justify-center"
             aria-label="Fale Conosco"
           >
             <MessageCircleQuestion size={28} />

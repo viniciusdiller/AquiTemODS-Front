@@ -34,7 +34,7 @@
 .leaflet-popup-content-wrapper {
   border-radius: 0.5rem !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-              0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
 .leaflet-popup-tip {
@@ -70,13 +70,24 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(142, 155, 161, 0.4); /* tom do seu azul (#017DB9) com opacidade */
+  /* COR ATUALIZADA AQUI */
+  background: rgba(
+    215,
+    56,
+    110,
+    0.5
+  ); /* tom do seu rosa (#D7386E) com opacidade */
   border-radius: 8px;
   transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(130, 138, 141, 0.6);
+  background: rgba(
+    215,
+    56,
+    110,
+    0.7
+  ); /* tom do seu rosa (#D7386E) com mais opacidade */
 }
 
 .fade-bottom-mask {
@@ -86,15 +97,14 @@
 /* Garante que o conteúdo dentro do popup não tenha margens estranhas */
 .leaflet-popup-content {
   margin: 0 !important;
-  font-family: inherit; 
-  padding: 1rem; 
+  font-family: inherit;
+  padding: 1rem;
 }
 
 .leaflet-container a.leaflet-popup-close-button {
   display: none;
 }
 /* Estilos da barra de rolagem para Firefox */
-
 
 @keyframes slide-down {
   from {
@@ -109,4 +119,17 @@
 
 .animate-slide-down {
   animation: slide-down 0.3s ease-out;
+}
+
+/*TOOLTIP*/
+@layer base {
+  :root {
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 339 65% 53%;
+  }
 }
