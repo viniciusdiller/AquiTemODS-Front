@@ -17,9 +17,9 @@ import {
   Alert,
   Avatar,
   Table,
-  Form, // NOVO: Importa o Form
-  Input, // NOVO: Importa o Input
+  Input,
   Select,
+  Pagination,
 } from "antd";
 import {
   UserAddOutlined,
@@ -48,6 +48,8 @@ enum StatusProjeto {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+const DASHBOARD_PAGE_SIZE = 5;
+
 // Objeto para os ícones dos cards
 const listIcons: { [key: string]: React.ReactNode } = {
   "Novos Cadastros": <UserAddOutlined style={{ color: "#52c41a" }} />,
@@ -61,27 +63,6 @@ interface PendingData {
   exclusoes: Projeto[];
 }
 
-const categorias = [
-  "ODS 1 - Erradicação da Pobreza",
-  "ODS 2 - Fome Zero e Agricultura Sustentável",
-  "ODS 3 - Saúde e Bem-estar",
-  "ODS 4 - Educação de Qualidade",
-  "ODS 5 - Igualdade de Gênero",
-  "ODS 6 - Água Potável e Saneamento",
-  "ODS 7 - Energia Acessível e Limpa",
-  "ODS 8 - Trabalho Decente e Crescimento Econômico",
-  "ODS 9 - Indústria, Inovação e Infraestrutura",
-  "ODS 10 - Redução das Desigualdades",
-  "ODS 11 - Cidades e Comunidades Sustentáveis",
-  "ODS 12 - Consumo e Produção Responsáveis",
-  "ODS 13 - Ação Contra a Mudança Global do Clima",
-  "ODS 14 - Vida na Água",
-  "ODS 15 - Vida Terrestre",
-  "ODS 16 - Paz, Justiça e Instituições Eficazes",
-  "ODS 17 - Parcerias e Meios de Implementação",
-  "ODS 18 - Igualdade Étnico/Racial",
-];
-
 const fieldConfig: { [key: string]: { label: string; order: number } } = {
   projetoId: { label: "ID", order: 1 },
   ods: { label: "ODS", order: 4 },
@@ -91,7 +72,7 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   emailContato: { label: "Email", order: 20 },
   endereco: { label: "Endereço", order: 22 },
   descricao: { label: "Descrição", order: 30 },
-  descricaoDiferencial: { label: "Diferencial", order: 31 },
+  descricaoDiferencial: { label: "Briefing", order: 31 },
   website: { label: "Website", order: 40 },
   odsRelacionadas: { label: "ODS Relacionadas", order: 50 },
   instagram: { label: "Instagram", order: 41 },
@@ -104,7 +85,6 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   createdAt: { label: "Data de Criação", order: 100 },
   updatedAt: { label: "Última Atualização", order: 101 },
 };
-// ...
 
 const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -119,6 +99,12 @@ const AdminDashboard: React.FC = () => {
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
+  const [currentPages, setCurrentPages] = useState({
+    cadastros: 1,
+    atualizacoes: 1,
+    exclusoes: 1,
+  });
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
@@ -188,6 +174,11 @@ const AdminDashboard: React.FC = () => {
     try {
       const pendingData = await getPendingAdminRequests(token);
       setData(pendingData);
+      setCurrentPages({
+        cadastros: 1,
+        atualizacoes: 1,
+        exclusoes: 1,
+      });
     } catch (error: any) {
       message.error(error.message || "Falha ao buscar dados.");
     } finally {
@@ -226,6 +217,14 @@ const AdminDashboard: React.FC = () => {
         });
         return newData;
       });
+
+      if (selectedItem.status === StatusProjeto.PENDENTE_APROVACAO) {
+        handlePageChange("cadastros")(1);
+      } else if (selectedItem.status === StatusProjeto.PENDENTE_ATUALIZACAO) {
+        handlePageChange("atualizacoes")(1);
+      } else if (selectedItem.status === StatusProjeto.PENDENTE_EXCLUSAO) {
+        handlePageChange("exclusoes")(1);
+      }
 
       setModalVisible(false);
       setSelectedItem(null);
@@ -388,47 +387,85 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
+  const handlePageChange = (listKey: keyof PendingData) => (page: number) => {
+    setCurrentPages((prev) => ({
+      ...prev,
+      [listKey]: page,
+    }));
+  };
+
   // ## MELHORIA: Adiciona ícones e avatares aos cards e listas ##
-  const renderList = (title: string, listData: Projeto[]) => (
-    <Col xs={24} md={12} lg={8}>
-      <Card
-        title={
-          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {listIcons[title]}
-            {title} ({listData.length})
-          </span>
-        }
-      >
-        {listData.length > 0 ? (
-          <List
-            dataSource={listData}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Button type="link" onClick={() => showModal(item)}>
-                    Detalhes
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      src={getFullImageUrl(item.logoUrl || "")}
-                      icon={listIcons[title]} // Icone de fallback
+  const renderList = (
+    title: string,
+    listData: Projeto[],
+    listKey: keyof PendingData
+  ) => {
+    // 8. NOVO: Lógica de paginação
+    const totalCount = listData.length;
+    const currentPage = currentPages[listKey];
+    const pagedData = listData.slice(
+      (currentPage - 1) * DASHBOARD_PAGE_SIZE,
+      currentPage * DASHBOARD_PAGE_SIZE
+    );
+
+    return (
+      <Col xs={24} md={12} lg={8}>
+        <Card
+          title={
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {listIcons[title]}
+              {title} ({listData.length})
+            </span>
+          }
+        >
+          {listData.length > 0 ? (
+            <>
+              {" "}
+              {/* 9. NOVO: Adiciona Fragmento para agrupar Lista e Paginação */}
+              <List
+                dataSource={pagedData} // 10. NOVO: Usa 'pagedData' em vez de 'listData'
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[
+                      <Button type="link" onClick={() => showModal(item)}>
+                        Detalhes
+                      </Button>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar
+                          src={getFullImageUrl(item.logoUrl || "")}
+                          icon={listIcons[title]} // Icone de fallback
+                        />
+                      }
+                      title={item.nomeProjeto}
+                      description={`Prefeitura: ${item.prefeitura}`}
                     />
-                  }
-                  title={item.nomeProjeto}
-                  description={`Prefeitura: ${item.prefeitura}`}
-                />
-              </List.Item>
-            )}
-          />
-        ) : (
-          <Empty description="Nenhuma solicitação" />
-        )}
-      </Card>
-    </Col>
-  );
+                  </List.Item>
+                )}
+              />
+              {/* 11. NOVO: Renderiza a paginação se houver mais de uma página */}
+              {totalCount > DASHBOARD_PAGE_SIZE && (
+                <div className="mt-4 text-center">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={DASHBOARD_PAGE_SIZE}
+                    total={totalCount}
+                    onChange={handlePageChange(listKey)}
+                    size="small"
+                    showSizeChanger={false}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <Empty description="Nenhuma solicitação" />
+          )}
+        </Card>
+      </Col>
+    );
+  };
 
   return (
     <div className="p-8">
@@ -437,19 +474,18 @@ const AdminDashboard: React.FC = () => {
           <Title level={2} className="m-0">
             Painel de Administração
           </Title>
-          {/* --- BOTÃO NOVO ADICIONADO AQUI --- */}
           <Link href="/admin/projetos-ativos" passHref>
             <Button type="primary" icon={<DatabaseOutlined />} size="large">
               Gerenciar Projetos Ativos
             </Button>
           </Link>
         </div>
-        {/* --- FIM DO BOTÃO NOVO --- */}
 
         <Row gutter={[16, 16]}>
-          {renderList("Novos Cadastros", data.cadastros)}
-          {renderList("Atualizações", data.atualizacoes)}
-          {renderList("Exclusões", data.exclusoes)}
+          {/* 12. NOVO: Passa a 'listKey' para a função renderList */}
+          {renderList("Novos Cadastros", data.cadastros, "cadastros")}
+          {renderList("Atualizações", data.atualizacoes, "atualizacoes")}
+          {renderList("Exclusões", data.exclusoes, "exclusoes")}
         </Row>
       </Spin>
 
@@ -470,9 +506,25 @@ const AdminDashboard: React.FC = () => {
             >
               Recusar
             </Button>,
+
+            // 2. EDITAR (Branco) - Movido para o meio e 'type' removido (para ser 'default')
+            selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO && (
+              <Button
+                key="edit_and_approve"
+                onClick={handleOpenEditModal}
+                icon={<EditOutlined />}
+                loading={isActionLoading}
+                // 'type="primary"' removido para ficar branco (default)
+              >
+                Editar Informações
+              </Button>
+            ),
+
+            // 3. APROVAR (Azul) - Movido para o final e 'type="primary"' adicionado
             selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO ? (
               <Button
                 key="approve_direct"
+                type="primary" // Adicionado para ficar azul
                 onClick={() => handleAction("approve")}
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
@@ -483,7 +535,7 @@ const AdminDashboard: React.FC = () => {
               <Button
                 key="approve_delete"
                 type="primary"
-                danger
+                danger // Manter 'danger' aqui faz sentido, pois é uma exclusão
                 onClick={() => handleAction("approve")}
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
@@ -491,20 +543,8 @@ const AdminDashboard: React.FC = () => {
                 Confirmar Exclusão
               </Button>
             ),
-            selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO && (
-              <Button
-                key="edit_and_approve"
-                type="primary"
-                onClick={handleOpenEditModal} // <-- Isso abre o modal de edição
-                icon={<EditOutlined />}
-                loading={isActionLoading}
-              >
-                Editar e Aprovar
-              </Button>
-            ),
           ]}
         >
-          {/* ... (Conteúdo do Modal: Descriptions e renderDiffTable permanecem iguais) ... */}
           <Title level={4}>Dados do Projeto</Title>
           <Descriptions bordered column={1} size="small">
             {selectedItem.logoUrl && (

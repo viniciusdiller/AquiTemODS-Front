@@ -15,6 +15,8 @@ import {
   Tabs,
   Input,
   Popconfirm,
+  Grid,
+  Pagination, // 1. IMPORTAR PAGINATION
 } from "antd";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -25,7 +27,7 @@ import {
 } from "@ant-design/icons";
 import {
   getAllActiveProjetos,
-  adminUpdateProjeto, // Importação mantida, embora não usada diretamente aqui
+  adminUpdateProjeto,
   adminDeleteProjeto,
 } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
@@ -34,8 +36,10 @@ import { Projeto } from "@/types/Interface-Projeto";
 const { Title, Text } = Typography;
 const { Search } = Input;
 const { TabPane } = Tabs;
+const { useBreakpoint } = Grid;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const PAGE_SIZE = 6; // 2. DEFINIR TAMANHO DA PÁGINA (ex: 6 projetos por página)
 
 const getFullImageUrl = (path: string): string => {
   if (!path) return "";
@@ -52,7 +56,9 @@ const ProjetosAtivosPage: React.FC = () => {
   const [filteredProjetos, setFilteredProjetos] = useState<Projeto[]>([]);
   const [selectedItem, setSelectedItem] = useState<Projeto | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // 3. ESTADO DA PÁGINA ATUAL
   const router = useRouter();
+  const screens = useBreakpoint();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -86,6 +92,7 @@ const ProjetosAtivosPage: React.FC = () => {
         p.secretaria.toLowerCase().includes(lowerCaseValue)
     );
     setFilteredProjetos(filtered);
+    setCurrentPage(1); // Reseta a página ao buscar
   };
 
   const openEditModal = (projeto: Projeto) => {
@@ -101,7 +108,6 @@ const ProjetosAtivosPage: React.FC = () => {
     }
   };
 
-  // NOVO: Função para excluir o projeto diretamente do card
   const handleDelete = async (projetoId: number) => {
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -109,15 +115,20 @@ const ProjetosAtivosPage: React.FC = () => {
       return;
     }
 
-    setLoading(true); // Ativa o spinner global
+    setLoading(true);
     try {
       await adminDeleteProjeto(projetoId, token);
       message.success("Projeto excluído com sucesso!");
-      fetchData(); // Recarrega a lista de projetos
+      fetchData();
     } catch (error: any) {
       message.error(error.message || "Falha ao excluir o projeto.");
-      setLoading(false); // Desativa o spinner em caso de erro
+      setLoading(false);
     }
+  };
+
+  // 4. FUNÇÃO PARA RESETAR PÁGINA AO TROCAR DE ABA
+  const handleTabChange = () => {
+    setCurrentPage(1);
   };
 
   // Agrupa os projetos por ODS
@@ -138,8 +149,10 @@ const ProjetosAtivosPage: React.FC = () => {
     return a.localeCompare(b);
   });
 
+  const tabPosition = screens.md ? "left" : "top";
+
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <Link href="/admin/dashboard" passHref>
         <Button icon={<ArrowLeftOutlined />} type="text" className="mb-4">
           Voltar ao Dashboard
@@ -165,72 +178,98 @@ const ProjetosAtivosPage: React.FC = () => {
         ) : (
           <Tabs
             defaultActiveKey="ODS 1 - Erradicação da Pobreza"
-            tabPosition="left"
+            tabPosition={tabPosition}
+            onChange={handleTabChange} // 4. ADICIONADO onChange
           >
-            {sortedCategories.map((ods) => (
-              <TabPane
-                tab={`${ods} (${groupedProjetos[ods].length})`}
-                key={ods}
-              >
-                <Row gutter={[16, 16]}>
-                  {groupedProjetos[ods].map((projeto) => (
-                    <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
-                      <Card
-                        hoverable
-                        actions={[
-                          <Button
-                            type="link"
-                            icon={<EditOutlined />}
-                            onClick={() => openEditModal(projeto)}
+            {sortedCategories.map((ods) => {
+              // 5. LÓGICA DE PAGINAÇÃO POR ABA
+              const allProjetosForOds = groupedProjetos[ods];
+              const totalCount = allProjetosForOds.length;
+              const projetosToShow = allProjetosForOds.slice(
+                (currentPage - 1) * PAGE_SIZE,
+                currentPage * PAGE_SIZE
+              );
+
+              return (
+                <TabPane tab={`${ods} (${allProjetosForOds.length})`} key={ods}>
+                  <Row gutter={[16, 16]}>
+                    {projetosToShow.map(
+                      (
+                        projeto // Mapeia apenas 'projetosToShow'
+                      ) => (
+                        <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+                          <Card
+                            hoverable
+                            actions={[
+                              <Button
+                                type="link"
+                                icon={<EditOutlined />}
+                                onClick={() => openEditModal(projeto)}
+                              >
+                                Editar
+                              </Button>,
+                              <Popconfirm
+                                key="delete"
+                                title="Excluir Projeto"
+                                description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
+                                onConfirm={() =>
+                                  handleDelete(projeto.projetoId)
+                                }
+                                okText="Sim, Excluir"
+                                cancelText="Não"
+                                okButtonProps={{ danger: true }}
+                              >
+                                <Button
+                                  type="link"
+                                  danger
+                                  icon={<DeleteOutlined />}
+                                >
+                                  Excluir
+                                </Button>
+                              </Popconfirm>,
+                            ]}
                           >
-                            Editar
-                          </Button>,
-                          // NOVO: Botão de excluir com confirmação
-                          <Popconfirm
-                            key="delete"
-                            title="Excluir Projeto"
-                            description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
-                            onConfirm={() => handleDelete(projeto.projetoId)}
-                            okText="Sim, Excluir"
-                            cancelText="Não"
-                            okButtonProps={{ danger: true }}
-                          >
-                            <Button
-                              type="link"
-                              danger
-                              icon={<DeleteOutlined />}
-                            >
-                              Excluir
-                            </Button>
-                          </Popconfirm>,
-                        ]}
-                      >
-                        <Card.Meta
-                          avatar={
-                            <Avatar
-                              src={getFullImageUrl(projeto.logoUrl || "")}
+                            <Card.Meta
+                              avatar={
+                                <Avatar
+                                  src={getFullImageUrl(projeto.logoUrl || "")}
+                                />
+                              }
+                              title={projeto.nomeProjeto}
+                              description={
+                                <>
+                                  <Text>Prefeitura: {projeto.prefeitura}</Text>
+                                  <br />
+                                  <Text>Secretaria: {projeto.secretaria}</Text>
+                                </>
+                              }
                             />
-                          }
-                          title={projeto.nomeProjeto}
-                          description={
-                            <>
-                              <Text>Prefeitura: {projeto.prefeitura}</Text>
-                              <br /> {/* Adicionado para quebra de linha */}
-                              <Text>Secretaria: {projeto.secretaria}</Text>
-                            </>
-                          }
-                        />
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-              </TabPane>
-            ))}
+                          </Card>
+                        </Col>
+                      )
+                    )}
+                  </Row>
+
+                  {/* 6. RENDERIZAR O COMPONENTE DE PAGINAÇÃO */}
+                  {totalCount > PAGE_SIZE && (
+                    <div className="mt-6 text-center">
+                      <Pagination
+                        current={currentPage}
+                        pageSize={PAGE_SIZE}
+                        total={totalCount}
+                        onChange={(page) => setCurrentPage(page)}
+                        showSizeChanger={false}
+                      />
+                    </div>
+                  )}
+                </TabPane>
+              );
+            })}
           </Tabs>
         )}
       </Spin>
 
-      {/* O MESMO MODAL, mas em modo "edit-only" */}
+      {/* O MESSO MODAL, mas em modo "edit-only" */}
       <AdminProjetoModal
         projeto={selectedItem}
         visible={isEditModalVisible}
