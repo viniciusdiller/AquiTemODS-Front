@@ -220,3 +220,19 @@ export const adminUpdateProjeto = async (
   }
   return response.json();
 };
+
+export const adminDeleteProjeto = async (id: number, token: string) => {
+  const response = await fetch(`${API_URL}/api/admin/projeto/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha ao excluir projeto");
+  }
+  // Respostas DELETE bem-sucedidas podem não ter corpo
+  return { success: true };
+};

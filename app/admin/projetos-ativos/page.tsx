@@ -14,13 +14,21 @@ import {
   Button,
   Tabs,
   Input,
+  Popconfirm,
 } from "antd";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
-import { getAllActiveProjetos } from "@/lib/api";
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import {
+  getAllActiveProjetos,
+  adminUpdateProjeto, // Importação mantida, embora não usada diretamente aqui
+  adminDeleteProjeto,
+} from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
-
 import { Projeto } from "@/types/Interface-Projeto";
 
 const { Title, Text } = Typography;
@@ -93,6 +101,25 @@ const ProjetosAtivosPage: React.FC = () => {
     }
   };
 
+  // NOVO: Função para excluir o projeto diretamente do card
+  const handleDelete = async (projetoId: number) => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
+      message.error("Autenticação expirada.");
+      return;
+    }
+
+    setLoading(true); // Ativa o spinner global
+    try {
+      await adminDeleteProjeto(projetoId, token);
+      message.success("Projeto excluído com sucesso!");
+      fetchData(); // Recarrega a lista de projetos
+    } catch (error: any) {
+      message.error(error.message || "Falha ao excluir o projeto.");
+      setLoading(false); // Desativa o spinner em caso de erro
+    }
+  };
+
   // Agrupa os projetos por ODS
   const groupedProjetos = filteredProjetos.reduce((acc, projeto) => {
     const ods = projeto.ods || "Sem Categoria";
@@ -158,6 +185,24 @@ const ProjetosAtivosPage: React.FC = () => {
                           >
                             Editar
                           </Button>,
+                          // NOVO: Botão de excluir com confirmação
+                          <Popconfirm
+                            key="delete"
+                            title="Excluir Projeto"
+                            description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
+                            onConfirm={() => handleDelete(projeto.projetoId)}
+                            okText="Sim, Excluir"
+                            cancelText="Não"
+                            okButtonProps={{ danger: true }}
+                          >
+                            <Button
+                              type="link"
+                              danger
+                              icon={<DeleteOutlined />}
+                            >
+                              Excluir
+                            </Button>
+                          </Popconfirm>,
                         ]}
                       >
                         <Card.Meta
@@ -170,6 +215,7 @@ const ProjetosAtivosPage: React.FC = () => {
                           description={
                             <>
                               <Text>Prefeitura: {projeto.prefeitura}</Text>
+                              <br /> {/* Adicionado para quebra de linha */}
                               <Text>Secretaria: {projeto.secretaria}</Text>
                             </>
                           }
