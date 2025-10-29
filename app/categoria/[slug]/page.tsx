@@ -10,7 +10,7 @@ import {
   SearchOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import { Spin, Empty, Button, Input } from "antd";
+import { Spin, Empty, Button, Input, Pagination } from "antd";
 import ModernCarousel from "@/components/ModernCarousel";
 import { getProjetosByOds } from "@/lib/api";
 
@@ -115,13 +115,17 @@ interface Projeto {
   endereco: string;
   prefeitura: string;
   ods: string;
+  logoUrl?: string;
 }
+
+const PROJETOS_PER_PAGE = 8;
 
 export default function CategoryPage() {
   const params = useParams();
   const slug = (params.slug as string)?.toUpperCase();
   const router = useRouter();
   const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -131,11 +135,21 @@ export default function CategoryPage() {
     [slug]
   );
 
+  const getImageUrl = (url?: string) => {
+    if (!url) {
+      return "/Logo_aquitemods.png";
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    return `${baseUrl}/${url.startsWith("/") ? url.substring(1) : url}`;
+  };
+
   useEffect(() => {
     if (slug) {
       const fetchProjetos = async () => {
         setIsLoading(true);
         setError(null);
+        setCurrentPage(1);
 
         const categoryInfo = categories.find((cat) => cat.id === slug);
         if (!categoryInfo) {
@@ -157,11 +171,29 @@ export default function CategoryPage() {
     }
   }, [slug]);
 
-  const filteredProjetos = projetos.filter((projeto) =>
-    projeto.nomeProjeto.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProjetos = useMemo(
+    () =>
+      projetos.filter((projeto) =>
+        projeto.nomeProjeto.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [projetos, searchTerm]
   );
 
-  // --- RENDERIZAÇÃO ---
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const paginatedProjetos = useMemo(() => {
+    const startIndex = (currentPage - 1) * PROJETOS_PER_PAGE;
+    const endIndex = startIndex + PROJETOS_PER_PAGE;
+    return filteredProjetos.slice(startIndex, endIndex);
+  }, [filteredProjetos, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (isLoading) {
     return (
@@ -255,38 +287,71 @@ export default function CategoryPage() {
               />
             </div>
             {filteredProjetos.length > 0 ? (
-              // Grid para os projetos, com 2 colunas em telas médias e acima
-              <div className="max-h-[50vh] overflow-y-auto px-2 space-y-4 pb-1 milecem:grid milecem:grid-cols-2 milecem:gap-4 milecem:space-y-0">
-                {filteredProjetos.map((projeto, index) => (
-                  <Link
-                    href={`/categoria/${slug}/${encodeURIComponent(
-                      projeto.nomeProjeto
-                    )}`}
-                    key={projeto.projetoId}
-                    className="block"
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white rounded-xl shadow-md p-4 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex flex-col h-full"
+              <>
+                <div className="space-y-4 pb-1 milecem:grid milecem:grid-cols-2 milecem:gap-4 milecem:space-y-0">
+                  {/* Map over PAGINATED projects */}
+                  {paginatedProjetos.map((projeto, index) => (
+                    <Link
+                      href={`/categoria/${slug}/${encodeURIComponent(
+                        projeto.nomeProjeto
+                      )}`}
+                      key={projeto.projetoId}
+                      className="block"
                     >
-                      <h3 className="text-lg font-semibold text-gray-800 break-words pr-2">
-                        {projeto.nomeProjeto}
-                      </h3>
-                      <p className="text-gray-600 my-2 text-sm break-words flex-grow">
-                        {projeto.descricaoDiferencial}
-                      </p>
-                      <div className="flex items-start gap-2 text-sm text-gray-500 mt-auto pt-2 border-t border-gray-100">
-                        <EnvironmentOutlined className="mt-1 flex-shrink-0 text-gray-400" />
-                        <span className="break-words">
-                          {projeto.prefeitura}
-                        </span>
-                      </div>
-                    </motion.div>
-                  </Link>
-                ))}
-              </div>
+                      {/* --- CARD PRINCIPAL COM relative --- */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="relative bg-white rounded-xl shadow-md p-4 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex flex-col h-full" // Adicionado `relative`
+                      >
+                        {/* --- LOGO ABSOLUTA NO CANTO SUPERIOR DIREITO --- */}
+                        <div
+                          className="absolute top-4 right-4 w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm z-10" // Posicionamento e estilo redondo
+                        >
+                          <Image
+                            src={getImageUrl(projeto.logoUrl)}
+                            alt={`Logo ${projeto.nomeProjeto}`}
+                            fill
+                            sizes="48px"
+                            className="object-contain" // Ou object-cover se preferir preenchimento
+                          />
+                        </div>
+
+                        <h3 className="text-lg font-semibold text-gray-800 break-words pr-16">
+                          {projeto.nomeProjeto}
+                        </h3>
+
+                        <p className="text-gray-600 my-2 text-sm break-words flex-grow line-clamp-3 pr-4">
+                          {" "}
+                          {projeto.descricaoDiferencial}
+                        </p>
+
+                        <div className="flex items-start gap-2 text-sm text-gray-500 mt-auto pt-2 border-t border-gray-100">
+                          <EnvironmentOutlined className="mt-1 flex-shrink-0 text-gray-400" />
+                          <span className="break-words">
+                            {projeto.prefeitura}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* --- PAGINATION COMPONENT --- */}
+                {filteredProjetos.length > PROJETOS_PER_PAGE && (
+                  <div className="flex justify-center mt-8">
+                    <Pagination
+                      current={currentPage}
+                      pageSize={PROJETOS_PER_PAGE}
+                      total={filteredProjetos.length}
+                      onChange={handlePageChange}
+                      showSizeChanger={false} // Hides the page size selector
+                    />
+                  </div>
+                )}
+                {/* --- END PAGINATION --- */}
+              </>
             ) : (
               <div className="mt-8">
                 <Empty description="Nenhum projeto encontrado para esta categoria ou busca." />

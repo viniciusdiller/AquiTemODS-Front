@@ -849,7 +849,7 @@ const CadastroProjetoPage: React.FC = () => {
         >
           <TextArea
             rows={2}
-            placeholder="Descreva brevemente o que é o seu projeto."
+            placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
           />
         </Form.Item>
         <Form.Item
@@ -864,7 +864,7 @@ const CadastroProjetoPage: React.FC = () => {
         >
           <TextArea
             rows={4}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
           />
         </Form.Item>
         <Row gutter={24}>
@@ -1088,14 +1088,14 @@ const CadastroProjetoPage: React.FC = () => {
         >
           <TextArea
             rows={2}
-            placeholder="Descreva brevemente o que é o seu projeto."
+            placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
           />
         </Form.Item>
 
         <Form.Item name="descricao" label="Nova Descrição do projeto">
           <TextArea
             rows={4}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
           />
         </Form.Item>
 
