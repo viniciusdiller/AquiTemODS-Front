@@ -10,6 +10,7 @@ export interface Projeto {
   projetoId: number;
   nomeProjeto: string;
   prefeitura: string;
+  responsavelProjeto?: string;
   logoUrl?: string;
   projetoImg?: Imagens[];
   dados_atualizacao?: any;

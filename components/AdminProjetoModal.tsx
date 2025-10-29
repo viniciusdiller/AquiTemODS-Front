@@ -61,18 +61,23 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 }) => {
   const [isEditLoading, setIsEditLoading] = useState(false);
   const [editForm] = Form.useForm();
+  const [outrasAlteracoes, setOutrasAlteracoes] = useState<string | null>(null);
 
-  // Preenche o formulário quando o projeto selecionado muda
   useEffect(() => {
     if (projeto) {
       let dataToEdit: any = { ...projeto };
 
-      // Se for um item de atualização, mescla os dados
       if (
         projeto.status === "pendente_atualizacao" &&
         projeto.dados_atualizacao
       ) {
         dataToEdit = { ...projeto, ...projeto.dados_atualizacao };
+
+        setOutrasAlteracoes(projeto.dados_atualizacao.outrasAlteracoes || null);
+
+        delete dataToEdit.outrasAlteracoes;
+      } else {
+        setOutrasAlteracoes(null);
       }
 
       if (typeof dataToEdit.odsRelacionadas === "string") {
@@ -84,6 +89,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       editForm.setFieldsValue(dataToEdit);
     } else {
       editForm.resetFields();
+      setOutrasAlteracoes(null);
     }
   }, [projeto, visible, editForm]);
 
@@ -152,6 +158,19 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
         autoComplete="off"
       >
         <Spin spinning={isEditLoading}>
+          {outrasAlteracoes && (
+            <Alert
+              message="Solicitação de 'Outras Alterações' do Usuário"
+              description={
+                <Typography.Paragraph pre-wrap>
+                  {outrasAlteracoes}
+                </Typography.Paragraph>
+              }
+              type="info"
+              showIcon
+              className="mb-4"
+            />
+          )}
           <Title level={5} className="mt-4">
             Informações Principais
           </Title>
@@ -195,6 +214,18 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               <Form.Item
                 name="secretaria"
                 label="Secretaria"
+                rules={[{ required: true }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                name="responsavelProjeto"
+                label="Responsável pelo Projeto"
                 rules={[{ required: true }]}
               >
                 <Input />

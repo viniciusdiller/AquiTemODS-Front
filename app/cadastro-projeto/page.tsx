@@ -704,6 +704,19 @@ const CadastroProjetoPage: React.FC = () => {
             </Form.Item>
           </Col>
         </Row>
+        <Row gutter={24}>
+          <Col xs={24}>
+            <Form.Item
+              name="responsavelProjeto"
+              label="Responsável pelo Projeto"
+              rules={[
+                { required: true, message: "Insira o nome do responsável!" },
+              ]}
+            >
+              <Input placeholder="Ex: João da Silva" />
+            </Form.Item>
+          </Col>
+        </Row>
       </section>
 
       {/* O RESTANTE DO FORMULÁRIO CONTINUA IGUAL */}
@@ -956,7 +969,6 @@ const CadastroProjetoPage: React.FC = () => {
 
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="prefeitura" */}
             <Form.Item
               name="prefeitura"
               label="Nome da Prefeitura"
@@ -992,7 +1004,6 @@ const CadastroProjetoPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            {/* CORREÇÃO: name="secretaria" */}
             <Form.Item
               name="secretaria"
               label="Nome da Secretaria"
@@ -1008,6 +1019,20 @@ const CadastroProjetoPage: React.FC = () => {
                 name="secretaria"
                 onChange={(e) => e}
               />
+            </Form.Item>
+
+            <Form.Item
+              name="responsavelProjeto"
+              label="Responsável pelo Projeto"
+              rules={[
+                {
+                  required: true,
+                  message:
+                    "O nome do responsável é obrigatório para identificação!",
+                },
+              ]}
+            >
+              <Input placeholder="Nome do Responsável" />
             </Form.Item>
           </Col>
         </Row>
@@ -1057,12 +1082,34 @@ const CadastroProjetoPage: React.FC = () => {
           </Upload>
         </Form.Item>
 
+        <Form.Item
+          name="descricaoDiferencial"
+          label="Novo Briefing do Projeto (Resumo)"
+        >
+          <TextArea
+            rows={2}
+            placeholder="Descreva brevemente o que é o seu projeto."
+          />
+        </Form.Item>
+
         <Form.Item name="descricao" label="Nova Descrição do projeto">
           <TextArea
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver."
           />
         </Form.Item>
+
+        <Form.Item
+          name="outrasAlteracoes"
+          label="Outras Alterações (Opcional)"
+          help="Se precisar alterar algo que não está no formulário (ex: site, instagram, endereço), descreva aqui."
+        >
+          <TextArea
+            rows={3}
+            placeholder="Ex: Por favor, alterar o website para https://novosite.com e o Instagram para @novoinsta."
+          />
+        </Form.Item>
+
         <Form.Item
           name="odsRelacionadas"
           label="Novas Tags de Busca (Até 5)"
@@ -1161,24 +1208,11 @@ const CadastroProjetoPage: React.FC = () => {
           prosseguir, confirme sua identidade.
         </p>
 
-        {/* --------------------- IDENTIFICAÇÃO OBRIGATÓRIA --------------------- */}
+        {/* --------------------- IDENTIFICAÇÃO OBRIGATÓRIA (Layout Corrigido) --------------------- */}
+
+        {/* ID do Projeto (Largura Total) */}
         <Row gutter={24}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="prefeitura"
-              label="Nome da Prefeitura"
-              rules={[
-                {
-                  required: true,
-                  message:
-                    "O nome da Prefeitura é neceesário para identificação!",
-                },
-              ]}
-            >
-              <Input placeholder="Nome da Prefeitura" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={24}>
+          <Col xs={24}>
             <Form.Item
               name="projetoId"
               label="ID do Projeto"
@@ -1201,6 +1235,25 @@ const CadastroProjetoPage: React.FC = () => {
               />
             </Form.Item>
           </Col>
+        </Row>
+
+        {/* Prefeitura e Secretaria (Meio a Meio) */}
+        <Row gutter={24}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="prefeitura"
+              label="Nome da Prefeitura"
+              rules={[
+                {
+                  required: true,
+                  message:
+                    "O nome da Prefeitura é necessário para identificação!",
+                },
+              ]}
+            >
+              <Input placeholder="Nome da Prefeitura" />
+            </Form.Item>
+          </Col>
           <Col xs={24} md={12}>
             <Form.Item
               name="secretaria"
@@ -1220,8 +1273,9 @@ const CadastroProjetoPage: React.FC = () => {
           </Col>
         </Row>
 
+        {/* Nome do Projeto e Responsável (Meio a Meio) */}
         <Row gutter={24}>
-          <Col xs={24} md={24}>
+          <Col xs={24} md={12}>
             <Form.Item
               name="nomeProjeto"
               label="Nome do Projeto"
@@ -1232,23 +1286,41 @@ const CadastroProjetoPage: React.FC = () => {
               <Input placeholder="Ex: Aqui tem ODS" />
             </Form.Item>
           </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="responsavelProjeto"
+              label="Nome do Responsável pelo Projeto"
+              rules={[
+                { required: true, message: "Insira o nome do responsável!" },
+              ]}
+            >
+              <Input placeholder="Nome do Responsável" />
+            </Form.Item>
+          </Col>
         </Row>
-        <Form.Item
-          name="emailContato"
-          label="E-mail de Contato do projeto"
-          rules={[
-            {
-              required: true,
-              message: "O e-mail é obrigatório para identificação!",
-            },
-            {
-              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "E-mail inválido!",
-            },
-          ]}
-        >
-          <Input placeholder="contato@email.com" />
-        </Form.Item>
+
+        {/* Email de Contato (Largura Total) */}
+        <Row gutter={24}>
+          <Col xs={24}>
+            <Form.Item
+              name="emailContato"
+              label="E-mail de Contato do projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "O e-mail é obrigatório para identificação!",
+                },
+                {
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "E-mail inválido!",
+                },
+              ]}
+            >
+              <Input placeholder="contato@email.com" />
+            </Form.Item>
+          </Col>
+        </Row>
+
         {/* --------------------- FIM DA IDENTIFICAÇÃO OBRIGATÓRIA --------------------- */}
 
         <Form.Item name="motivo" label="Motivo da exclusão">
