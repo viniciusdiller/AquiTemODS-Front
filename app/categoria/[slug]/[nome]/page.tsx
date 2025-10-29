@@ -102,8 +102,6 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-// --- Funções Auxiliares (Mantidas e Adaptadas) ---
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const normalizeImagePath = (filePath: string) => {
@@ -164,6 +162,7 @@ function ProjetoPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
+  const [descricaoExpandida, setDescricaoExpandida] = useState(false);
 
   const fetchProjetoData = async () => {
     if (!nomeDoProjeto) {
@@ -320,9 +319,14 @@ function ProjetoPageContent() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="md:col-span-2 flex flex-col">
                 <div className="mb-6 text-center md:text-left">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
-                    {projeto.nomeProjeto}
-                  </h2>
+                  <div className="flex flex-col miletrezentos:flex-row">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
+                      {projeto.nomeProjeto}
+                    </h2>
+                    <span className="flex items-center text-sm text-gray-500 border-gray-300 md:ml-4">
+                      | {projeto.prefeitura}
+                    </span>
+                  </div>
                   <div className="flex items-center justify-center md:justify-start gap-2">
                     <StarRating rating={rating} />
                     <span className="text-gray-700 font-semibold">
@@ -464,63 +468,95 @@ function ProjetoPageContent() {
             </div>
           </motion.section>
 
-          {projeto.linkProjeto && ( // Só mostra esta secção se houver um link
+          {projeto.descricao && ( // Mostra apenas se a descrição existir
             <motion.section
-              className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4" // Mantém o estilo
-              variants={itemVariants} // Mantém a animação
+              className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4 mb-8" // Adiciona margem inferior
+              initial="hidden"
+              animate="visible"
+              variants={itemVariants}
             >
               <h3 className="text-2xl font-bold text-gray-900 border-l-4 border-[#D7386E] pl-3">
                 Sobre o Projeto
               </h3>
               <div>
-                <p className="text-gray-700 leading-relaxed md:pl-2 break-all">
-                  <FormattedDescription text={projeto.descricao} />
-                </p>
-              </div>
-              <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-link flex-shrink-0 text-[#3C6AB2]" // Usa uma das suas cores
+                <div
+                  className={`relative overflow-hidden transition-all duration-300 ease-in-out ${
+                    descricaoExpandida ? "max-h-none" : "max-h-24"
+                  }`}
                 >
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                </svg>
-                <a
-                  href={projeto.linkProjeto}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium break-all" // Estilo do link
+                  <p className="text-gray-700 leading-relaxed md:pl-2 break-words">
+                    {" "}
+                    {/* Mudei break-all para break-words */}
+                    <FormattedDescription text={projeto.descricao} />
+                  </p>
+                  {/* Efeito de fade para texto recolhido */}
+                  {!descricaoExpandida && (
+                    <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+                  )}
+                </div>
+                {/* 4. Adiciona o botão "Ler mais/menos" */}
+                <button
+                  onClick={() => setDescricaoExpandida(!descricaoExpandida)}
+                  className="text-md font-bold  text-[#D7386E] hover:text-[#3C6AB2]  mt-2 md:pl-2 "
+                  aria-expanded={descricaoExpandida}
                 >
-                  {projeto.linkProjeto}
-                </a>
+                  {descricaoExpandida ? "Ler menos" : "Ler mais"}
+                </button>
               </div>
+
+              {/* Seção do Link (mostrada apenas se o link existir) */}
+              {projeto.linkProjeto && (
+                <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm mt-4">
+                  {" "}
+                  {/* Adicionado mt-4 */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-link flex-shrink-0 text-[#3C6AB2]"
+                  >
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
+                  <a
+                    href={projeto.linkProjeto}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-[#D7386E] hover:underline font-medium break-all"
+                  >
+                    {projeto.linkProjeto}
+                  </a>
+                </div>
+              )}
             </motion.section>
           )}
 
-          <motion.section
-            className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-6"
-            variants={itemVariants}
-          >
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
-                Portfólio
-              </h3>
-              <p className="text-sm text-gray-600">
-                Clique em uma imagem para visualizar em tamanho completo
-              </p>
-            </div>
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl shadow-md border border-gray-200">
-              <ImageGrid items={portfolioImages} />
-            </div>
-          </motion.section>
+          {Array.isArray(portfolioImages) &&
+            portfolioImages.some((item) => item && item.img) && (
+              <motion.section
+                className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%]"
+                layout="position"
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+              >
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
+                    Portfólio
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Clique em uma imagem para visualizar em tamanho completo
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl shadow-md border border-gray-200">
+                  <ImageGrid items={portfolioImages} />
+                </div>
+              </motion.section>
+            )}
 
           <AnimatedSection>
             <div className="bg-white p-6 rounded-3xl shadow-md md:mx-auto md:max-w-[85%]">

@@ -12,7 +12,6 @@ interface Item {
 interface ImageGridProps {
   items: Item[];
 }
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://172.16.32.199:3001";
 
 const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -31,6 +30,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
             whileHover={{ scale: 1.05, y: -5 }}
             transition={{ type: "spring", stiffness: 300 }}
             layoutId={`card-${item.id}`}
+            layout={false}
           >
             <Image
               src={item.img}

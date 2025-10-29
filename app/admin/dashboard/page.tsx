@@ -250,11 +250,6 @@ const AdminDashboard: React.FC = () => {
   const handleEditAndApproveSubmit = async (values: any) => {
     if (!selectedItem) return;
 
-    // A lógica de submit (fetch) permanece aqui por enquanto
-    // (ou pode ser movida para o AdminProjetoModal, como fizemos na Etapa 3)
-    // Vamos seguir o que fizemos na Etapa 3, onde a lógica de submit está no modal.
-    // Esta função será passada como prop.
-
     setIsActionLoading(true); // Reutiliza o estado de loading
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -516,7 +511,6 @@ const AdminDashboard: React.FC = () => {
                 onClick={handleOpenEditModal}
                 icon={<EditOutlined />}
                 loading={isActionLoading}
-                // 'type="primary"' removido para ficar branco (default)
               >
                 Editar Informações
               </Button>

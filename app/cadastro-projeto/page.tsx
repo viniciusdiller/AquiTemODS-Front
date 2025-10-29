@@ -848,6 +848,8 @@ const CadastroProjetoPage: React.FC = () => {
           ]}
         >
           <TextArea
+            showCount
+            maxLength={150}
             rows={2}
             placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
           />
@@ -863,6 +865,8 @@ const CadastroProjetoPage: React.FC = () => {
           ]}
         >
           <TextArea
+            showCount
+            maxLength={5000}
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
           />
@@ -1087,6 +1091,8 @@ const CadastroProjetoPage: React.FC = () => {
           label="Novo Briefing do Projeto (Resumo)"
         >
           <TextArea
+            showCount
+            maxLength={150}
             rows={2}
             placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
           />
@@ -1094,6 +1100,8 @@ const CadastroProjetoPage: React.FC = () => {
 
         <Form.Item name="descricao" label="Nova Descrição do projeto">
           <TextArea
+            showCount
+            maxLength={5000}
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
           />

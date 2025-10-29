@@ -274,7 +274,7 @@ export default function CategoryPage() {
               transition={{ duration: 0.4 }}
               className="text-3xl font-bold text-gray-800 tracking-tight mb-4"
             >
-              Projetos Recomendados
+              Projetos
             </motion.h2>
             <div className="relative mb-6">
               <Input
