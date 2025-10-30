@@ -236,3 +236,23 @@ export const adminDeleteProjeto = async (id: number, token: string) => {
   // Respostas DELETE bem-sucedidas podem não ter corpo
   return { success: true };
 };
+
+export const adminGetReviewsByProject = (
+  projetoId: string,
+  token: string // <--- MUDOU
+) =>
+  fetchApi(`/api/admin/avaliacoes/projeto/${projetoId}`, {
+    // <--- MUDOU
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+export const adminDeleteReview = (id: number, token: string) =>
+  fetchApi(`/api/admin/avaliacoes/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });

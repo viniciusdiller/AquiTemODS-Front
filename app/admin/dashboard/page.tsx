@@ -20,6 +20,7 @@ import {
   Input,
   Select,
   Pagination,
+  Grid,
 } from "antd";
 import {
   UserAddOutlined,
@@ -28,6 +29,7 @@ import {
   CheckOutlined,
   CloseOutlined,
   DatabaseOutlined,
+  CommentOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,6 +41,7 @@ const { Text, Title } = Typography;
 const { Column } = Table;
 const { TextArea } = Input;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 enum StatusProjeto {
   PENDENTE_APROVACAO = "pendente_aprovacao",
@@ -107,6 +110,9 @@ const AdminDashboard: React.FC = () => {
     atualizacoes: 1,
     exclusoes: 1,
   });
+
+  const screens = useBreakpoint(); // 3. OBTER O ESTADO DA TELA
+  const isMobile = !screens.md;
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
@@ -467,15 +473,39 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="p-8">
       <Spin spinning={loading}>
-        <div className="flex justify-between items-center mb-6">
-          <Title level={2} className="m-0">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          {/* Título (com tamanho ajustado e centrado no mobile) */}
+          <Title
+            level={isMobile ? 3 : 2}
+            className="m-0 md:text-left text-center"
+          >
             Painel de Administração
           </Title>
-          <Link href="/admin/projetos-ativos" passHref>
-            <Button type="primary" icon={<DatabaseOutlined />} size="large">
-              Gerenciar Projetos Ativos
-            </Button>
-          </Link>
+
+          {/* Wrapper dos Botões (empilha e ocupa largura total no mobile) */}
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+            <Link href="/admin/projetos-ativos" passHref>
+              <Button
+                type="primary"
+                icon={<DatabaseOutlined />}
+                size="large"
+                className={isMobile ? "w-full" : ""} // Ocupa largura total no mobile
+              >
+                Gerenciar Projetos Ativos
+              </Button>
+            </Link>
+
+            <Link href="/admin/comentarios" passHref>
+              <Button
+                icon={<CommentOutlined />}
+                size="large"
+                style={{ backgroundColor: "#3C6AB2", color: "#fff" }}
+                className={isMobile ? "w-full" : ""} // Ocupa largura total no mobile
+              >
+                Gerenciar Comentários
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Row gutter={[16, 16]}>
