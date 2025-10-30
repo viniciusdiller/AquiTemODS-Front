@@ -23,14 +23,16 @@ const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
     <div className="w-full max-w-5xl mx-auto p-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {displayedItems.map((item) => (
-          <motion.div
+          /* 1. Trocado de 'motion.div' para 'div' e removidas as props de animação:
+      - whileHover
+      - transition
+      - layoutId
+      - layout
+     */
+          <div
             key={item.id}
             className="relative aspect-square cursor-pointer overflow-hidden rounded-xl shadow-lg"
             onClick={() => setSelectedImage(item.img)}
-            whileHover={{ scale: 1.05, y: -5 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            layoutId={`card-${item.id}`}
-            layout={false}
           >
             <Image
               src={item.img}
@@ -39,7 +41,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
               className="object-cover"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -48,7 +50,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
           <ImageModal
             src={selectedImage}
             onClose={() => setSelectedImage(null)}
-            layoutId={`card-${selectedImage}`}
+            // 2. Prop 'layoutId' removida daqui
           />
         )}
       </AnimatePresence>
@@ -59,10 +61,11 @@ const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
 interface ImageModalProps {
   src: string;
   onClose: () => void;
-  layoutId: string;
+  // 3. 'layoutId' removido da interface
 }
 
-const ImageModal: React.FC<ImageModalProps> = ({ src, onClose, layoutId }) => {
+// 4. 'layoutId' removido dos parâmetros da função
+const ImageModal: React.FC<ImageModalProps> = ({ src, onClose }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -84,7 +87,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ src, onClose, layoutId }) => {
       <motion.div
         className="relative p-4"
         onClick={(e) => e.stopPropagation()}
-        layoutId={layoutId}
+        // 5. Prop 'layoutId' removida do modal
       >
         <img
           src={src}

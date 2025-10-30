@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/pagination";
 import { motion, useInView } from "framer-motion";
 import TagsAnimate from "@/components/ui/tagsanimate";
-import ImageGrid from "@/components/ImagesMEI";
+import ImageGrid from "@/components/ProjectImages";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import {
@@ -164,6 +164,9 @@ function ProjetoPageContent() {
   const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
   const [descricaoExpandida, setDescricaoExpandida] = useState(false);
 
+  const sobreProjetoRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
+
   const fetchProjetoData = async () => {
     if (!nomeDoProjeto) {
       setIsLoading(false);
@@ -284,6 +287,7 @@ function ProjetoPageContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2]">
       <motion.header
+        ref={headerRef}
         className="sticky top-0 z-20"
         initial={{ y: "-100%", opacity: 0 }}
         animate={{ y: "0%", opacity: 1 }}
@@ -470,6 +474,7 @@ function ProjetoPageContent() {
 
           {projeto.descricao && ( // Mostra apenas se a descrição existir
             <motion.section
+              ref={sobreProjetoRef}
               className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4 mb-8" // Adiciona margem inferior
               initial="hidden"
               animate="visible"
@@ -494,9 +499,25 @@ function ProjetoPageContent() {
                     <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                   )}
                 </div>
-                {/* 4. Adiciona o botão "Ler mais/menos" */}
+
                 <button
-                  onClick={() => setDescricaoExpandida(!descricaoExpandida)}
+                  onClick={() => {
+                    setDescricaoExpandida(!descricaoExpandida);
+
+                    if (descricaoExpandida) {
+                      const headerHeight = headerRef.current?.offsetHeight || 0;
+
+                      const sectionTop =
+                        sobreProjetoRef.current?.offsetTop || 0;
+
+                      const scrollToPosition = sectionTop - headerHeight - 20;
+
+                      window.scrollTo({
+                        top: scrollToPosition,
+                        behavior: "smooth",
+                      });
+                    }
+                  }}
                   className="text-md font-bold  text-[#D7386E] hover:text-[#3C6AB2]  mt-2 md:pl-2 "
                   aria-expanded={descricaoExpandida}
                 >
@@ -539,25 +560,22 @@ function ProjetoPageContent() {
 
           {Array.isArray(portfolioImages) &&
             portfolioImages.some((item) => item && item.img) && (
-              <motion.section
-                className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%]"
-                layout="position"
-                transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              >
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
-                    Portfólio
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Clique em uma imagem para visualizar em tamanho completo
-                  </p>
+              <AnimatedSection>
+                <div className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%]">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 border-l-4 border-[#D7386E] pl-3">
+                      Portfólio
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Clique em uma imagem para visualizar em tamanho completo
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl shadow-md border border-gray-200">
+                    <ImageGrid items={portfolioImages} />
+                  </div>
                 </div>
-                <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl shadow-md border border-gray-200">
-                  <ImageGrid items={portfolioImages} />
-                </div>
-              </motion.section>
+              </AnimatedSection>
             )}
-
           <AnimatedSection>
             <div className="bg-white p-6 rounded-3xl shadow-md md:mx-auto md:max-w-[85%]">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E] pl-3">
