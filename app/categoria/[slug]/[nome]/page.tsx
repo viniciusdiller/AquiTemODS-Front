@@ -258,7 +258,7 @@ function ProjetoPageContent() {
     try {
       await deleteReview(reviewToDelete, user.token);
       toast.success("Comentário excluído com sucesso!");
-      setReviews(reviews.filter((r) => r.avaliacoesId !== reviewToDelete));
+      fetchProjetoData();
     } catch (error: any) {
       toast.error(error.message || "Não foi possível excluir o comentário.");
     } finally {

@@ -104,6 +104,8 @@ const AdminDashboard: React.FC = () => {
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const [currentPages, setCurrentPages] = useState({
     cadastros: 1,
@@ -198,22 +200,61 @@ const AdminDashboard: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleAction = async (action: "approve" | "reject") => {
-    // ... (lógica de handleAction inalterada) ...
+  const handleAction = async (
+    action: "approve" | "reject",
+    motivoRejeicao?: string
+  ) => {
     if (!selectedItem) return;
 
     setIsActionLoading(true);
     const token = localStorage.getItem("admin_token");
 
     try {
+      // 1. Prepara as opções base
+      const fetchOptions: RequestInit = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // 2. Adiciona o body APENAS se for "reject"
+      if (action === "reject") {
+        fetchOptions.headers = {
+          ...fetchOptions.headers,
+          "Content-Type": "application/json",
+        };
+        fetchOptions.body = JSON.stringify({
+          motivoRejeicao: motivoRejeicao || "",
+        });
+      }
+
+      // 3. CHAMA O FETCH USANDO a variável fetchOptions
       const response = await fetch(
         `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
-        { method: "POST", headers: { Authorization: `Bearer ${token}` } }
+        fetchOptions // <-- ESTA É A CORREÇÃO PRINCIPAL
       );
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message);
 
-      message.success(`Ação executada com sucesso!`);
+      // 4. VERIFICA O ERRO ANTES de tentar o .json()
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          // Tenta ver se o erro é um JSON válido (ex: { message: "..." })
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.message || "Erro do servidor");
+        } catch (e) {
+          // Se não for JSON (é o HTML "<!DOCTYPE..."), lança este erro
+          console.error("Erro não-JSON da API:", errorText);
+          throw new Error(
+            "Falha na comunicação com o servidor. (Recebeu HTML)"
+          );
+        }
+      }
+
+      // Se passou pela verificação, a resposta é OK e é JSON
+      const result = await response.json();
+
+      message.success(result.message || `Ação executada com sucesso!`);
 
       setData((prevData) => {
         const newData = { ...prevData };
@@ -235,7 +276,9 @@ const AdminDashboard: React.FC = () => {
       }
 
       setModalVisible(false);
+      setIsRejectModalVisible(false); // Fecha o novo modal
       setSelectedItem(null);
+      setRejectionReason("");
     } catch (error: any) {
       message.error(error.message);
     } finally {
@@ -509,7 +552,6 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <Row gutter={[16, 16]}>
-          {/* 12. NOVO: Passa a 'listKey' para a função renderList */}
           {renderList("Novos Cadastros", data.cadastros, "cadastros")}
           {renderList("Atualizações", data.atualizacoes, "atualizacoes")}
           {renderList("Exclusões", data.exclusoes, "exclusoes")}
@@ -522,11 +564,10 @@ const AdminDashboard: React.FC = () => {
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           width={1000}
-          // O footer JÁ ESTÁ CORRETO (da nossa modificação anterior)
           footer={[
             <Button
               key="reject"
-              onClick={() => handleAction("reject")}
+              onClick={() => setIsRejectModalVisible(true)}
               icon={<CloseOutlined />}
               danger
               loading={isActionLoading}
@@ -534,7 +575,6 @@ const AdminDashboard: React.FC = () => {
               Recusar
             </Button>,
 
-            // 2. EDITAR (Branco) - Movido para o meio e 'type' removido (para ser 'default')
             selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO && (
               <Button
                 key="edit_and_approve"
@@ -627,7 +667,7 @@ const AdminDashboard: React.FC = () => {
         </Modal>
       )}
 
-      {/* --- NOVO: MODAL DE EDIÇÃO --- */}
+      {/* ---MODAL DE EDIÇÃO --- */}
       <AdminProjetoModal
         projeto={selectedItem}
         visible={isEditModalVisible}
@@ -642,6 +682,32 @@ const AdminDashboard: React.FC = () => {
         mode="edit-and-approve"
         onEditAndApprove={handleEditAndApproveSubmit}
       />
+      {/* --- NOVO: MODAL DE REJEIÇÃO --- */}
+      <Modal
+        title="Confirmar Rejeição"
+        open={isRejectModalVisible}
+        onCancel={() => {
+          setIsRejectModalVisible(false);
+          setRejectionReason(""); // Limpa ao cancelar
+        }}
+        // Chama o handleAction com o motivo
+        onOk={() => handleAction("reject", rejectionReason)}
+        confirmLoading={isActionLoading}
+        okText="Confirmar Rejeição"
+        cancelText="Voltar"
+        okButtonProps={{ danger: true }} // Deixa o botão de confirmação vermelho
+      >
+        <Typography.Text strong className="block mb-2">
+          Por favor, informe o motivo da rejeição (será enviado ao usuário):
+        </Typography.Text>
+        <TextArea
+          rows={4}
+          value={rejectionReason}
+          onChange={(e) => setRejectionReason(e.target.value)}
+          placeholder="O projeto foi rejeitado pois..."
+        />
+      </Modal>
+      {/* --- FIM DO NOVO MODAL --- */}
     </div>
   );
 };
