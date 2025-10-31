@@ -12,32 +12,40 @@ import {
   Empty,
   Avatar,
   Pagination,
-  Grid, // 1. IMPORTAR GRID
+  Grid,
 } from "antd";
-import { DeleteOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  ArrowLeftOutlined,
+  MessageOutlined,
+  DownOutlined,
+  UpOutlined,
+} from "@ant-design/icons";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { adminGetReviewsByProject, adminDeleteReview } from "@/lib/api";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { confirm } = Modal;
-const { useBreakpoint } = Grid; // 2. INICIAR O HOOK DE BREAKPOINT
+const { useBreakpoint } = Grid;
 
-const PAGE_SIZE = 5;
+// Sugestão: Aumente o PAGE_SIZE para 6 ou 8 para preencher melhor o grid
+const PAGE_SIZE = 8;
 
-// Interface para a Avaliação (sem mudanças)
+// --- 1. INTERFACES (Sem mudanças) ---
 interface AvaliacaoAdmin {
   avaliacoesId: number;
   comentario: string;
-  nota: number;
+  nota: number | null;
   usuario: {
     usuarioId: number;
     nomeCompleto: string;
     email: string;
   };
+  parent_id: number | null;
+  respostas?: AvaliacaoAdmin[];
 }
 
-// Interface para os dados da página (sem mudanças)
 interface PageData {
   projeto: {
     projetoId: number;
@@ -47,6 +55,135 @@ interface PageData {
   avaliacoes: AvaliacaoAdmin[];
 }
 
+// --- 2. COMPONENTE RECURSIVO (REFATORADO PARA O GRID) ---
+// Este componente agora é um 'card' (<div>) para funcionar dentro do grid
+// ---
+interface AdminReviewCommentItemProps {
+  review: AvaliacaoAdmin;
+  handleDelete: (id: number) => void;
+  isReply: boolean;
+  isMobile: boolean;
+  isActionLoading: boolean;
+}
+
+const AdminReviewCommentItem: React.FC<AdminReviewCommentItemProps> = ({
+  review,
+  handleDelete,
+  isReply,
+  isMobile,
+  isActionLoading,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const hasReplies = review.respostas && review.respostas.length > 0;
+  const replyCount = review.respostas?.length ?? 0;
+
+  const deleteButton = (
+    <Button
+      type="primary"
+      danger
+      icon={<DeleteOutlined />}
+      onClick={() => handleDelete(review.avaliacoesId)}
+      loading={isActionLoading}
+      size={isReply || isMobile ? "small" : "middle"}
+      // --- CORREÇÃO DE ALINHAMENTO ---
+      className="ml-auto" // Alterado de ml-8 para ml-auto
+    >
+      {isMobile ? null : "Excluir"}
+    </Button>
+  );
+
+  const expandButton = !isReply && hasReplies && (
+    <Button
+      icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
+      onClick={() => setIsExpanded(!isExpanded)}
+      size={isMobile ? "small" : "middle"}
+    >
+      {isExpanded
+        ? "Esconder"
+        : `Ver ${replyCount} ${replyCount === 1 ? "Resposta" : "Respostas"}`}
+    </Button>
+  );
+
+  return (
+    // --- MUDANÇA: Isto não é mais um <List.Item>, é um card <div> ---
+    // 'h-full' e 'flex-col' garantem que os cards no grid tenham a mesma altura
+    <div
+      className={`h-full flex flex-col p-4 border rounded-lg shadow-sm bg-white ${
+        isReply ? "ml-4 md:ml-8" : "" // Indentação de resposta
+      }`}
+    >
+      {/* 1. Meta (Cabeçalho do card) */}
+      <div className="flex gap-3">
+        <Avatar
+          src={"/avatars/default-avatar.png"}
+          size={isReply ? "small" : "default"}
+        />
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Text strong className={isReply ? "text-sm" : ""}>
+              {review.usuario.nomeCompleto}
+            </Text>
+            {review.nota && (
+              <Tag
+                color={
+                  review.nota < 3 ? "red" : review.nota > 3 ? "green" : "blue"
+                }
+              >
+                {review.nota} estrela(s)
+              </Tag>
+            )}
+            {isReply && (
+              <Tag icon={<MessageOutlined />} color="default">
+                Resposta
+              </Tag>
+            )}
+          </div>
+          <Text type="secondary" className={isReply ? "text-xs" : ""}>
+            {review.usuario.email}
+          </Text>
+        </div>
+      </div>
+
+      {/* 2. Conteúdo (com 'flex-1' para empurrar o rodapé para baixo) */}
+      <div
+        className={`mt-3 ${
+          isReply ? "pl-10 text-sm" : "pl-2 text-base"
+        } flex-1`}
+      >
+        <Paragraph>
+          {review.comentario || <Text type="secondary">(Sem comentário)</Text>}
+        </Paragraph>
+      </div>
+
+      {/* 3. Respostas recursivas (se expandido) */}
+      {isExpanded && hasReplies && (
+        <div className="mt-4">
+          <List
+            itemLayout="vertical"
+            dataSource={review.respostas}
+            renderItem={(reply) => (
+              <AdminReviewCommentItem
+                key={reply.avaliacoesId} // Key aqui está correta (lista aninhada)
+                review={reply}
+                handleDelete={handleDelete}
+                isReply={true}
+                isMobile={isMobile}
+                isActionLoading={isActionLoading}
+              />
+            )}
+          />
+        </div>
+      )}
+
+      {/* 4. Rodapé de Ações */}
+      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+        {[expandButton, deleteButton].filter(Boolean)}
+      </div>
+    </div>
+  );
+};
+
+// --- 3. COMPONENTE PRINCIPAL (ATUALIZADO) ---
 const AdminComentariosDoProjeto: React.FC = () => {
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,13 +192,10 @@ const AdminComentariosDoProjeto: React.FC = () => {
   const router = useRouter();
   const params = useParams();
   const projetoId = params.id as string;
+  const screens = useBreakpoint();
 
-  const screens = useBreakpoint(); // 3. OBTER O ESTADO DA TELA
-
-  // fetchData, useEffect, e handleDelete (sem mudanças)
   const fetchData = useCallback(async () => {
     if (!projetoId) return;
-
     setLoading(true);
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -79,7 +213,9 @@ const AdminComentariosDoProjeto: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projetoId, router]);
+    // --- CORREÇÃO DO LOOP INFINITO ---
+    // Removemos 'router' da lista de dependências
+  }, [projetoId]);
 
   useEffect(() => {
     fetchData();
@@ -88,7 +224,7 @@ const AdminComentariosDoProjeto: React.FC = () => {
   const handleDelete = (id: number) => {
     confirm({
       title: "Você tem certeza que quer excluir este comentário?",
-      content: "Esta ação não pode ser desfeita.",
+      content: "Esta ação (e suas respostas) não pode ser desfeita.",
       okText: "Sim, excluir",
       okType: "danger",
       cancelText: "Cancelar",
@@ -100,11 +236,10 @@ const AdminComentariosDoProjeto: React.FC = () => {
           setIsActionLoading(false);
           return;
         }
-
         try {
           await adminDeleteReview(id, token);
           message.success("Comentário excluído com sucesso!");
-          fetchData();
+          fetchData(); // Recarrega a árvore de comentários
         } catch (error: any) {
           message.error(error.message || "Falha ao excluir comentário.");
         } finally {
@@ -114,11 +249,13 @@ const AdminComentariosDoProjeto: React.FC = () => {
     });
   };
 
+  const isMobile = !screens.md;
+
   const pageTitle = pageData?.projeto?.nomeProjeto
     ? `Comentários de: ${pageData.projeto.nomeProjeto}`
     : "Carregando comentários...";
 
-  // Lógica de paginação (sem mudanças)
+  // Paginação dos comentários-PAI
   const allAvaliacoes = pageData?.avaliacoes || [];
   const totalCount = allAvaliacoes.length;
   const paginatedAvaliacoes = allAvaliacoes.slice(
@@ -126,15 +263,10 @@ const AdminComentariosDoProjeto: React.FC = () => {
     currentPage * PAGE_SIZE
   );
 
-  // Determina se a tela é pequena (md = 768px)
-  const isMobile = !screens.md;
-
   return (
-    // 4. PADDING RESPONSIVO
     <div className="p-4 md:p-8">
-      {/* 5. CABEÇALHO RESPONSIVO */}
+      {/* Cabeçalho responsivo (sem mudanças) */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
-        {/* Bloco Título + Tag */}
         <div>
           <Title level={isMobile ? 3 : 2} className="m-0" ellipsis>
             {pageTitle}
@@ -149,13 +281,10 @@ const AdminComentariosDoProjeto: React.FC = () => {
             </Tag>
           )}
         </div>
-
-        {/* Bloco Botão Voltar */}
         <Link href="/admin/comentarios" passHref>
           <Button
             icon={<ArrowLeftOutlined />}
             size={isMobile ? "middle" : "large"}
-            // Ocupa 100% da largura no mobile
             className={isMobile ? "w-full" : ""}
           >
             Voltar para Projetos
@@ -164,68 +293,43 @@ const AdminComentariosDoProjeto: React.FC = () => {
       </div>
 
       <Spin spinning={loading}>
+        {/* --- MUDANÇA PARA O LAYOUT DE GRID --- */}
         <List
-          className="bg-white p-4 md:p-6 rounded-lg shadow-sm"
-          itemLayout="vertical"
+          // 1. Removemos classes de layout e fundo
+          //    (itemLayout="vertical" e className="...")
+
+          // 2. Adicionamos a prop 'grid'
+          //    1 coluna em mobile, 2 em desktop
+          grid={{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 2, xl: 2, xxl: 2 }}
           dataSource={paginatedAvaliacoes}
           locale={{
-            emptyText: (
-              <Empty description="Nenhum comentário encontrado para este projeto." />
-            ),
+            emptyText: <Empty description="Nenhum comentário encontrado." />,
           }}
+          // 3. O renderItem agora envolve o componente no <List.Item>
           renderItem={(item: AvaliacaoAdmin) => (
-            <List.Item
-              key={item.avaliacoesId}
-              actions={[
-                // 6. BOTÃO DE EXCLUIR RESPONSIVO
-                <Button
-                  type="primary"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(item.avaliacoesId)}
-                  loading={isActionLoading}
-                >
-                  {/* O texto "Excluir" some em telas pequenas */}
-                  {isMobile ? null : "Excluir"}
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                avatar={<Avatar src={"/avatars/default-avatar.png"} />}
-                title={
-                  // Adicionado flex-wrap para caso o nome e a tag fiquem grandes
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Text strong>{item.usuario.nomeCompleto}</Text>
-                    <Tag
-                      color={
-                        item.nota < 3 ? "red" : item.nota > 3 ? "green" : "blue"
-                      }
-                    >
-                      {item.nota} estrela(s)
-                    </Tag>
-                  </div>
-                }
-                description={<Text type="secondary">{item.usuario.email}</Text>}
+            // --- CORREÇÃO DA KEY ---
+            // A 'key' deve estar no item de lista de nível superior
+            <List.Item key={item.avaliacoesId} style={{ height: "100%" }}>
+              <AdminReviewCommentItem
+                review={item}
+                handleDelete={handleDelete}
+                isReply={false}
+                isMobile={isMobile}
+                isActionLoading={isActionLoading}
               />
-              <div className="mt-3 pl-2 text-base">
-                {item.comentario || (
-                  <Text type="secondary">(Sem comentário)</Text>
-                )}
-              </div>
             </List.Item>
           )}
         />
 
+        {/* Paginação (sem mudanças) */}
         {totalCount > PAGE_SIZE && (
           <div className="mt-6 text-center">
-            {/* 7. PAGINAÇÃO RESPONSIVA */}
             <Pagination
               current={currentPage}
               pageSize={PAGE_SIZE}
               total={totalCount}
               onChange={(page) => setCurrentPage(page)}
               showSizeChanger={false}
-              // Usa o modo "simple" em telas pequenas
               simple={isMobile}
             />
           </div>

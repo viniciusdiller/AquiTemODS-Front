@@ -6,20 +6,18 @@ import {
   Loader2,
   Globe,
   Instagram,
-  Trash2,
   SearchX,
   CalendarDays,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
 import "leaflet/dist/leaflet.css";
-import Image from "next/image";
+
 import {
   getProjetoByNome,
   deleteReview,
   formatarDataParaMesAno,
 } from "@/lib/api";
-import AvaliacaoModalButton from "@/components/Pop-up Coments";
 import {
   Pagination,
   PaginationContent,
@@ -45,6 +43,8 @@ import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import FormattedDescription from "@/components/FormattedDescription";
 import OdsTag from "@/components/ui/OdsTag";
+import AvaliacaoModal from "@/components/Pop-up Coments";
+import { ReviewComment } from "@/components/ReviewComments";
 
 const CustomStarIcon = ({
   fillPercentage = "100%",
@@ -84,7 +84,7 @@ const CustomStarIcon = ({
   );
 };
 
-const StarRating = ({ rating }: { rating: number }) => {
+export const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
   return (
     <div className="flex items-center">
@@ -163,6 +163,10 @@ function ProjetoPageContent() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
   const [descricaoExpandida, setDescricaoExpandida] = useState(false);
+  const [modalState, setModalState] = useState<{
+    open: boolean;
+    parentId: number | null;
+  }>({ open: false, parentId: null });
 
   const sobreProjetoRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
@@ -263,7 +267,34 @@ function ProjetoPageContent() {
     }
   };
 
-  // Adaptação das variáveis para o layout
+  const handleNewReviewClick = () => {
+    if (!user) {
+      toast.error("Você precisa estar logado para avaliar.");
+      return;
+    }
+    setModalState({ open: true, parentId: null });
+  };
+
+  // Abre o modal para uma RESPOSTA (com parent_id)
+  const handleReplyClick = (parentId: number) => {
+    if (!user) {
+      toast.error("Você precisa estar logado para responder.");
+      return;
+    }
+    setModalState({ open: true, parentId: parentId });
+  };
+
+  // Fecha o modal
+  const closeModal = () => {
+    setModalState({ open: false, parentId: null });
+  };
+
+  // Callback para quando o envio for bem-sucedido
+  const handleReviewSubmit = () => {
+    fetchProjetoData(); // Recarrega todos os comentários e respostas
+    closeModal(); // Fecha o modal
+  };
+
   const rating = projeto.media || 0;
   const portfolioImages = (projeto.projetoImg || []).map(
     (image: any, index: number) => ({
@@ -582,10 +613,12 @@ function ProjetoPageContent() {
               <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E] pl-3">
                 Avaliações
               </h3>
-              <AvaliacaoModalButton
-                projetoId={projeto.projetoId.toString()}
-                onReviewSubmit={fetchProjetoData}
-              />
+              <Button
+                onClick={handleNewReviewClick} // <-- Chama o novo handler
+                className="rounded-full px-6 hover:cursor-pointer hover:text-white bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg active:scale-95 transition-all mb-4"
+              >
+                Deixe sua avaliação
+              </Button>
               <div className="space-y-4">
                 {reviews.length > 0 ? (
                   <>
@@ -594,50 +627,17 @@ function ProjetoPageContent() {
                         .slice()
                         .reverse()
                         .map((review) => (
-                          <div
+                          <ReviewComment
                             key={review.avaliacoesId}
-                            className="flex gap-4 py-2 items-start border-b"
-                          >
-                            <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0 my-auto ml-4">
-                              <Image
-                                src="/avatars/default-avatar.png"
-                                alt={`Avatar de ${review.usuario.nomeCompleto}`}
-                                width={48}
-                                height={48}
-                                className="rounded-full w-full h-full object-cover"
-                              />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-semibold text-gray-800 ">
-                                  {review.usuario.nomeCompleto}
-                                  {user &&
-                                    user.usuarioId ===
-                                      review.usuario.usuarioId && (
-                                      <button
-                                        onClick={() =>
-                                          handleDeleteClick(review.avaliacoesId)
-                                        }
-                                        className="ml-3 text-sm text-red-500 hover:text-red-700"
-                                        aria-label="Excluir seu comentário"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    )}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-1 my-1">
-                                <StarRating rating={review.nota} />
-                              </div>
-                              <p className="text-gray-600 break-words">
-                                <FormattedDescription
-                                  text={review.comentario}
-                                />
-                              </p>
-                            </div>
-                          </div>
+                            review={review}
+                            onReplyClick={handleReplyClick}
+                            onDeleteClick={handleDeleteClick}
+                            currentUser={user}
+                            allowReply={true}
+                          />
                         ))}
                     </div>
+
                     {totalPages > 1 && (
                       <div className="pt-4 flex justify-end rounded-lg">
                         <Pagination>
@@ -705,6 +705,15 @@ function ProjetoPageContent() {
           </AnimatedSection>
         </div>
       </motion.main>
+      {projeto && (
+        <AvaliacaoModal
+          isOpen={modalState.open}
+          onClose={closeModal}
+          parentId={modalState.parentId}
+          projetoId={projeto.projetoId} // Passando o número
+          onReviewSubmit={handleReviewSubmit}
+        />
+      )}
     </div>
   );
 }

@@ -1,125 +1,104 @@
+// components/AvaliacaoModal.tsx
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react"; // <-- Importar useEffect
 import { Star } from "lucide-react";
 import { submitReview } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { contemPalavrao } from "@/lib/profanityFilter";
-import { removeEmojis, containsEmoji } from "@/lib/utils";
+import { removeEmojis } from "@/lib/utils"; // (assumindo que 'utils' exporta 'removeEmojis')
 import TextArea from "antd/es/input/TextArea";
 
-const AvaliacaoModalButton = ({
-  projetoId,
-  onReviewSubmit,
-}: {
-  projetoId: number;
-  onReviewSubmit?: () => void;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-
-  const handleButtonClick = () => {
-    if (!user) {
-      toast.error(
-        "Para realizar um comentário, é necessário estar logado em uma conta."
-      );
-    } else {
-      setIsOpen(true);
-    }
-  };
-
-  return (
-    <div className="my-4 text-left mb-5">
-      <button
-        onClick={handleButtonClick}
-        className="bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] text-white font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
-      >
-        Deixe aqui sua Avaliação
-      </button>
-      <SpringModal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        projetoId={projetoId}
-        onReviewSubmit={onReviewSubmit}
-      />
-    </div>
-  );
-};
-
-const SpringModal = ({
-  isOpen,
-  setIsOpen,
-  projetoId,
-  onReviewSubmit,
-}: {
+// <-- MODIFICADO: Props do Modal controlado
+interface SpringModalProps {
   isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
   projetoId: number;
-  onReviewSubmit?: () => void;
-}) => {
+  parentId: number | null; // <-- NOVO: Para saber se é uma resposta
+  onReviewSubmit: () => void;
+}
+
+const AvaliacaoModal = ({
+  isOpen,
+  onClose,
+  projetoId,
+  parentId,
+  onReviewSubmit,
+}: SpringModalProps) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
 
+  // <-- NOVO: Limpa o estado quando o modal fecha
+  useEffect(() => {
+    if (!isOpen) {
+      setRating(0);
+      setHoverRating(0);
+      setComment("");
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
+
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const valueComEmoji = e.target.value;
     const valueSemEmoji = removeEmojis(valueComEmoji);
 
     if (valueComEmoji !== valueSemEmoji) {
-      // ADICIONAMOS UM ID AO TOAST AQUI
       toast.error("Não é possível adicionar emojis", {
         id: "emoji-error-toast",
       });
     }
-
     setComment(valueSemEmoji);
   };
+
   const handleAvaliarClick = async () => {
-    if (rating === 0) {
+    // <-- MODIFICADO: Só exige nota se NÃO for uma resposta
+    if (!parentId && rating === 0) {
       toast.warning("Por favor, selecione uma nota de 1 a 5 estrelas.");
       return;
     }
-
     if (contemPalavrao(comment)) {
       toast.error("Você utilizou palavras inapropriadas.");
+      return;
+    }
+    if (!comment.trim()) {
+      toast.error("O comentário não pode estar vazio.");
       return;
     }
 
     setIsSubmitting(true);
 
+    // <-- MODIFICADO: Estrutura dos dados enviados para a API
     const reviewData = {
-      nota: rating,
+      nota: parentId ? null : rating, // Nota é null se for resposta
       comentario: comment,
-      projeto: {
-        projetoId: projetoId,
-      },
+      projetoId: projetoId, // Enviado no nível raiz
+      parent_id: parentId, // Enviado no nível raiz
     };
 
     try {
       await submitReview(reviewData, user?.token ?? "");
-      toast.success("Avaliação enviada com sucesso!");
-
-      setIsOpen(false);
-      setRating(0);
-      setComment("");
+      toast.success(parentId ? "Resposta enviada!" : "Avaliação enviada!");
 
       if (onReviewSubmit) {
-        onReviewSubmit();
+        onReviewSubmit(); // Isso vai fechar o modal e recarregar os dados na página
       }
     } catch (error: any) {
-      console.error("Erro ao enviar avaliação:", error);
+      console.error("Erro ao enviar:", error);
       toast.error(
         error.message ||
-          "Erro ao enviar sua avaliação. Verifique se você já avaliou este local."
+          "Erro ao enviar. Verifique se você já avaliou este local."
       );
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const isReply = parentId !== null;
 
   return (
     <AnimatePresence>
@@ -128,7 +107,7 @@ const SpringModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setIsOpen(false)}
+          onClick={onClose} // <-- MODIFICADO
           className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer"
         >
           <motion.div
@@ -138,41 +117,52 @@ const SpringModal = ({
             onClick={(e) => e.stopPropagation()}
             className="bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] text-white p-6 w-full max-w-lg shadow-xl cursor-default relative overflow-hidden rounded-2xl"
           >
-            <Star className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+            {/* ... (ícone de estrela de fundo) ... */}
             <div className="relative z-10">
               <div className="bg-white w-16 h-16 mb-4 rounded-full text-3xl text-blue-600 grid place-items-center mx-auto">
                 <Star />
               </div>
 
-              <div
-                className="flex justify-center gap-2 mb-4"
-                onMouseLeave={() => setHoverRating(0)}
-              >
-                {[1, 2, 3, 4, 5].map((index) => (
-                  <Star
-                    key={index}
-                    onClick={() => setRating(index)}
-                    onMouseEnter={() => setHoverRating(index)}
-                    className={`cursor-pointer transition-colors text-3xl ${
-                      (hoverRating || rating) >= index
-                        ? "text-yellow-400 fill-yellow-400"
-                        : "text-white/30"
-                    }`}
-                  />
-                ))}
-              </div>
+              <h3 className="text-center text-xl font-medium mb-4">
+                {isReply ? "Responder ao comentário" : "Deixe sua avaliação"}
+              </h3>
+
+              {/* <-- MODIFICADO: Renderização condicional das estrelas --> */}
+              {!isReply && (
+                <div
+                  className="flex justify-center gap-2 mb-4"
+                  onMouseLeave={() => setHoverRating(0)}
+                >
+                  {[1, 2, 3, 4, 5].map((index) => (
+                    <Star
+                      key={index}
+                      onClick={() => setRating(index)}
+                      onMouseEnter={() => setHoverRating(index)}
+                      className={`cursor-pointer transition-colors text-3xl ${
+                        (hoverRating || rating) >= index
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-white/30"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
 
               <TextArea
                 showCount
-                maxLength={150}
-                placeholder="Digite aqui seu comentário..."
+                maxLength={250} // <-- Aumentei o limite para respostas
+                placeholder={
+                  isReply
+                    ? "Digite sua resposta..."
+                    : "Digite aqui seu comentário..."
+                }
                 value={comment}
                 onChange={handleCommentChange}
                 className="review-textarea-dark w-full h-24 p-3 rounded-xl transition-all mb-2"
               />
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={onClose} // <-- MODIFICADO
                   className="bg-transparent hover:bg-white/10 transition-colors text-white font-semibold w-full py-2 rounded"
                   disabled={isSubmitting}
                 >
@@ -183,7 +173,11 @@ const SpringModal = ({
                   className="bg-white hover:opacity-90 transition-opacity text-blue-600 font-semibold w-full py-2 rounded disabled:opacity-50"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Enviando..." : "Avaliar"}
+                  {isSubmitting
+                    ? "Enviando..."
+                    : isReply
+                    ? "Responder"
+                    : "Avaliar"}
                 </button>
               </div>
             </div>
@@ -194,4 +188,4 @@ const SpringModal = ({
   );
 };
 
-export default AvaliacaoModalButton;
+export default AvaliacaoModal;
