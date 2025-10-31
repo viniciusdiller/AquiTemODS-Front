@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { contemPalavrao } from "@/lib/profanityFilter";
 import { removeEmojis, containsEmoji } from "@/lib/utils";
+import TextArea from "antd/es/input/TextArea";
 
 const AvaliacaoModalButton = ({
   projetoId,
@@ -161,11 +162,13 @@ const SpringModal = ({
                 ))}
               </div>
 
-              <textarea
+              <TextArea
+                showCount
+                maxLength={150}
                 placeholder="Digite aqui seu comentário..."
                 value={comment}
                 onChange={handleCommentChange}
-                className="w-full h-24 p-3 rounded-xl bg-slate-800/50 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+                className="review-textarea-dark w-full h-24 p-3 rounded-xl transition-all mb-2"
               />
               <div className="flex gap-2 mt-4">
                 <button

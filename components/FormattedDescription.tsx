@@ -2,34 +2,30 @@
 import React from "react";
 
 interface FormattedDescriptionProps {
-  text: string | null | undefined; // Permite texto nulo ou indefinido
+  text: string | null | undefined;
 }
 
 const FormattedDescription: React.FC<FormattedDescriptionProps> = ({
   text,
 }) => {
-  // Verifica se o texto é nulo, indefinido ou vazio
   if (!text) {
-    return null; // Não renderiza nada se não houver texto
+    return null;
   }
 
-  // 1. Divide o texto em linhas baseado no caractere de nova linha (\n)
-  // 2. Remove linhas que contêm apenas espaços em branco (trim() remove espaços no início/fim)
-  // 3. Garante que não criamos parágrafos vazios
   const paragraphs = text.split("\n").filter((p) => p.trim().length > 0);
 
-  // Se, após filtrar, não houver parágrafos, não renderiza nada
   if (paragraphs.length === 0) {
     return null;
   }
 
-  // Renderiza cada linha filtrada como um parágrafo separado
   return (
-    <div className="text-gray-700 leading-relaxed space-y-4">
-      {" "}
-      {/* Mantém o estilo */}
+    /* 1. Removemos o 'space-y-1'. Agora não há margem EXTRA. */
+    <div className="text-gray-600 leading-relaxed">
       {paragraphs.map((paragraph, index) => (
-        <p key={index}>{paragraph}</p>
+        /* 2. Mantemos 'm-0' para resetar a margem do navegador. */
+        <p key={index} className="break-words m-0">
+          {paragraph}
+        </p>
       ))}
     </div>
   );

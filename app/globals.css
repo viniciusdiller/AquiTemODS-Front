@@ -104,6 +104,37 @@
 .leaflet-container a.leaflet-popup-close-button {
   display: none;
 }
+
+.review-textarea-dark .ant-input {
+  /* Equivalente a bg-blue-950/70 */
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  color: black !important;
+  border-color: transparent !important; /* Remove a borda padrão */
+}
+
+/* 2. Estilo QUANDO FOCADO */
+.review-textarea-dark .ant-input:focus,
+.review-textarea-dark .ant-input-focused {
+  /* Mantém o mesmo fundo */
+  background-color: rgb(255, 255, 255, 0.7) !important;
+  color: black !important;
+
+  /* Cor do seu focus:ring-blue-400 (rgb(96 165 250)) */
+  box-shadow: 0 0 0 2px rgb(96 165 250) !important;
+  border-color: rgb(96 165 250) !important;
+}
+
+/* 3. Cor do Placeholder (um pouco mais clara) */
+.review-textarea-dark .ant-input::placeholder {
+  /* Equivalente a placeholder-white/50 */
+  color: rgb(211, 211, 211) !important;
+}
+
+/* 4. Cor do Contador (showCount) */
+.review-textarea-dark .ant-input-comp-count {
+  color: white !important;
+}
+
 /* Estilos da barra de rolagem para Firefox */
 
 @keyframes slide-down {

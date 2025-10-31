@@ -576,6 +576,7 @@ function ProjetoPageContent() {
                 </div>
               </AnimatedSection>
             )}
+
           <AnimatedSection>
             <div className="bg-white p-6 rounded-3xl shadow-md md:mx-auto md:max-w-[85%]">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-[#D7386E] pl-3">
@@ -629,7 +630,9 @@ function ProjetoPageContent() {
                                 <StarRating rating={review.nota} />
                               </div>
                               <p className="text-gray-600 break-words">
-                                {review.comentario}
+                                <FormattedDescription
+                                  text={review.comentario}
+                                />
                               </p>
                             </div>
                           </div>
