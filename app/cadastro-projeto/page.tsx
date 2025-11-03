@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Form,
   Input,
@@ -410,6 +410,15 @@ const CadastroProjetoPage: React.FC = () => {
   });
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const toastShownRef = useRef(false);
+
+  const stripEmojis = (value: string) => {
+    if (!value) return "";
+    return value.replace(
+      /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+      ""
+    );
+  };
 
   const handleLogoChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setLogoFileList(fileList);
@@ -418,24 +427,34 @@ const CadastroProjetoPage: React.FC = () => {
     setPortfolioFileList(fileList);
 
   useEffect(() => {
-    // Se ainda estiver a verificar o estado de login, não faz nada
     if (isLoading) {
       return;
     }
 
-    // Se a verificação terminou e não há utilizador, redireciona
     if (!user) {
-      toast.error("Você precisa estar logado para cadastrar um Projeto.");
+      if (!toastShownRef.current) {
+        toast.error("Você precisa estar logado para cadastrar um Projeto.");
+        toastShownRef.current = true;
+      }
       router.push("/login");
     }
   }, [user, isLoading, router]);
 
-  // 5. Adicionar um estado de carregamento para a página
-  // Isto impede que o formulário apareça rapidamente antes do redirecionamento
   if (isLoading || !user) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Verificando autenticação...</p>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="flex items-center space-x-3">
+          <p className="text-xl font-medium text-gray-700">
+            Verificando autenticação
+          </p>
+
+          {/* Os Pontos Pulsantes */}
+          <div className="flex space-x-1.5">
+            <span className="h-2.5 w-2.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span className="h-2.5 w-2.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span className="h-2.5 w-2.5 bg-blue-600 rounded-full animate-bounce"></span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -682,7 +701,13 @@ const CadastroProjetoPage: React.FC = () => {
                 { required: true, message: "Insira o nome da Prefeitura!" },
               ]}
             >
-              <Input placeholder="Ex: Prefeitura Municipal de Saquarema" />
+              <Input
+                placeholder="Ex: Prefeitura Municipal de Saquarema"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ prefeitura: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -699,7 +724,10 @@ const CadastroProjetoPage: React.FC = () => {
             >
               <Input
                 placeholder="Ex: Secretaria Municipal de Governança e Sustentabilidade"
-                name="secretaria"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ secretaria: strippedValue });
+                }}
               />
             </Form.Item>
           </Col>
@@ -713,7 +741,13 @@ const CadastroProjetoPage: React.FC = () => {
                 { required: true, message: "Insira o nome do responsável!" },
               ]}
             >
-              <Input placeholder="Ex: João da Silva" />
+              <Input
+                placeholder="Ex: João da Silva"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ responsavelProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -734,7 +768,13 @@ const CadastroProjetoPage: React.FC = () => {
                 { required: true, message: "Insira o nome do seu Projeto!" },
               ]}
             >
-              <Input placeholder="Ex: Aqui tem Ods" />
+              <Input
+                placeholder="Ex: Aqui tem Ods"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ nomeProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -769,7 +809,13 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="Ex: link para um vídeo, site, rede social, etc." />
+              <Input
+                placeholder="Ex: link para um vídeo, site, rede social, etc."
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ linkProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -827,10 +873,22 @@ const CadastroProjetoPage: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder="contato@email.com" />
+          <Input
+            placeholder="contato@email.com"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ emailContato: strippedValue });
+            }}
+          />
         </Form.Item>
         <Form.Item name="endereco" label="Endereço Físico (se houver)">
-          <Input placeholder="Rua, Bairro, Nº" />
+          <Input
+            placeholder="Rua, Bairro, Nº"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ endereco: strippedValue });
+            }}
+          />
         </Form.Item>
       </section>
 
@@ -852,6 +910,10 @@ const CadastroProjetoPage: React.FC = () => {
             maxLength={150}
             rows={2}
             placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ descricaoDiferencial: strippedValue });
+            }}
           />
         </Form.Item>
         <Form.Item
@@ -869,17 +931,33 @@ const CadastroProjetoPage: React.FC = () => {
             maxLength={5000}
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ descricao: strippedValue });
+            }}
           />
         </Form.Item>
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item name="website" label="Site da Prefeitura">
-              <Input placeholder="Cole o link da página da sua Prefeitura" />
+              <Input
+                placeholder="Cole o link da página da sua Prefeitura"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ website: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
             <Form.Item name="instagram" label="Instagram (Opcional)">
-              <Input placeholder="Cole o link do seu perfil" />
+              <Input
+                placeholder="Cole o link do seu perfil"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ instagram: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -983,7 +1061,13 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="Nome da Prefeitura" />
+              <Input
+                placeholder="Ex: Prefeitura Municipal de Saquarema"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ prefeitura: strippedValue });
+                }}
+              />
             </Form.Item>
             <Form.Item
               name="projetoId"
@@ -1001,7 +1085,7 @@ const CadastroProjetoPage: React.FC = () => {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 onChange={(e) => {
-                  const valorLimpo = maskId(e.target.value);
+                  const valorLimpo = maskId(stripEmojis(e.target.value));
                   form.setFieldsValue({ projetoId: valorLimpo });
                 }}
               />
@@ -1020,8 +1104,10 @@ const CadastroProjetoPage: React.FC = () => {
             >
               <Input
                 placeholder="Nome da Secretaria"
-                name="secretaria"
-                onChange={(e) => e}
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ secretaria: strippedValue });
+                }}
               />
             </Form.Item>
 
@@ -1036,7 +1122,13 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="Nome do Responsável" />
+              <Input
+                placeholder="Nome do Responsável"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ responsavelProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -1059,7 +1151,13 @@ const CadastroProjetoPage: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder="contato@email.com" />
+          <Input
+            placeholder="contato@email.com"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ emailContato: strippedValue });
+            }}
+          />
         </Form.Item>
       </section>
       <section className="mb-8 border-t pt-4">
@@ -1095,6 +1193,10 @@ const CadastroProjetoPage: React.FC = () => {
             maxLength={150}
             rows={2}
             placeholder="Descreva brevemente o que é o seu projeto. (Em até 150 caracteres)"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ descricaoDiferencial: strippedValue });
+            }}
           />
         </Form.Item>
 
@@ -1104,6 +1206,10 @@ const CadastroProjetoPage: React.FC = () => {
             maxLength={5000}
             rows={4}
             placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ descricao: strippedValue });
+            }}
           />
         </Form.Item>
 
@@ -1115,6 +1221,10 @@ const CadastroProjetoPage: React.FC = () => {
           <TextArea
             rows={3}
             placeholder="Ex: Por favor, alterar o website para https://novosite.com e o Instagram para @novoinsta."
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ outrasAlteracoes: strippedValue });
+            }}
           />
         </Form.Item>
 
@@ -1237,7 +1347,7 @@ const CadastroProjetoPage: React.FC = () => {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 onChange={(e) => {
-                  const valorLimpo = maskId(e.target.value);
+                  const valorLimpo = maskId(stripEmojis(e.target.value));
                   form.setFieldsValue({ projetoId: valorLimpo });
                 }}
               />
@@ -1259,7 +1369,13 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="Nome da Prefeitura" />
+              <Input
+                placeholder="Ex: Prefeitura Municipal de Saquarema"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ prefeitura: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1276,6 +1392,10 @@ const CadastroProjetoPage: React.FC = () => {
               <Input
                 placeholder="Ex: Secretaria Municipal de Governança e Sustentabilidade"
                 name="secretaria"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ secretaria: strippedValue });
+                }}
               />
             </Form.Item>
           </Col>
@@ -1291,7 +1411,13 @@ const CadastroProjetoPage: React.FC = () => {
                 { required: true, message: "Insira o nome do seu Projeto!" },
               ]}
             >
-              <Input placeholder="Ex: Aqui tem ODS" />
+              <Input
+                placeholder="Ex: Aqui tem ODS"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ nomeProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1302,7 +1428,13 @@ const CadastroProjetoPage: React.FC = () => {
                 { required: true, message: "Insira o nome do responsável!" },
               ]}
             >
-              <Input placeholder="Nome do Responsável" />
+              <Input
+                placeholder="Nome do Responsável"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ responsavelProjeto: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -1324,7 +1456,13 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               ]}
             >
-              <Input placeholder="contato@email.com" />
+              <Input
+                placeholder="contato@email.com"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ emailContato: strippedValue });
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -1335,6 +1473,10 @@ const CadastroProjetoPage: React.FC = () => {
           <TextArea
             rows={3}
             placeholder="Sua opinião é importante para nós. Se puder, nos diga por que está saindo."
+            onChange={(e) => {
+              const strippedValue = stripEmojis(e.target.value);
+              form.setFieldsValue({ motivo: strippedValue });
+            }}
           />
         </Form.Item>
         <Form.Item
