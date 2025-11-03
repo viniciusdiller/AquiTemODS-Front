@@ -372,7 +372,7 @@ export default function EspacoODSPage() {
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <img
-                  src="/logo_aquitemods.png"
+                  src="/Logo_aquitemods.png"
                   alt="Logo do Aqui Tem ODS"
                   width={400}
                   height={300}
