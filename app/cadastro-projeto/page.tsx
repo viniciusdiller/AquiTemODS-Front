@@ -459,13 +459,6 @@ const CadastroProjetoPage: React.FC = () => {
     );
   }
 
-  const handleMaskChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    maskFn: (value: string) => string
-  ) => {
-    const { name, value } = e.target;
-    form.setFieldsValue({ [name]: maskFn(value) });
-  };
   const maskId = (value: string) => {
     return value.replace(/\D/g, "");
   };
@@ -753,9 +746,6 @@ const CadastroProjetoPage: React.FC = () => {
         </Row>
       </section>
 
-      {/* O RESTANTE DO FORMULÁRIO CONTINUA IGUAL */}
-      {/* ... (seções Informações do Projeto, Contato e Localização, Detalhes e Mídia) ... */}
-
       {/* --------------------- Informações do Projeto --------------------- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações do Projeto")}
@@ -769,7 +759,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Ex: Aqui tem Ods"
+                placeholder="Ex: Aqui tem ODS"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ nomeProjeto: strippedValue });
@@ -1103,7 +1093,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Nome da Secretaria"
+                placeholder="Ex: Secretaria Municipal de Governança e Sustentabilidade"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ secretaria: strippedValue });
@@ -1123,7 +1113,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Nome do Responsável"
+                placeholder="Ex: João da Silva"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ responsavelProjeto: strippedValue });
@@ -1134,31 +1124,51 @@ const CadastroProjetoPage: React.FC = () => {
         </Row>
 
         <Row gutter={24}>
-          <Col xs={24} md={12}></Col>
-          <Col xs={24} md={12}></Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="nomeProjeto"
+              label="Nome do Projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o nome do seu Projeto para identificação!",
+                },
+              ]}
+            >
+              <Input
+                placeholder="Ex: Aqui tem ODS"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ nomeProjeto: strippedValue });
+                }}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="emailContato"
+              label="E-mail de Contato do projeto"
+              rules={[
+                {
+                  required: true,
+                  message: "O e-mail é obrigatório para identificação!",
+                },
+                {
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "E-mail inválido!",
+                },
+              ]}
+            >
+              <Input
+                placeholder="contato@email.com"
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({ emailContato: strippedValue });
+                }}
+              />
+            </Form.Item>
+          </Col>
         </Row>
-        <Form.Item
-          name="emailContato"
-          label="E-mail de Contato do projeto"
-          rules={[
-            {
-              required: true,
-              message: "O e-mail é obrigatório para identificação!",
-            },
-            {
-              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "E-mail inválido!",
-            },
-          ]}
-        >
-          <Input
-            placeholder="contato@email.com"
-            onChange={(e) => {
-              const strippedValue = stripEmojis(e.target.value);
-              form.setFieldsValue({ emailContato: strippedValue });
-            }}
-          />
-        </Form.Item>
       </section>
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações para Atualizar")}
@@ -1429,7 +1439,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Nome do Responsável"
+                placeholder="Ex: João da Silva"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ responsavelProjeto: strippedValue });

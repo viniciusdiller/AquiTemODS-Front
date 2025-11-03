@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { Image } from "antd";
 
 interface Item {
   id: string;
@@ -14,108 +12,36 @@ interface ImageGridProps {
 }
 
 const ImageGrid: React.FC<ImageGridProps> = ({ items }) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const displayedItems = Array.isArray(items)
     ? items.filter((item) => item && item.img).slice(0, 4)
     : [];
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        {displayedItems.map((item) => (
-          /* 1. Trocado de 'motion.div' para 'div' e removidas as props de animação:
-      - whileHover
-      - transition
-      - layoutId
-      - layout
-     */
-          <div
-            key={item.id}
-            className="relative aspect-square cursor-pointer overflow-hidden rounded-xl shadow-lg"
-            onClick={() => setSelectedImage(item.img)}
-          >
-            <Image
-              src={item.img}
-              alt={`Imagem do portfólio ${item.id}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 50vw, 25vw"
-            />
-          </div>
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {selectedImage && (
-          <ImageModal
-            src={selectedImage}
-            onClose={() => setSelectedImage(null)}
-            // 2. Prop 'layoutId' removida daqui
-          />
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-interface ImageModalProps {
-  src: string;
-  onClose: () => void;
-  // 3. 'layoutId' removido da interface
-}
-
-// 4. 'layoutId' removido dos parâmetros da função
-const ImageModal: React.FC<ImageModalProps> = ({ src, onClose }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm"
-      onClick={onClose}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <Image.PreviewGroup
+      preview={{
+        rootClassName: "custom-image-preview-root",
+      }}
     >
-      <motion.div
-        className="relative p-4"
-        onClick={(e) => e.stopPropagation()}
-        // 5. Prop 'layoutId' removida do modal
-      >
-        <img
-          src={src}
-          alt="Visualização da imagem ampliada"
-          className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl"
-        />
-        <button
-          onClick={onClose}
-          className="absolute -top-1 -right-1 bg-white rounded-full p-1.5 text-black hover:bg-gray-200 transition-transform transform hover:scale-110"
-          aria-label="Fechar modal"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </motion.div>
-    </motion.div>
+      <div className="w-full max-w-5xl mx-auto p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {displayedItems.map((item) => (
+            <div
+              key={item.id}
+              className="relative aspect-square cursor-pointer overflow-hidden rounded-xl shadow-lg"
+            >
+              <Image
+                src={item.img}
+                alt={`Imagem do portfólio ${item.id}`}
+                width="100%"
+                height="100%"
+                style={{ objectFit: "cover" }}
+                className="rounded-xl"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </Image.PreviewGroup>
   );
 };
 
