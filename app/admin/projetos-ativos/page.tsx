@@ -16,7 +16,7 @@ import {
   Input,
   Popconfirm,
   Grid,
-  Pagination, // 1. IMPORTAR PAGINATION
+  Pagination,
 } from "antd";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -104,7 +104,7 @@ const ProjetosAtivosPage: React.FC = () => {
     setIsEditModalVisible(false);
     setSelectedItem(null);
     if (shouldRefresh) {
-      fetchData(); // Recarrega os dados se uma edição foi salva
+      fetchData();
     }
   };
 
@@ -240,9 +240,20 @@ const ProjetosAtivosPage: React.FC = () => {
                               title={projeto.nomeProjeto}
                               description={
                                 <>
-                                  <Text>Prefeitura: {projeto.prefeitura}</Text>
+                                  <Text>
+                                    <strong>ID do Projeto:</strong>{" "}
+                                    {projeto.projetoId}
+                                  </Text>
                                   <br />
-                                  <Text>Secretaria: {projeto.secretaria}</Text>
+                                  <Text>
+                                    <strong>Prefeitura:</strong>{" "}
+                                    {projeto.prefeitura}
+                                  </Text>
+                                  <br />
+                                  <Text>
+                                    <strong>Secretaria:</strong>{" "}
+                                    {projeto.secretaria}
+                                  </Text>
                                 </>
                               }
                             />

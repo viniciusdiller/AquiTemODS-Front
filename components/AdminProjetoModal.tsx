@@ -14,13 +14,19 @@ import {
   Alert,
   message,
   Typography,
+  Image as AntdImage,
+  Tag,
+  Popconfirm,
 } from "antd";
+import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { adminUpdateProjeto } from "@/lib/api";
-import { Projeto } from "@/types/Interface-Projeto";
+import { Projeto, Imagens } from "@/types/Interface-Projeto";
 
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",
@@ -49,7 +55,7 @@ interface AdminProjetoModalProps {
   onClose: (shouldRefresh: boolean) => void;
 
   mode: "edit-and-approve" | "edit-only";
-  onEditAndApprove: (values: any) => Promise<void>; // Função do dashboard
+  onEditAndApprove: (values: any) => Promise<void>;
 }
 
 const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
@@ -63,18 +69,41 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
   const [editForm] = Form.useForm();
   const [outrasAlteracoes, setOutrasAlteracoes] = useState<string | null>(null);
 
+  const [currentLogo, setCurrentLogo] = useState<string | null>(null);
+  // ALTERAÇÃO 2: Corrigido de 'ImagemProjeto[]' para 'Imagens[]'
+  const [currentPortfolio, setCurrentPortfolio] = useState<Imagens[]>([]);
+  const [portfolioToDelete, setPortfolioToDelete] = useState<string[]>([]);
+  const [logoToDelete, setLogoToDelete] = useState<boolean>(false);
+
   useEffect(() => {
     if (projeto) {
       let dataToEdit: any = { ...projeto };
+
+      setCurrentLogo(projeto.logoUrl || null);
+      // Aqui está correto, pois 'projeto.projetoImg' é do tipo 'Imagens[]'
+      setCurrentPortfolio(projeto.projetoImg || []);
+      setPortfolioToDelete([]);
+      setLogoToDelete(false);
 
       if (
         projeto.status === "pendente_atualizacao" &&
         projeto.dados_atualizacao
       ) {
         dataToEdit = { ...projeto, ...projeto.dados_atualizacao };
-
         setOutrasAlteracoes(projeto.dados_atualizacao.outrasAlteracoes || null);
-
+        if (projeto.dados_atualizacao.logo) {
+          setCurrentLogo(projeto.dados_atualizacao.logo);
+        }
+        if (projeto.dados_atualizacao.imagens) {
+          const novasImagens = projeto.dados_atualizacao.imagens.map(
+            (url: string, index: number) => ({
+              id: `new-${index}`, // O ID não está na interface 'Imagens', mas tudo bem
+              url: url,
+            })
+          );
+          // O TypeScript vai aceitar isso porque { url: string } é compatível com 'Imagens'
+          setCurrentPortfolio(novasImagens);
+        }
         delete dataToEdit.outrasAlteracoes;
       } else {
         setOutrasAlteracoes(null);
@@ -90,6 +119,10 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
     } else {
       editForm.resetFields();
       setOutrasAlteracoes(null);
+      setCurrentLogo(null);
+      setCurrentPortfolio([]);
+      setPortfolioToDelete([]);
+      setLogoToDelete(false);
     }
   }, [projeto, visible, editForm]);
 
@@ -102,6 +135,16 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       values.odsRelacionadas = values.odsRelacionadas.join(", ");
     }
 
+    const finalValues = { ...values };
+
+    if (logoToDelete) {
+      finalValues.logoUrl = null;
+    }
+
+    if (portfolioToDelete.length > 0) {
+      finalValues.urlsParaExcluir = portfolioToDelete;
+    }
+
     try {
       const token = localStorage.getItem("admin_token");
       if (!token) {
@@ -111,11 +154,10 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       }
 
       if (mode === "edit-and-approve") {
-        await onEditAndApprove(values);
-
+        await onEditAndApprove(finalValues);
         message.success("Projeto editado e aprovado!");
       } else {
-        await adminUpdateProjeto(projeto.projetoId, values, token);
+        await adminUpdateProjeto(projeto.projetoId, finalValues, token);
         message.success("Projeto atualizado com sucesso!");
       }
 
@@ -125,6 +167,19 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
     } finally {
       setIsEditLoading(false);
     }
+  };
+
+  // Mantém a função de URL correta (do dashboard)
+  const getFullImageUrl = (path: string): string => {
+    if (!path) return "";
+    if (path.startsWith("http") || path.startsWith("blob:")) {
+      return path;
+    }
+    const normalizedPath = path.replace(/\\/g, "/");
+    const cleanPath = normalizedPath.startsWith("/")
+      ? normalizedPath.substring(1)
+      : normalizedPath;
+    return `${API_URL}/${cleanPath}`;
   };
 
   return (
@@ -174,6 +229,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           <Title level={5} className="mt-4">
             Informações Principais
           </Title>
+          {/* ... (Restante dos Form.Items) ... */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -220,7 +276,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
@@ -232,7 +287,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
-
           <Title level={5} className="mt-4">
             Contato e Links
           </Title>
@@ -279,7 +333,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           <Form.Item name="endereco" label="Endereço">
             <Input />
           </Form.Item>
-
           <Title level={5} className="mt-4">
             Detalhes
           </Title>
@@ -299,7 +352,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           </Form.Item>
           <Form.Item name="odsRelacionadas" label="ODS Relacionadas">
             <Select mode="multiple" placeholder="Selecione as ODS relacionadas">
-              {/* Lista simplificada de todas as ODS */}
               {categorias
                 .map((cat) => cat.split(" - ")[0])
                 .filter(
@@ -312,13 +364,120 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
                 ))}
             </Select>
           </Form.Item>
-          <Alert
-            message="Aviso sobre Arquivos"
-            description="A 'Nova Logo' e as 'Novas Imagens' enviadas pelo usuário (visíveis na tela anterior) serão aprovadas automaticamente junto com estas edições. Não é possível adicionar novos arquivos nesta tela."
-            type="warning"
-            showIcon
-            className="mt-4"
-          />
+
+          {/* --- SEÇÃO DE GERENCIAMENTO DE IMAGENS --- */}
+          <Title level={5} className="mt-4">
+            Gerenciamento de Imagens
+          </Title>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Title level={5} style={{ fontSize: "16px" }}>
+                Logo
+              </Title>
+              {currentLogo ? (
+                <div style={{ position: "relative", width: "fit-content" }}>
+                  <AntdImage
+                    src={getFullImageUrl(currentLogo)}
+                    alt="Logo do Projeto"
+                    style={{
+                      width: 150,
+                      height: 150,
+                      objectFit: "cover",
+                      border: "1px solid #d9d9d9",
+                      borderRadius: "8px",
+                    }}
+                    fallback="/placeholder-logo.svg"
+                  />
+                  <Popconfirm
+                    title="Remover esta logo?"
+                    okText="Remover"
+                    cancelText="Cancelar"
+                    okType="danger"
+                    placement="topRight"
+                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                    onConfirm={() => {
+                      setLogoToDelete(true);
+                      setCurrentLogo(null);
+                      message.info("Logo marcada para remoção.");
+                    }}
+                  >
+                    <Button
+                      type="primary"
+                      danger
+                      icon={<CloseOutlined />}
+                      style={{ position: "absolute", top: 5, right: 5 }}
+                      size="small"
+                      title="Remover Logo"
+                    />
+                  </Popconfirm>
+                </div>
+              ) : (
+                <p>{logoToDelete ? "Logo será removida." : "Nenhuma logo."}</p>
+              )}
+            </Col>
+            <Col span={12}>
+              <Title level={5} style={{ fontSize: "16px" }}>
+                Imagens do Portfólio
+              </Title>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {currentPortfolio.length > 0 ? (
+                  currentPortfolio.map((img) => (
+                    <div
+                      key={img.url}
+                      style={{ position: "relative", width: "fit-content" }}
+                    >
+                      <AntdImage
+                        src={getFullImageUrl(img.url)}
+                        alt="Imagem do Portfólio"
+                        style={{
+                          width: 100,
+                          height: 100,
+                          objectFit: "cover",
+                          border: "1px solid #d9d9d9",
+                          borderRadius: "8px",
+                        }}
+                        fallback="/placeholder-logo.svg"
+                      />
+                      <Popconfirm
+                        title="Tem certeza que quer remover esta imagem?"
+                        okText="Remover"
+                        cancelText="Cancelar"
+                        okType="danger"
+                        placement="topRight"
+                        icon={
+                          <QuestionCircleOutlined style={{ color: "red" }} />
+                        }
+                        onConfirm={() => {
+                          setPortfolioToDelete((prev) => [...prev, img.url]);
+                          setCurrentPortfolio((prev) =>
+                            prev.filter((i) => i.url !== img.url)
+                          );
+                          message.info("Imagem marcada para remoção.");
+                        }}
+                      >
+                        <Button
+                          type="primary"
+                          danger
+                          icon={<CloseOutlined />}
+                          style={{ position: "absolute", top: 5, right: 5 }}
+                          size="small"
+                          title="Remover Imagem"
+                        />
+                      </Popconfirm>
+                    </div>
+                  ))
+                ) : (
+                  <p>Nenhuma imagem no portfólio.</p>
+                )}
+                {portfolioToDelete.length > 0 && (
+                  <Tag color="red" style={{ marginTop: 10, width: "100%" }}>
+                    {portfolioToDelete.length} imagem(ns) serão removidas.
+                  </Tag>
+                )}
+              </div>
+            </Col>
+          </Row>
+          {/* --- FIM DA SEÇÃO --- */}
         </Spin>
       </Form>
     </Modal>
