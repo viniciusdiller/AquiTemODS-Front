@@ -177,6 +177,12 @@ export function Navbar() {
               Espaço dos ODS
             </Link>
             <Link
+              href="/FAQ"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors"
+            >
+              FAQ
+            </Link>
+            <Link
               href="/enigmas-do-futuro"
               className="text-gray-700 hover:text-[#D7386E]  transition-colors"
             >
@@ -278,6 +284,13 @@ export function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Espaço dos ODS
+            </Link>
+            <Link
+              href="/FAQ"
+              className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
+              onClick={() => setIsOpen(false)}
+            >
+              FAQ
             </Link>
             <Link
               href="/enigmas-do-futuro"

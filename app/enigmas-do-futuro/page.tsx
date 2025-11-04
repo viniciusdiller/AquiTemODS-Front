@@ -1,5 +1,6 @@
 // Enigmas do Futuro
 import React from "react";
+import FaleConoscoButton from "@/components/FaleConoscoButton";
 
 export default function EnigmasDoFuturoPage() {
   return (
@@ -45,7 +46,7 @@ export default function EnigmasDoFuturoPage() {
         </section>
         {/* --- CONTEÚDO PRINCIPAL --- */}
         <section className="mt-8 border-t pt-6">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               O que é "ODS: Enigmas do Futuro"?
             </span>
@@ -88,7 +89,7 @@ export default function EnigmasDoFuturoPage() {
         </section>
         {/* --- LINK PARA O JOGO --- */}
         <section className="mt-12 border-t pt-6">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               Link para o Enigmas do Futuro:
             </span>
@@ -116,6 +117,7 @@ export default function EnigmasDoFuturoPage() {
           </div>
         </section>
       </div>
+      <FaleConoscoButton />
     </div>
   );
 }

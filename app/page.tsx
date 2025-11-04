@@ -189,13 +189,13 @@ export default function HomePage() {
           className="hidden md:hidden mx-auto h-20 w-auto mb-5"
         />
         <div>
-          <Link href="/" target="about:blank">
+          <Link href="/" target="about:blank" className="w-fit mx-auto block">
             <Image
               src="/Logo_aquitemods.png"
               alt="Logo Aqui Tem ODS"
               width={2660}
               height={898}
-              className="md:block mx-auto h-14 sm:h-20 w-auto mb-5 milecem:h-24"
+              className="block h-14 sm:h-20 w-auto mb-5 milecem:h-24"
             />
           </Link>
         </div>

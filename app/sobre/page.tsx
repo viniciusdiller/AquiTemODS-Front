@@ -1,6 +1,7 @@
 // Espaço dos Aqui Tem ODS React from "react";
 import CarouselSobre from "@/components/CarouselSobre";
 import { Heart } from "lucide-react";
+import FaleConoscoButton from "@/components/FaleConoscoButton";
 
 export default function EspacoODSPage() {
   return (
@@ -63,7 +64,7 @@ export default function EspacoODSPage() {
 
         {/* --- O QUE É --- */}
         <section className="mb-8 border-t pt-8">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               Origem e contexto: dos Seminários Saquarema 2030 ao Lab ISA
             </span>
@@ -385,6 +386,7 @@ export default function EspacoODSPage() {
             </a>
           </div>
         </section>
+        <FaleConoscoButton />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
+import FaleConoscoButton from "@/components/FaleConoscoButton";
 
 export default function SobrePage() {
   return (
@@ -67,7 +68,7 @@ export default function SobrePage() {
 
         {/* --- CONTEÚDO PRINCIPAL --- */}
         <section className="mt-8 border-t pt-6">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               Por que os ODS são importantes?
             </span>
@@ -94,7 +95,7 @@ export default function SobrePage() {
         </section>
 
         <section className="mb-8 border-t pt-8">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               O papel dos municípios
             </span>
@@ -140,7 +141,7 @@ export default function SobrePage() {
         </section>
 
         <section className="mt-8 border-t pt-6">
-          <h2 className="text-3xl font-bold text-left mb-10">
+          <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               Um compromisso que começa no território
             </span>
@@ -163,7 +164,7 @@ export default function SobrePage() {
 
         {/* --- SEÇÃO DE CURSOS --- */}
         <section className="mt-12 border-t pt-6">
-          <h2 className="text-3xl font-bold text-center mb-10">
+          <h2 className="text-3xl font-semibold text-center mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
               Capacitações e Conteúdos sobre os ODS:
             </span>
@@ -353,6 +354,7 @@ export default function SobrePage() {
           </p>
         </section>
       </div>
+      <FaleConoscoButton />
     </div>
   );
 }
