@@ -468,6 +468,7 @@ const CadastroProjetoPage: React.FC = () => {
     form.resetFields();
     setLogoFileList([]);
     setPortfolioFileList([]);
+    setSelectedCategory(null);
     setFlowStep("initial");
   };
 
@@ -676,7 +677,11 @@ const CadastroProjetoPage: React.FC = () => {
         >
           <Select
             placeholder="Selecione uma ação"
-            onChange={(value) => setFlowStep(value as FlowStep)}
+            onChange={(value) => {
+              setSelectedCategory(null);
+              form.resetFields();
+              setFlowStep(value as FlowStep);
+            }}
             size="large"
           >
             <Option value="register">
@@ -786,7 +791,7 @@ const CadastroProjetoPage: React.FC = () => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item
-              name="ods" // <-- CORRIGIDO
+              name="ods"
               label="ODS principal do Projeto"
               rules={[{ required: true, message: "Selecione uma categoria!" }]}
             >
@@ -826,7 +831,7 @@ const CadastroProjetoPage: React.FC = () => {
             </Form.Item>
             <Form.Item
               name="venceuPspe"
-              label="Venceu o prêmio PSPE?"
+              label="O Projeto é vencedor do Prêmio Sebrae Prefeitura Empreendedora?"
               rules={[{ required: true, message: "Selecione uma opção!" }]}
               initialValue={false}
             >
@@ -1267,33 +1272,60 @@ const CadastroProjetoPage: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          name="odsRelacionadas"
-          label="Novas Tags de Busca (Até 5)"
-          help="Selecione até 5 ODS relacionadas. As novas tags substituirão as atuais."
-          rules={[
-            {
-              validator: (_, value) =>
-                value && value.length > 5
-                  ? Promise.reject(new Error("Selecione no máximo 5 tags!"))
-                  : Promise.resolve(),
-            },
-          ]}
+          name="ods"
+          label="Nova ODS Principal (Opcional)"
+          help="Selecione uma nova ODS principal para alterar a atual. Isso redefinirá as ODS relacionadas."
+          className="mt-10"
         >
           <Select
-            mode="multiple"
+            placeholder="Selecione a NOVA ODS principal do Projeto"
+            onSelect={(value: string) => setSelectedCategory(value)}
+            onChange={() => form.setFieldsValue({ odsRelacionadas: [] })}
             allowClear
-            placeholder="Selecione as tags"
-            maxTagCount={5}
           >
-            {Object.values(odsRelacionadas)
-              .flat()
-              .map((tag) => (
+            {categorias.map((cat) => (
+              <Option key={cat} value={cat}>
+                {cat}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {selectedCategory ? (
+          <Form.Item
+            name="odsRelacionadas"
+            label="Novas ODS Relacionadas"
+            help="Selecione no máximo 5 ODS. Elas substituirão as atuais."
+            rules={[
+              // Nenhuma regra 'required'
+              {
+                validator: (_, value) =>
+                  value && value.length > 5
+                    ? Promise.reject(new Error("Selecione no máximo 5 tags!"))
+                    : Promise.resolve(),
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Selecione até 5 ODS relacionadas"
+              maxTagCount={5}
+            >
+              {/* Popula baseado no selectedCategory */}
+              {odsRelacionadas[selectedCategory]?.map((tag) => (
                 <Option key={tag} value={tag}>
                   {tag}
                 </Option>
               ))}
-          </Select>
-        </Form.Item>
+            </Select>
+          </Form.Item>
+        ) : (
+          <p className="text-gray-600 mb-6 mt-2">
+            *Selecione uma Nova ODS Principal acima para ver as ODS relacionadas
+            sugeridas.*
+          </p>
+        )}
 
         <Form.Item
           name="venceuPspe"
@@ -1570,7 +1602,16 @@ const CadastroProjetoPage: React.FC = () => {
       title={submittedMessage.title}
       subTitle={submittedMessage.subTitle}
       extra={[
-        <Button type="primary" key="console" onClick={resetAll}>
+        <Button
+          type="primary"
+          key="console"
+          onClick={() => {
+            setSelectedCategory(null);
+            form.resetFields();
+            setFlowStep("initial");
+          }}
+          className="mb-6"
+        >
           Voltar ao Início
         </Button>,
       ]}

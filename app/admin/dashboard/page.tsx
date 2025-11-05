@@ -85,7 +85,7 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   logo: { label: "Nova Logo", order: 42 },
   projetoImg: { label: "Portfólio Atual", order: 43 },
   status: { label: "Status Atual", order: 5 },
-  venceuPspe: { label: "Prêmio PSPE", order: 6 },
+  venceuPspe: { label: "Venceu o Prêmio PSPE", order: 6 },
   motivo: { label: "Motivo da Exclusão", order: 1000 },
   motivoExclusao: { label: "Motivo da Exclusão", order: 6 },
   createdAt: { label: "Data de Criação", order: 100 },
@@ -114,7 +114,7 @@ const AdminDashboard: React.FC = () => {
     exclusoes: 1,
   });
 
-  const screens = useBreakpoint(); // 3. OBTER O ESTADO DA TELA
+  const screens = useBreakpoint();
   const isMobile = !screens.md;
 
   const getFullImageUrl = (path: string): string => {
@@ -127,9 +127,29 @@ const AdminDashboard: React.FC = () => {
   };
 
   const renderValue = (key: string, value: any): React.ReactNode => {
-    // Adicionando um fallback para valores nulos ou vazios
     if (value === null || value === undefined || value === "") {
       return <Text type="secondary">Não informado</Text>;
+    }
+
+    if (key === "createdAt" || key === "updatedAt") {
+      try {
+        const date = new Date(value);
+
+        return new Intl.DateTimeFormat("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }).format(date);
+      } catch (error) {
+        return String(value);
+      }
+    }
+
+    if (key === "venceuPspe") {
+      return value === true ? "Sim" : "Não";
     }
 
     if (
@@ -174,7 +194,6 @@ const AdminDashboard: React.FC = () => {
   };
 
   const fetchData = useCallback(async () => {
-    // ... (lógica de fetchData inalterada) ...
     setLoading(true);
     const token = localStorage.getItem("admin_token");
     if (!token) {
@@ -233,18 +252,16 @@ const AdminDashboard: React.FC = () => {
       // 3. CHAMA O FETCH USANDO a variável fetchOptions
       const response = await fetch(
         `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
-        fetchOptions // <-- ESTA É A CORREÇÃO PRINCIPAL
+        fetchOptions
       );
 
       // 4. VERIFICA O ERRO ANTES de tentar o .json()
       if (!response.ok) {
         const errorText = await response.text();
         try {
-          // Tenta ver se o erro é um JSON válido (ex: { message: "..." })
           const errorJson = JSON.parse(errorText);
           throw new Error(errorJson.message || "Erro do servidor");
         } catch (e) {
-          // Se não for JSON (é o HTML "<!DOCTYPE..."), lança este erro
           console.error("Erro não-JSON da API:", errorText);
           throw new Error(
             "Falha na comunicação com o servidor. (Recebeu HTML)"
@@ -277,7 +294,7 @@ const AdminDashboard: React.FC = () => {
       }
 
       setModalVisible(false);
-      setIsRejectModalVisible(false); // Fecha o novo modal
+      setIsRejectModalVisible(false);
       setSelectedItem(null);
       setRejectionReason("");
     } catch (error: any) {
@@ -300,7 +317,7 @@ const AdminDashboard: React.FC = () => {
   const handleEditAndApproveSubmit = async (values: any) => {
     if (!selectedItem) return;
 
-    setIsActionLoading(true); // Reutiliza o estado de loading
+    setIsActionLoading(true);
     const token = localStorage.getItem("admin_token");
     if (!token) {
       message.error("Autenticação expirada.");
@@ -323,20 +340,18 @@ const AdminDashboard: React.FC = () => {
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
 
-      // A mensagem de sucesso é mostrada pelo modal
-      // Fecha ambos os modais
       setIsEditModalVisible(false);
       setModalVisible(false);
       setSelectedItem(null);
-      fetchData(); // Recarrega os dados
+      fetchData();
     } catch (error: any) {
-      setIsActionLoading(false); // Garante que o loading pare em caso de erro
-      throw error; // Lança o erro para o modal (AdminProjetoModal) tratar
+      setIsActionLoading(false);
+      throw error;
     } finally {
       setIsActionLoading(false);
     }
   };
-  // ## MELHORIA: Renderiza a tabela de comparação (Diff) ##
+
   const renderDiffTable = (
     status: "pendente_atualizacao" | "pendente_exclusao",
     alertType: "info" | "error",
@@ -351,7 +366,7 @@ const AdminDashboard: React.FC = () => {
       return null;
     }
 
-    // Mapa de chaves (como já tínhamos)
+    // Mapa de chaves
     const keyMap: { [newKey: string]: { oldKey: string; labelKey: string } } = {
       logo: { oldKey: "logoUrl", labelKey: "logo" },
       imagens: { oldKey: "projetoImg", labelKey: "projetoImg" },
@@ -359,7 +374,7 @@ const AdminDashboard: React.FC = () => {
 
     // Prepara os dados para a tabela
     const diffData = Object.entries(selectedItem.dados_atualizacao)
-      .filter(([key]) => !keysToFilter.includes(key)) // Usa o novo parâmetro
+      .filter(([key]) => !keysToFilter.includes(key))
       .map(([key, newValue]) => {
         const mapping = keyMap[key];
         const oldKey = mapping ? mapping.oldKey : key;
@@ -390,17 +405,17 @@ const AdminDashboard: React.FC = () => {
       );
 
     // Define a cor do título com base no tipo de alerta
-    const titleColor = alertType === "info" ? "#0050b3" : "#d4380d"; // Cor de erro do Antd
+    const titleColor = alertType === "info" ? "#0050b3" : "#d4380d";
 
     return (
       <Alert
-        type={alertType} // Parâmetro
+        type={alertType}
         showIcon
         className="mt-6"
         style={{ overflow: "hidden" }}
         message={
           <Title level={4} style={{ margin: 0, color: titleColor }}>
-            {title} {/* Parâmetro */}
+            {title}
           </Title>
         }
         description={
@@ -418,14 +433,14 @@ const AdminDashboard: React.FC = () => {
               title="Valor Antigo"
               dataIndex="oldValue"
               key="oldValue"
-              width={400} // Usando os valores que ajustamos
+              width={400}
               render={(value, record: any) => renderValue(record.key, value)}
             />
             <Column
               title="Valor Novo"
               dataIndex="newValue"
               key="newValue"
-              width={450} // Usando os valores que ajustamos
+              width={450}
               render={(value, record: any) => renderValue(record.newKey, value)}
             />
           </Table>
@@ -441,7 +456,6 @@ const AdminDashboard: React.FC = () => {
     }));
   };
 
-  // ## MELHORIA: Adiciona ícones e avatares aos cards e listas ##
   const renderList = (
     title: string,
     listData: Projeto[],
@@ -483,7 +497,7 @@ const AdminDashboard: React.FC = () => {
                       avatar={
                         <Avatar
                           src={getFullImageUrl(item.logoUrl || "")}
-                          icon={listIcons[title]} // Icone de fallback
+                          icon={listIcons[title]}
                         />
                       }
                       title={item.nomeProjeto}
@@ -492,7 +506,7 @@ const AdminDashboard: React.FC = () => {
                   </List.Item>
                 )}
               />
-              {/* 11. NOVO: Renderiza a paginação se houver mais de uma página */}
+              {/* Renderiza a paginação se houver mais de uma página */}
               {totalCount > DASHBOARD_PAGE_SIZE && (
                 <div className="mt-4 text-center">
                   <Pagination
@@ -533,7 +547,7 @@ const AdminDashboard: React.FC = () => {
                 type="primary"
                 icon={<DatabaseOutlined />}
                 size="large"
-                className={isMobile ? "w-full" : ""} // Ocupa largura total no mobile
+                className={isMobile ? "w-full" : ""}
               >
                 Gerenciar Projetos Ativos
               </Button>
@@ -544,7 +558,7 @@ const AdminDashboard: React.FC = () => {
                 icon={<CommentOutlined />}
                 size="large"
                 style={{ backgroundColor: "#3C6AB2", color: "#fff" }}
-                className={isMobile ? "w-full" : ""} // Ocupa largura total no mobile
+                className={isMobile ? "w-full" : ""}
               >
                 Gerenciar Comentários
               </Button>
@@ -587,11 +601,10 @@ const AdminDashboard: React.FC = () => {
               </Button>
             ),
 
-            // 3. APROVAR (Azul) - Movido para o final e 'type="primary"' adicionado
             selectedItem.status !== StatusProjeto.PENDENTE_EXCLUSAO ? (
               <Button
                 key="approve_direct"
-                type="primary" // Adicionado para ficar azul
+                type="primary"
                 onClick={() => handleAction("approve")}
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
@@ -602,7 +615,7 @@ const AdminDashboard: React.FC = () => {
               <Button
                 key="approve_delete"
                 type="primary"
-                danger // Manter 'danger' aqui faz sentido, pois é uma exclusão
+                danger
                 onClick={() => handleAction("approve")}
                 icon={<CheckOutlined />}
                 loading={isActionLoading}
@@ -675,7 +688,7 @@ const AdminDashboard: React.FC = () => {
         onClose={(shouldRefresh) => {
           setIsEditModalVisible(false);
           if (shouldRefresh) {
-            setModalVisible(false); // Fecha o modal de detalhes também
+            setModalVisible(false);
             setSelectedItem(null);
             fetchData();
           }
@@ -683,20 +696,19 @@ const AdminDashboard: React.FC = () => {
         mode="edit-and-approve"
         onEditAndApprove={handleEditAndApproveSubmit}
       />
-      {/* --- NOVO: MODAL DE REJEIÇÃO --- */}
+      {/* ---  MODAL DE REJEIÇÃO --- */}
       <Modal
         title="Confirmar Rejeição"
         open={isRejectModalVisible}
         onCancel={() => {
           setIsRejectModalVisible(false);
-          setRejectionReason(""); // Limpa ao cancelar
+          setRejectionReason("");
         }}
-        // Chama o handleAction com o motivo
         onOk={() => handleAction("reject", rejectionReason)}
         confirmLoading={isActionLoading}
         okText="Confirmar Rejeição"
         cancelText="Voltar"
-        okButtonProps={{ danger: true }} // Deixa o botão de confirmação vermelho
+        okButtonProps={{ danger: true }}
       >
         <Typography.Text strong className="block mb-2">
           Por favor, informe o motivo da rejeição (será enviado ao usuário):
@@ -708,7 +720,6 @@ const AdminDashboard: React.FC = () => {
           placeholder="O projeto foi rejeitado pois..."
         />
       </Modal>
-      {/* --- FIM DO NOVO MODAL --- */}
     </div>
   );
 };
