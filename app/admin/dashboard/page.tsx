@@ -85,6 +85,7 @@ const fieldConfig: { [key: string]: { label: string; order: number } } = {
   logo: { label: "Nova Logo", order: 42 },
   projetoImg: { label: "Portfólio Atual", order: 43 },
   status: { label: "Status Atual", order: 5 },
+  venceuPspe: { label: "Prêmio PSPE", order: 6 },
   motivo: { label: "Motivo da Exclusão", order: 1000 },
   motivoExclusao: { label: "Motivo da Exclusão", order: 6 },
   createdAt: { label: "Data de Criação", order: 100 },

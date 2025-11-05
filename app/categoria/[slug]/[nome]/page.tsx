@@ -12,7 +12,7 @@ import {
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
 import "leaflet/dist/leaflet.css";
-
+import Image from "next/image";
 import {
   getProjetoByNome,
   deleteReview,
@@ -506,14 +506,39 @@ function ProjetoPageContent() {
           {projeto.descricao && ( // Mostra apenas se a descrição existir
             <motion.section
               ref={sobreProjetoRef}
-              className="bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4 mb-8" // Adiciona margem inferior
+              className="relative bg-white p-6 rounded-3xl shadow-lg md:mx-auto md:max-w-[85%] space-y-4 mb-8" // Adiciona margem inferior
               initial="hidden"
               animate="visible"
               variants={itemVariants}
             >
-              <h3 className="text-2xl font-bold text-gray-900 border-l-4 border-[#D7386E] pl-3">
-                Sobre o Projeto
-              </h3>
+              {projeto.venceuPspe && (
+                <div className="absolute top-0 right-0 p-2 sm:p-4">
+                  <Image
+                    src="/Selo PSPE.png"
+                    alt="Selo Prêmio PSPE"
+                    width={100}
+                    height={100}
+                    className="opacity-90 w-20 h-20 sm:w-20 sm:h-20"
+                  />
+                </div>
+              )}
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-2 mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 border-l-4 border-[#D7386E] pl-3">
+                  Sobre o Projeto
+                </h3>
+                {projeto.venceuPspe && (
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="h-6 w-px bg-gray-300"
+                      aria-hidden="true"
+                    ></div>
+
+                    <span className="text-sm font-medium text-gray-500">
+                      Projeto vencedor do Prêmio PSPE
+                    </span>
+                  </div>
+                )}
+              </div>
               <div>
                 <div
                   className={`relative overflow-hidden transition-all duration-300 ease-in-out ${

@@ -365,6 +365,17 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             </Select>
           </Form.Item>
 
+          <Form.Item
+            name="venceuPspe"
+            label="Venceu o Prêmio PSPE?"
+            rules={[{ required: true, message: "Selecione uma opção" }]}
+          >
+            <Select placeholder="Selecione uma opção">
+              <Option value={true}>Sim</Option>
+              <Option value={false}>Não</Option>
+            </Select>
+          </Form.Item>
+
           {/* --- SEÇÃO DE GERENCIAMENTO DE IMAGENS --- */}
           <Title level={5} className="mt-4">
             Gerenciamento de Imagens

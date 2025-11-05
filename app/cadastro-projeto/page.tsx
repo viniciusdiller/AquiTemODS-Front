@@ -13,6 +13,7 @@ import {
   Col,
   Result,
   Checkbox,
+  Radio,
 } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
@@ -476,7 +477,12 @@ const CadastroProjetoPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
-        if (value && key !== "logo" && key !== "projeto") {
+        if (
+          value &&
+          key !== "logo" &&
+          key !== "projeto" &&
+          key !== "venceuPspe"
+        ) {
           if (key === "ODS Relacionadas" && Array.isArray(value)) {
             formData.append(key, value.join(", "));
           } else {
@@ -484,6 +490,8 @@ const CadastroProjetoPage: React.FC = () => {
           }
         }
       });
+
+      formData.append("venceuPspe", String(values.venceuPspe));
 
       if (logoFileList.length > 0 && logoFileList[0].originFileObj) {
         formData.append("logo", logoFileList[0].originFileObj);
@@ -515,7 +523,7 @@ const CadastroProjetoPage: React.FC = () => {
   const handleUpdateSubmit = async (values: any) => {
     setLoading(true);
     try {
-      const { projetoId, ...updateData } = values; // Extrai o ID do projeto
+      const { projetoId, ...updateData } = values;
       if (!projetoId) {
         message.error("O ID do projeto é obrigatório para a atualização.");
         setLoading(false);
@@ -525,7 +533,12 @@ const CadastroProjetoPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(updateData).forEach(([key, value]) => {
-        if (value && key !== "portfolio" && key !== "logo") {
+        if (
+          value &&
+          key !== "logo" &&
+          key !== "projeto" &&
+          key !== "venceuPspe"
+        ) {
           if (key === "locais" && Array.isArray(value)) {
             formData.append("areasAtuacao", value.join(", "));
           } else if (key === "ODS Relacionadas" && Array.isArray(value)) {
@@ -535,6 +548,10 @@ const CadastroProjetoPage: React.FC = () => {
           }
         }
       });
+
+      if (updateData.venceuPspe !== undefined) {
+        formData.append("venceuPspe", String(updateData.venceuPspe));
+      }
 
       if (logoFileList.length > 0 && logoFileList[0].originFileObj) {
         formData.append("logo", logoFileList[0].originFileObj);
@@ -806,6 +823,17 @@ const CadastroProjetoPage: React.FC = () => {
                   form.setFieldsValue({ linkProjeto: strippedValue });
                 }}
               />
+            </Form.Item>
+            <Form.Item
+              name="venceuPspe"
+              label="Venceu o prêmio PSPE?"
+              rules={[{ required: true, message: "Selecione uma opção!" }]}
+              initialValue={false}
+            >
+              <Radio.Group>
+                <Radio value={true}>Sim</Radio>
+                <Radio value={false}>Não</Radio>
+              </Radio.Group>
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1266,6 +1294,18 @@ const CadastroProjetoPage: React.FC = () => {
               ))}
           </Select>
         </Form.Item>
+
+        <Form.Item
+          name="venceuPspe"
+          label="Venceu o prêmio PSPE? (Opcional)"
+          help="Selecione 'Sim' ou 'Não' para alterar o status atual."
+        >
+          <Select placeholder="Não alterar" allowClear>
+            <Option value={true}>Sim</Option>
+            <Option value={false}>Não</Option>
+          </Select>
+        </Form.Item>
+
         <Form.Item
           name="portfolio"
           label="Novas Fotos do Portfólio (até 4)"

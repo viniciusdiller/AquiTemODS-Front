@@ -15,5 +15,6 @@ export interface Projeto {
   projetoImg?: Imagens[];
   dados_atualizacao?: any;
   status: string;
+  venceuPspe: boolean;
   [key: string]: any;
 }
