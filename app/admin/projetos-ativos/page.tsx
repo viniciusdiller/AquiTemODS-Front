@@ -1,4 +1,3 @@
-// app/admin/projetos-ativos/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -27,7 +26,7 @@ import {
 } from "@ant-design/icons";
 import {
   getAllActiveProjetos,
-  adminUpdateProjeto,
+  adminUpdateProjeto, // Esta função não está sendo usada neste arquivo, mas mantida
   adminDeleteProjeto,
 } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
@@ -83,13 +82,15 @@ const ProjetosAtivosPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
+  // --- ALTERAÇÃO 1: ATUALIZADO handleSearch PARA INCLUIR ID ---
   const handleSearch = (value: string) => {
     const lowerCaseValue = value.toLowerCase();
     const filtered = projetos.filter(
       (p) =>
         p.nomeProjeto.toLowerCase().includes(lowerCaseValue) ||
         p.prefeitura.toLowerCase().includes(lowerCaseValue) ||
-        p.secretaria.toLowerCase().includes(lowerCaseValue)
+        p.secretaria.toLowerCase().includes(lowerCaseValue) ||
+        String(p.projetoId).includes(lowerCaseValue)
     );
     setFilteredProjetos(filtered);
     setCurrentPage(1);
@@ -126,12 +127,11 @@ const ProjetosAtivosPage: React.FC = () => {
     }
   };
 
-  // 4. FUNÇÃO PARA RESETAR PÁGINA AO TROCAR DE ABA
   const handleTabChange = () => {
     setCurrentPage(1);
   };
 
-  // Agrupa os projetos por ODS
+  // Agrupa os projetos por ODS (para as abas de categoria)
   const groupedProjetos = filteredProjetos.reduce((acc, projeto) => {
     const ods = projeto.ods || "Sem Categoria";
     if (!acc[ods]) {
@@ -151,6 +151,12 @@ const ProjetosAtivosPage: React.FC = () => {
 
   const tabPosition = screens.md ? "left" : "top";
 
+  const totalTodos = filteredProjetos.length;
+  const paginatedTodos = filteredProjetos.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   return (
     <div className="p-4 md:p-8">
       <Link href="/admin/dashboard" passHref>
@@ -160,11 +166,11 @@ const ProjetosAtivosPage: React.FC = () => {
       </Link>
 
       <Title level={2} className="mb-6">
-        Gerenciar Projetos Ativos ({filteredProjetos.length})
+        Gerenciar Projetos Ativos ({projetos.length})
       </Title>
 
       <Search
-        placeholder="Buscar por nome, prefeitura ou secretaria..."
+        placeholder="Buscar por ID, nome, prefeitura ou secretaria..."
         onSearch={handleSearch}
         onChange={(e) => handleSearch(e.target.value)}
         enterButton
@@ -177,12 +183,88 @@ const ProjetosAtivosPage: React.FC = () => {
           <Empty description="Nenhum projeto ativo encontrado." />
         ) : (
           <Tabs
-            defaultActiveKey="ODS 1 - Erradicação da Pobreza"
+            defaultActiveKey="todos"
             tabPosition={tabPosition}
-            onChange={handleTabChange} // 4. ADICIONADO onChange
+            onChange={handleTabChange}
           >
+            <TabPane tab={`Todos os Projetos (${totalTodos})`} key="todos">
+              <Row gutter={[16, 16]}>
+                {paginatedTodos.map((projeto) => (
+                  <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+                    <Card
+                      hoverable
+                      actions={[
+                        <Button
+                          type="text"
+                          icon={<EditOutlined />}
+                          onClick={() => openEditModal(projeto)}
+                          className="hover:!bg-blue-500 hover:!text-white"
+                        >
+                          Editar
+                        </Button>,
+                        <Popconfirm
+                          key="delete"
+                          title="Excluir Projeto"
+                          description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
+                          onConfirm={() => handleDelete(projeto.projetoId)}
+                          okText="Sim, Excluir"
+                          cancelText="Não"
+                          okButtonProps={{ danger: true }}
+                        >
+                          <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            className="hover:!bg-red-500 hover:!text-white"
+                          >
+                            Excluir
+                          </Button>
+                        </Popconfirm>,
+                      ]}
+                    >
+                      <Card.Meta
+                        avatar={
+                          <Avatar
+                            src={getFullImageUrl(projeto.logoUrl || "")}
+                          />
+                        }
+                        title={projeto.nomeProjeto}
+                        description={
+                          <>
+                            <Text>
+                              <strong>ID do Projeto:</strong>{" "}
+                              {projeto.projetoId}
+                            </Text>
+                            <br />
+                            <Text>
+                              <strong>Prefeitura:</strong> {projeto.prefeitura}
+                            </Text>
+                            <br />
+                            <Text>
+                              <strong>Secretaria:</strong> {projeto.secretaria}
+                            </Text>
+                          </>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+
+              {totalTodos > PAGE_SIZE && (
+                <div className="mt-6 text-center">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={PAGE_SIZE}
+                    total={totalTodos}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                  />
+                </div>
+              )}
+            </TabPane>
+
             {sortedCategories.map((ods) => {
-              // 5. LÓGICA DE PAGINAÇÃO POR ABA
               const allProjetosForOds = groupedProjetos[ods];
               const totalCount = allProjetosForOds.length;
               const projetosToShow = allProjetosForOds.slice(
@@ -193,77 +275,71 @@ const ProjetosAtivosPage: React.FC = () => {
               return (
                 <TabPane tab={`${ods} (${allProjetosForOds.length})`} key={ods}>
                   <Row gutter={[16, 16]}>
-                    {projetosToShow.map(
-                      (
-                        projeto // Mapeia apenas 'projetosToShow'
-                      ) => (
-                        <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
-                          <Card
-                            hoverable
-                            actions={[
+                    {projetosToShow.map((projeto) => (
+                      <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+                        <Card
+                          hoverable
+                          actions={[
+                            <Button
+                              type="text"
+                              icon={<EditOutlined />}
+                              onClick={() => openEditModal(projeto)}
+                              className="hover:!bg-blue-500 hover:!text-white"
+                            >
+                              Editar
+                            </Button>,
+                            <Popconfirm
+                              key="delete"
+                              title="Excluir Projeto"
+                              description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
+                              onConfirm={() => handleDelete(projeto.projetoId)}
+                              okText="Sim, Excluir"
+                              cancelText="Não"
+                              okButtonProps={{ danger: true }}
+                            >
                               <Button
                                 type="text"
-                                icon={<EditOutlined />}
-                                onClick={() => openEditModal(projeto)}
-                                className="hover:!bg-blue-500 hover:!text-white"
+                                danger
+                                icon={<DeleteOutlined />}
+                                className="hover:!bg-red-500 hover:!text-white"
                               >
-                                Editar
-                              </Button>,
-                              <Popconfirm
-                                key="delete"
-                                title="Excluir Projeto"
-                                description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
-                                onConfirm={() =>
-                                  handleDelete(projeto.projetoId)
-                                }
-                                okText="Sim, Excluir"
-                                cancelText="Não"
-                                okButtonProps={{ danger: true }}
-                              >
-                                <Button
-                                  type="text"
-                                  danger
-                                  icon={<DeleteOutlined />}
-                                  className="hover:!bg-red-500 hover:!text-white"
-                                >
-                                  Excluir
-                                </Button>
-                              </Popconfirm>,
-                            ]}
-                          >
-                            <Card.Meta
-                              avatar={
-                                <Avatar
-                                  src={getFullImageUrl(projeto.logoUrl || "")}
-                                />
-                              }
-                              title={projeto.nomeProjeto}
-                              description={
-                                <>
-                                  <Text>
-                                    <strong>ID do Projeto:</strong>{" "}
-                                    {projeto.projetoId}
-                                  </Text>
-                                  <br />
-                                  <Text>
-                                    <strong>Prefeitura:</strong>{" "}
-                                    {projeto.prefeitura}
-                                  </Text>
-                                  <br />
-                                  <Text>
-                                    <strong>Secretaria:</strong>{" "}
-                                    {projeto.secretaria}
-                                  </Text>
-                                </>
-                              }
-                            />
-                          </Card>
-                        </Col>
-                      )
-                    )}
+                                Excluir
+                              </Button>
+                            </Popconfirm>,
+                          ]}
+                        >
+                          <Card.Meta
+                            avatar={
+                              <Avatar
+                                src={getFullImageUrl(projeto.logoUrl || "")}
+                              />
+                            }
+                            title={projeto.nomeProjeto}
+                            description={
+                              <>
+                                <Text>
+                                  <strong>ID do Projeto:</strong>{" "}
+                                  {projeto.projetoId}
+                                </Text>
+                                <br />
+                                <Text>
+                                  <strong>Prefeitura:</strong>{" "}
+                                  {projeto.prefeitura}
+                                </Text>
+                                <br />
+                                <Text>
+                                  <strong>Secretaria:</strong>{" "}
+                                  {projeto.secretaria}
+                                </Text>
+                              </>
+                            }
+                          />
+                        </Card>
+                      </Col>
+                    ))}
                   </Row>
 
-                  {/* 6. RENDERIZAR O COMPONENTE DE PAGINAÇÃO */}
+                  {/* Paginação para as abas de Categoria */}
                   {totalCount > PAGE_SIZE && (
                     <div className="mt-6 text-center">
                       <Pagination
@@ -282,13 +358,11 @@ const ProjetosAtivosPage: React.FC = () => {
         )}
       </Spin>
 
-      {/* O MESSO MODAL, mas em modo "edit-only" */}
       <AdminProjetoModal
         projeto={selectedItem}
         visible={isEditModalVisible}
         onClose={handleModalClose}
         mode="edit-only"
-        // Passa uma função vazia pois o modal "edit-only" não usa
         onEditAndApprove={async () => {}}
       />
     </div>

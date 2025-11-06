@@ -14,19 +14,12 @@ import {
   Tabs,
   Input,
   Grid,
-  Pagination, // 1. Mantemos a paginação
+  Pagination,
 } from "antd";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeftOutlined,
-  CommentOutlined, // 2. Trocamos os ícones de Edit/Delete por este
-} from "@ant-design/icons";
-import {
-  getAllActiveProjetos,
-  // Não precisamos de 'adminUpdateProjeto' ou 'adminDeleteProjeto' aqui
-} from "@/lib/api";
-// Não precisamos do AdminProjetoModal
+import { ArrowLeftOutlined, CommentOutlined } from "@ant-design/icons";
+import { getAllActiveProjetos } from "@/lib/api";
 import { Projeto } from "@/types/Interface-Projeto";
 
 const { Title, Text } = Typography;
@@ -46,12 +39,10 @@ const getFullImageUrl = (path: string): string => {
   return `${API_URL}/${cleanPath}`;
 };
 
-// 3. Renomeamos o componente
 const AdminComentariosPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [filteredProjetos, setFilteredProjetos] = useState<Projeto[]>([]);
-  // Não precisamos de 'selectedItem' ou 'isEditModalVisible'
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const screens = useBreakpoint();
@@ -79,46 +70,37 @@ const AdminComentariosPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  // Lógica de busca (idêntica)
+  // Lógica de busca atualizada para incluir ID
   const handleSearch = (value: string) => {
     const lowerCaseValue = value.toLowerCase();
     const filtered = projetos.filter(
       (p) =>
         p.nomeProjeto.toLowerCase().includes(lowerCaseValue) ||
         p.prefeitura.toLowerCase().includes(lowerCaseValue) ||
-        (p.secretaria && p.secretaria.toLowerCase().includes(lowerCaseValue)) // Adicionamos verificação se secretaria existe
+        (p.secretaria && p.secretaria.toLowerCase().includes(lowerCaseValue)) ||
+        String(p.projetoId).includes(lowerCaseValue)
     );
     setFilteredProjetos(filtered);
     setCurrentPage(1);
   };
 
-  // 4. Removemos as funções de Modal e Delete
-  // (openEditModal, handleModalClose, handleDelete)
-
-  // Lógica de troca de aba (idêntica)
   const handleTabChange = () => {
     setCurrentPage(1);
   };
 
-  // Lógica de agrupar projetos (idêntica)
+  // Lógica de agrupar projetos (levemente ajustada para consistência)
   const groupedProjetos = filteredProjetos.reduce((acc, projeto) => {
-    // 5. Garantimos que 'ods' existe, ou vai para 'Sem Categoria'
-    const odsKey = projeto.ods || "Sem Categoria";
-    const ods = odsKey.startsWith("ODS") ? odsKey : `ODS ${odsKey}`;
-
-    if (ods === "ODS Sem Categoria") {
-      if (!acc["Sem Categoria"]) acc["Sem Categoria"] = [];
-      acc["Sem Categoria"].push(projeto);
-    } else {
-      if (!acc[ods]) acc[ods] = [];
-      acc[ods].push(projeto);
+    const ods = projeto.ods || "Sem Categoria";
+    if (!acc[ods]) {
+      acc[ods] = [];
     }
+    acc[ods].push(projeto);
     return acc;
   }, {} as { [key: string]: Projeto[] });
 
-  // Lógica de ordenar categorias (idêntica)
+  // Lógica de ordenar categorias
   const sortedCategories = Object.keys(groupedProjetos).sort((a, b) => {
-    if (a === "Sem Categoria") return 1; // Joga "Sem Categoria" para o final
+    if (a === "Sem Categoria") return 1;
     if (b === "Sem Categoria") return -1;
     const aNum = parseInt(a.split(" ")[1]);
     const bNum = parseInt(b.split(" ")[1]);
@@ -128,6 +110,13 @@ const AdminComentariosPage: React.FC = () => {
 
   const tabPosition = screens.md ? "left" : "top";
 
+  // Lógica de paginação para a aba "Todos"
+  const totalTodos = filteredProjetos.length;
+  const paginatedTodos = filteredProjetos.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   return (
     <div className="p-4 md:p-8">
       <Link href="/admin/dashboard" passHref>
@@ -136,13 +125,12 @@ const AdminComentariosPage: React.FC = () => {
         </Button>
       </Link>
 
-      {/* 6. Título da página atualizado */}
       <Title level={2} className="mb-6">
-        Gerenciar Comentários por Projeto ({filteredProjetos.length})
+        Gerenciar Comentários por Projeto ({projetos.length})
       </Title>
 
       <Search
-        placeholder="Buscar por nome, prefeitura ou secretaria..."
+        placeholder="Buscar por ID, nome, prefeitura ou secretaria..."
         onSearch={handleSearch}
         onChange={(e) => handleSearch(e.target.value)}
         enterButton
@@ -155,13 +143,77 @@ const AdminComentariosPage: React.FC = () => {
           <Empty description="Nenhum projeto ativo encontrado." />
         ) : (
           <Tabs
-            // 7. Definimos a aba ativa padrão para a primeira da lista
-            defaultActiveKey={sortedCategories[0]}
+            defaultActiveKey="todos"
             tabPosition={tabPosition}
             onChange={handleTabChange}
           >
+            <TabPane tab={`Todos os Projetos (${totalTodos})`} key="todos">
+              <Row gutter={[16, 16]}>
+                {paginatedTodos.map((projeto) => (
+                  <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+                    <Card
+                      hoverable
+                      actions={[
+                        <Link
+                          href={`/admin/comentarios/${projeto.projetoId}`}
+                          passHref
+                          key="comentarios"
+                        >
+                          <Button
+                            type="text"
+                            icon={<CommentOutlined />}
+                            className="hover:!bg-blue-500 hover:!text-white"
+                          >
+                            Ver Comentários
+                          </Button>
+                        </Link>,
+                      ]}
+                    >
+                      <Card.Meta
+                        avatar={
+                          <Avatar
+                            src={getFullImageUrl(projeto.logoUrl || "")}
+                          />
+                        }
+                        title={projeto.nomeProjeto}
+                        description={
+                          <>
+                            <Text>
+                              <strong>ID do Projeto:</strong>{" "}
+                              {projeto.projetoId}
+                            </Text>
+                            <br />
+                            <Text>
+                              <strong>Prefeitura:</strong> {projeto.prefeitura}
+                            </Text>
+                            <br />
+                            <Text>
+                              <strong>Secretaria:</strong>{" "}
+                              {projeto.secretaria || "N/A"}
+                            </Text>
+                          </>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+
+              {totalTodos > PAGE_SIZE && (
+                <div className="mt-6 text-center">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={PAGE_SIZE}
+                    total={totalTodos}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                  />
+                </div>
+              )}
+            </TabPane>
+
+            {/* Abas de Categoria (lógica original) */}
             {sortedCategories.map((ods) => {
-              // Lógica de paginação por aba (idêntica)
               const allProjetosForOds = groupedProjetos[ods];
               const totalCount = allProjetosForOds.length;
               const projetosToShow = allProjetosForOds.slice(
@@ -172,56 +224,58 @@ const AdminComentariosPage: React.FC = () => {
               return (
                 <TabPane tab={`${ods} (${allProjetosForOds.length})`} key={ods}>
                   <Row gutter={[16, 16]}>
-                    {projetosToShow.map(
-                      (
-                        projeto // Mapeia apenas 'projetosToShow'
-                      ) => (
-                        <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
-                          <Card
-                            hoverable
-                            // --- 8. AÇÕES DO CARD ATUALIZADAS ---
-                            actions={[
-                              <Link
-                                href={`/admin/comentarios/${projeto.projetoId}`}
-                                passHref
-                                key="comentarios"
+                    {projetosToShow.map((projeto) => (
+                      <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+                        <Card
+                          hoverable
+                          actions={[
+                            <Link
+                              href={`/admin/comentarios/${projeto.projetoId}`}
+                              passHref
+                              key="comentarios"
+                            >
+                              <Button
+                                type="text"
+                                icon={<CommentOutlined />}
+                                className="hover:!bg-blue-500 hover:!text-white"
                               >
-                                <Button
-                                  type="text"
-                                  icon={<CommentOutlined />}
-                                  // Usamos a mesma classe de hover do seu botão de editar
-                                  className="hover:!bg-blue-500 hover:!text-white"
-                                >
-                                  Ver Comentários
-                                </Button>
-                              </Link>,
-                            ]}
-                            // --- FIM DAS AÇÕES ---
-                          >
-                            <Card.Meta
-                              avatar={
-                                <Avatar
-                                  src={getFullImageUrl(projeto.logoUrl || "")}
-                                />
-                              }
-                              title={projeto.nomeProjeto}
-                              description={
-                                <>
-                                  <Text>Prefeitura: {projeto.prefeitura}</Text>
-                                  <br />
-                                  <Text>
-                                    Secretaria: {projeto.secretaria || "N/A"}
-                                  </Text>
-                                </>
-                              }
-                            />
-                          </Card>
-                        </Col>
-                      )
-                    )}
+                                Ver Comentários
+                              </Button>
+                            </Link>,
+                          ]}
+                        >
+                          <Card.Meta
+                            avatar={
+                              <Avatar
+                                src={getFullImageUrl(projeto.logoUrl || "")}
+                              />
+                            }
+                            title={projeto.nomeProjeto}
+                            description={
+                              <>
+                                <Text>
+                                  <strong>ID do Projeto:</strong>{" "}
+                                  {projeto.projetoId}
+                                </Text>
+                                <br />
+                                <Text>
+                                  <strong>Prefeitura:</strong>{" "}
+                                  {projeto.prefeitura}
+                                </Text>
+                                <br />
+                                <Text>
+                                  <strong>Secretaria:</strong>{" "}
+                                  {projeto.secretaria || "N/A"}
+                                </Text>
+                              </>
+                            }
+                          />
+                        </Card>
+                      </Col>
+                    ))}
                   </Row>
 
-                  {/* Lógica de paginação (idêntica) */}
+                  {/* Lógica de paginação por aba */}
                   {totalCount > PAGE_SIZE && (
                     <div className="mt-6 text-center">
                       <Pagination
@@ -239,8 +293,6 @@ const AdminComentariosPage: React.FC = () => {
           </Tabs>
         )}
       </Spin>
-
-      {/* 9. Removemos o Modal de Edição */}
     </div>
   );
 };
