@@ -97,16 +97,22 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
         if (projeto.dados_atualizacao.imagens) {
           const novasImagens = projeto.dados_atualizacao.imagens.map(
             (url: string, index: number) => ({
-              id: `new-${index}`, // O ID não está na interface 'Imagens', mas tudo bem
+              id: `new-${index}`,
               url: url,
             })
           );
-          // O TypeScript vai aceitar isso porque { url: string } é compatível com 'Imagens'
+
           setCurrentPortfolio(novasImagens);
         }
         delete dataToEdit.outrasAlteracoes;
       } else {
         setOutrasAlteracoes(null);
+      }
+
+      if (dataToEdit.hasOwnProperty("venceuPspe")) {
+        dataToEdit.venceuPspe =
+          String(dataToEdit.venceuPspe).toLowerCase() === "true" ||
+          dataToEdit.venceuPspe === true;
       }
 
       if (typeof dataToEdit.odsRelacionadas === "string") {

@@ -1605,11 +1605,7 @@ const CadastroProjetoPage: React.FC = () => {
         <Button
           type="primary"
           key="console"
-          onClick={() => {
-            setSelectedCategory(null);
-            form.resetFields();
-            setFlowStep("initial");
-          }}
+          onClick={resetAll}
           className="mb-6"
         >
           Voltar ao Início
@@ -1642,7 +1638,7 @@ const CadastroProjetoPage: React.FC = () => {
             <Button
               type="text"
               icon={<ArrowLeftOutlined />}
-              onClick={() => setFlowStep("initial")}
+              onClick={resetAll}
               className="mb-6"
             >
               Voltar ao início

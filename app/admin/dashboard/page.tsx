@@ -149,7 +149,9 @@ const AdminDashboard: React.FC = () => {
     }
 
     if (key === "venceuPspe") {
-      return value === true ? "Sim" : "Não";
+      const boolValue =
+        String(value).toLowerCase() === "true" || value === true;
+      return boolValue ? "Sim" : "Não";
     }
 
     if (
