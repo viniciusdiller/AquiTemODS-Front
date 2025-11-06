@@ -5,7 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { ConditionalFooter } from "@/components/ConditionalFooter";
-import AccessibilityStyles from "@/components/AccessibilityStyles"; // 1. IMPORTE O NOVO COMPONENTE
+import AccessibilityStyles from "@/components/AccessibilityStyles";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { ConditionalAccessibility } from "@/components/ConditionalAccessibility";
 
@@ -20,27 +20,46 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Aqui Tem ODS",
+  description:
+    "O ponto de encontro entre inovação, gestão e sustentabilidade. Conheça o AquiTemODS!",
+
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "192x192" }, // Para Android
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" }, // Para Android (maior)
+    ],
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/manifest.json", // Para Web App (PWA)
+
+  // --- 3. OPEN GRAPH (WHATSAPP, FACEBOOK, LINKEDIN, ETC.) ---
   openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "https://aquitemods.saquarema.rj.gov.br/",
     title: "Aqui Tem ODS",
     description:
-      "Seu guia completo para explorar e conhecer os projetos que movimentam a economia do Rio de Janeiro.",
-    url: "https://aquitemods.saquarema.rj.gov.br/",
-    siteName: "AquiTemODS",
+      "O ponto de encontro entre inovação, gestão e sustentabilidade. Conheça o AquiTemODS!",
     images: [
       {
-        url: "/logo_aquitemods.png",
+        url: "https://aquitemods.saquarema.rj.gov.br//og-image.png",
         width: 1200,
         height: 630,
-        alt: "AquiTemODS Logo",
+        alt: "Logo Aqui Tem ODS",
       },
     ],
-    type: "website",
+    siteName: "Aqui Tem ODS",
+  },
+
+  // --- 4. TWITTER CARDS (ESPECÍFICO DO TWITTER) ---
+  twitter: {
+    card: "summary_large_image",
+    title: "Aqui Tem ODS",
+    description: "Conectando projetos sociais a voluntários e doadores.",
+    images: ["https://aquitemods.saquarema.rj.gov.br//og-image.png"],
   },
 };
-
 export default function RootLayout({
   children,
 }: {

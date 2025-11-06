@@ -13,7 +13,7 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "172.16.32.199",
-        port: "3001",
+        port: "3303",
         pathname: "/uploads/**",
       },
     ],
@@ -25,7 +25,7 @@ const nextConfig = {
     return [
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:3003/uploads/:path*",
+        destination: "http://localhost:3303/uploads/:path*",
       },
     ];
   },

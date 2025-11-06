@@ -1,0 +1,16 @@
+# Permitir todos os robôs
+User-agent: *
+Allow: /
+
+# Desabilitar indexação de páginas de admin e autenticação
+Disallow: /admin/
+Disallow: /login/
+Disallow: /cadastro/
+Disallow: /perfil/
+Disallow: /esqueci-senha/
+Disallow: /redefinir-senha/
+Disallow: /confirmar-conta/
+Disallow: /confirmar-novo-email/
+
+# URL do Sitemap de produção
+Sitemap: https://aquitemods.saquarema.rj.gov.br/sitemap.xml
