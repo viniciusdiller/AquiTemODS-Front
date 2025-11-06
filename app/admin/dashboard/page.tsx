@@ -35,7 +35,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
-import { Projeto } from "@/types/Interface-Projeto"; // (Precisa criar ou ajustar este type)
+import { Projeto } from "@/types/Interface-Projeto";
 
 const { Text, Title } = Typography;
 const { Column } = Table;
@@ -66,30 +66,40 @@ interface PendingData {
   exclusoes: Projeto[];
 }
 
-const fieldConfig: { [key: string]: { label: string; order: number } } = {
-  projetoId: { label: "ID", order: 1 },
-  ods: { label: "ODS", order: 4 },
-  prefeitura: { label: "Prefeitura", order: 2 },
-  secretaria: { label: "Secretaria", order: 3 },
-  nomeProjeto: { label: "Nome do Projeto", order: 10 },
-  responsavelProjeto: { label: "Responsável", order: 11 },
-  emailContato: { label: "Email", order: 20 },
-  endereco: { label: "Endereço", order: 22 },
-  descricao: { label: "Descrição", order: 30 },
-  descricaoDiferencial: { label: "Briefing", order: 31 },
-  outrasAlteracoes: { label: "Outras Alterações", order: 32 },
-  website: { label: "Website", order: 40 },
-  odsRelacionadas: { label: "ODS Relacionadas", order: 50 },
-  instagram: { label: "Instagram", order: 41 },
-  logoUrl: { label: "Logo Atual", order: 42 },
-  logo: { label: "Nova Logo", order: 42 },
-  projetoImg: { label: "Portfólio Atual", order: 43 },
-  status: { label: "Status Atual", order: 5 },
-  venceuPspe: { label: "Venceu o Prêmio PSPE", order: 6 },
-  motivo: { label: "Motivo da Exclusão", order: 1000 },
-  motivoExclusao: { label: "Motivo da Exclusão", order: 6 },
-  createdAt: { label: "Data de Criação", order: 100 },
-  updatedAt: { label: "Última Atualização", order: 101 },
+const fieldConfig: {
+  [key: string]: { label: string; order: number; group: string };
+} = {
+  projetoId: { label: "ID", order: 1, group: "identificacao" },
+  prefeitura: { label: "Prefeitura", order: 2, group: "identificacao" },
+  secretaria: { label: "Secretaria", order: 3, group: "identificacao" },
+  nomeProjeto: { label: "Nome do Projeto", order: 10, group: "identificacao" },
+  responsavelProjeto: {
+    label: "Responsável",
+    order: 11,
+    group: "identificacao",
+  },
+  emailContato: { label: "Email", order: 20, group: "identificacao" },
+
+  // --- Grupo de Informações do Projeto ---
+  ods: { label: "ODS", order: 4, group: "info" },
+  venceuPspe: { label: "Venceu o Prêmio PSPE", order: 6, group: "info" },
+  endereco: { label: "Endereço", order: 22, group: "info" },
+  descricao: { label: "Descrição", order: 30, group: "info" },
+  descricaoDiferencial: { label: "Briefing", order: 31, group: "info" },
+  outrasAlteracoes: { label: "Outras Alterações", order: 32, group: "info" },
+  website: { label: "Website", order: 40, group: "info" },
+  instagram: { label: "Instagram", order: 41, group: "info" },
+  logoUrl: { label: "Logo Atual", order: 42, group: "info" },
+  logo: { label: "Nova Logo", order: 42, group: "info" },
+  projetoImg: { label: "Portfólio Atual", order: 43, group: "info" },
+  odsRelacionadas: { label: "ODS Relacionadas", order: 50, group: "info" },
+
+  // --- Grupo de Metadados ---
+  status: { label: "Status Atual", order: 5, group: "meta" },
+  motivo: { label: "Motivo da Exclusão", order: 1000, group: "meta" },
+  motivoExclusao: { label: "Motivo da Exclusão", order: 6, group: "meta" },
+  createdAt: { label: "Data de Criação", order: 100, group: "meta" },
+  updatedAt: { label: "Última Atualização", order: 101, group: "meta" },
 };
 
 const AdminDashboard: React.FC = () => {
@@ -374,8 +384,7 @@ const AdminDashboard: React.FC = () => {
       imagens: { oldKey: "projetoImg", labelKey: "projetoImg" },
     };
 
-    // Prepara os dados para a tabela
-    const diffData = Object.entries(selectedItem.dados_atualizacao)
+    const diffDataAll = Object.entries(selectedItem.dados_atualizacao)
       .filter(([key]) => !keysToFilter.includes(key))
       .map(([key, newValue]) => {
         const mapping = keyMap[key];
@@ -389,7 +398,6 @@ const AdminDashboard: React.FC = () => {
         if (labelKey === "projetoImg") finalLabel = "Portfólio";
         if (labelKey === "logo") finalLabel = "Logo";
 
-        // Ajusta o label de 'motivo' se for o caso de exclusão
         if (key === "motivo") finalLabel = "Motivo da Exclusão";
 
         return {
@@ -406,8 +414,56 @@ const AdminDashboard: React.FC = () => {
           (fieldConfig[b.newKey]?.order ?? 999)
       );
 
+    // 2. Extrai 'outrasAlteracoes' dos dados
+    const outrasAlteracoesUpdate = diffDataAll.find(
+      (d) => d.newKey === "outrasAlteracoes"
+    );
+
+    const diffData = diffDataAll.filter((d) => d.newKey !== "outrasAlteracoes");
+
+    // 4. Filtra os dados da tabela (AGORA USANDO 'diffData')
+    const identificacaoDiff = diffData.filter(
+      (d) =>
+        fieldConfig[d.newKey]?.group === "identificacao" ||
+        fieldConfig[d.key]?.group === "identificacao"
+    );
+
+    const infoDiff = diffData.filter(
+      (d) =>
+        fieldConfig[d.newKey]?.group === "info" ||
+        fieldConfig[d.key]?.group === "info"
+    );
+
+    const metaDiff = diffData.filter(
+      (d) =>
+        (fieldConfig[d.newKey]?.group === "meta" ||
+          fieldConfig[d.key]?.group === "meta") &&
+        fieldConfig[d.newKey]?.group !== "identificacao" &&
+        fieldConfig[d.key]?.group !== "identificacao" &&
+        fieldConfig[d.newKey]?.group !== "info" &&
+        fieldConfig[d.key]?.group !== "info"
+    );
+
     // Define a cor do título com base no tipo de alerta
     const titleColor = alertType === "info" ? "#0050b3" : "#d4380d";
+
+    const columns = [
+      <Column title="Campo" dataIndex="field" key="field" width={150} />,
+      <Column
+        title="Valor Antigo"
+        dataIndex="oldValue"
+        key="oldValue"
+        width={400}
+        render={(value, record: any) => renderValue(record.key, value)}
+      />,
+      <Column
+        title="Valor Novo"
+        dataIndex="newValue"
+        key="newValue"
+        width={450}
+        render={(value, record: any) => renderValue(record.newKey, value)}
+      />,
+    ];
 
     return (
       <Alert
@@ -421,31 +477,89 @@ const AdminDashboard: React.FC = () => {
           </Title>
         }
         description={
-          <Table
-            dataSource={diffData}
-            pagination={false}
-            size="middle"
-            bordered
-            className="mt-4"
-            scroll={{ x: true }}
-          >
-            {/* As colunas permanecem exatamente iguais */}
-            <Column title="Campo" dataIndex="field" key="field" width={150} />
-            <Column
-              title="Valor Antigo"
-              dataIndex="oldValue"
-              key="oldValue"
-              width={400}
-              render={(value, record: any) => renderValue(record.key, value)}
-            />
-            <Column
-              title="Valor Novo"
-              dataIndex="newValue"
-              key="newValue"
-              width={450}
-              render={(value, record: any) => renderValue(record.newKey, value)}
-            />
-          </Table>
+          <>
+            {outrasAlteracoesUpdate && (
+              <Alert
+                message="Atenção: Pedido de 'Outras Alterações' (Ação Manual)"
+                description={
+                  <Typography.Paragraph
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      margin: 0,
+                      padding: "8px",
+                      background: "#fff",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {renderValue(
+                      "outrasAlteracoes",
+                      outrasAlteracoesUpdate.newValue
+                    )}
+                  </Typography.Paragraph>
+                }
+                type="warning"
+                showIcon
+                className="my-4"
+              />
+            )}
+
+            {identificacaoDiff.length > 0 && (
+              <>
+                <Title
+                  level={5}
+                  style={{ color: titleColor, marginTop: "16px" }}
+                >
+                  Identificação do Projeto
+                </Title>
+                <Table
+                  dataSource={identificacaoDiff}
+                  pagination={false}
+                  size="middle"
+                  bordered
+                  className="mt-4"
+                  scroll={{ x: true }}
+                >
+                  {columns.map((col) => col)}
+                </Table>
+              </>
+            )}
+
+            {infoDiff.length > 0 && (
+              <>
+                <Title
+                  level={5}
+                  style={{ color: titleColor, marginTop: "24px" }}
+                >
+                  Informações do Projeto
+                </Title>
+                <Table
+                  dataSource={infoDiff}
+                  pagination={false}
+                  size="middle"
+                  bordered
+                  className="mt-4"
+                  scroll={{ x: true }}
+                >
+                  {columns.map((col) => col)}
+                </Table>
+              </>
+            )}
+
+            {metaDiff.length > 0 && (
+              <>
+                <Table
+                  dataSource={metaDiff}
+                  pagination={false}
+                  size="middle"
+                  bordered
+                  className="mt-4"
+                  scroll={{ x: true }}
+                >
+                  {columns.map((col) => col)}
+                </Table>
+              </>
+            )}
+          </>
         }
       />
     );
@@ -463,7 +577,6 @@ const AdminDashboard: React.FC = () => {
     listData: Projeto[],
     listKey: keyof PendingData
   ) => {
-    // 8. NOVO: Lógica de paginação
     const totalCount = listData.length;
     const currentPage = currentPages[listKey];
     const pagedData = listData.slice(
@@ -484,9 +597,8 @@ const AdminDashboard: React.FC = () => {
           {listData.length > 0 ? (
             <>
               {" "}
-              {/* 9. NOVO: Adiciona Fragmento para agrupar Lista e Paginação */}
               <List
-                dataSource={pagedData} // 10. NOVO: Usa 'pagedData' em vez de 'listData'
+                dataSource={pagedData}
                 renderItem={(item) => (
                   <List.Item
                     actions={[
@@ -508,7 +620,6 @@ const AdminDashboard: React.FC = () => {
                   </List.Item>
                 )}
               />
-              {/* Renderiza a paginação se houver mais de uma página */}
               {totalCount > DASHBOARD_PAGE_SIZE && (
                 <div className="mt-4 text-center">
                   <Pagination
@@ -534,7 +645,6 @@ const AdminDashboard: React.FC = () => {
     <div className="p-8">
       <Spin spinning={loading}>
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          {/* Título (com tamanho ajustado e centrado no mobile) */}
           <Title
             level={isMobile ? 3 : 2}
             className="m-0 md:text-left text-center"
@@ -542,7 +652,6 @@ const AdminDashboard: React.FC = () => {
             Painel de Administração
           </Title>
 
-          {/* Wrapper dos Botões (empilha e ocupa largura total no mobile) */}
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <Link href="/admin/projetos-ativos" passHref>
               <Button
@@ -627,45 +736,100 @@ const AdminDashboard: React.FC = () => {
             ),
           ]}
         >
-          <Title level={4}>Dados do Projeto</Title>
-          <Descriptions bordered column={1} size="small">
-            {selectedItem.logoUrl && (
-              <Descriptions.Item label={fieldConfig.logoUrl.label}>
-                {renderValue("logoUrl", selectedItem.logoUrl)}
-              </Descriptions.Item>
-            )}
-
-            {selectedItem.projetoImg && selectedItem.projetoImg.length > 0 && (
-              <Descriptions.Item label={fieldConfig.projetoImg.label}>
-                {renderValue("projetoImg", selectedItem.projetoImg)}
-              </Descriptions.Item>
-            )}
-
-            {Object.entries(selectedItem)
+          {(() => {
+            const allEntries = Object.entries(selectedItem)
               .filter(
                 ([key]) =>
                   key !== "dados_atualizacao" &&
                   key !== "logoUrl" &&
                   key !== "projetoImg" &&
-                  key !== "status"
+                  key !== "status" &&
+                  fieldConfig[key]
               )
               .sort(
                 ([keyA], [keyB]) =>
                   (fieldConfig[keyA]?.order ?? 999) -
                   (fieldConfig[keyB]?.order ?? 999)
-              )
-              .map(
-                ([key, value]) =>
-                  fieldConfig[key] && (
+              );
+
+            const identificacaoEntries = allEntries.filter(
+              ([key]) => fieldConfig[key]?.group === "identificacao"
+            );
+            const infoEntries = allEntries.filter(
+              ([key]) => fieldConfig[key]?.group === "info"
+            );
+            const metaEntries = allEntries.filter(
+              ([key]) => fieldConfig[key]?.group === "meta"
+            );
+
+            return (
+              <>
+                {/* --- Bloco de Identificação --- */}
+                {identificacaoEntries.length > 0 && (
+                  <>
+                    <Title level={4} className="mt-4">
+                      Identificação do Projeto
+                    </Title>
+                    <Descriptions bordered column={1} size="small">
+                      {identificacaoEntries.map(([key, value]) => (
+                        <Descriptions.Item
+                          key={key}
+                          label={fieldConfig[key]?.label ?? key}
+                        >
+                          {renderValue(key, value)}
+                        </Descriptions.Item>
+                      ))}
+                    </Descriptions>
+                  </>
+                )}
+
+                {/* --- Bloco de Informações --- */}
+                <Title level={4} className="mt-6">
+                  Informações do Projeto
+                </Title>
+                <Descriptions bordered column={1} size="small">
+                  {selectedItem.logoUrl && (
+                    <Descriptions.Item label={fieldConfig.logoUrl.label}>
+                      {renderValue("logoUrl", selectedItem.logoUrl)}
+                    </Descriptions.Item>
+                  )}
+                  {selectedItem.projetoImg &&
+                    selectedItem.projetoImg.length > 0 && (
+                      <Descriptions.Item label={fieldConfig.projetoImg.label}>
+                        {renderValue("projetoImg", selectedItem.projetoImg)}
+                      </Descriptions.Item>
+                    )}
+                  {infoEntries.map(([key, value]) => (
                     <Descriptions.Item
                       key={key}
                       label={fieldConfig[key]?.label ?? key}
                     >
                       {renderValue(key, value)}
                     </Descriptions.Item>
-                  )
-              )}
-          </Descriptions>
+                  ))}
+                </Descriptions>
+
+                {/* --- Bloco de Metadados --- */}
+                {metaEntries.length > 0 && (
+                  <>
+                    <Title level={4} className="mt-6">
+                      Metadados
+                    </Title>
+                    <Descriptions bordered column={1} size="small">
+                      {metaEntries.map(([key, value]) => (
+                        <Descriptions.Item
+                          key={key}
+                          label={fieldConfig[key]?.label ?? key}
+                        >
+                          {renderValue(key, value)}
+                        </Descriptions.Item>
+                      ))}
+                    </Descriptions>
+                  </>
+                )}
+              </>
+            );
+          })()}
 
           {renderDiffTable(
             "pendente_exclusao",
