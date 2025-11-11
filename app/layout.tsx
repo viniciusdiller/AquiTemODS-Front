@@ -26,12 +26,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.png", type: "image/png", sizes: "192x192" }, // Para Android
-      { url: "/favicon.png", type: "image/png", sizes: "512x512" }, // Para Android (maior)
+      { url: "/favicon.png", type: "image/png", sizes: "192x192" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
     ],
     apple: "/apple-touch-icon.png",
   },
-  manifest: "/manifest.json", // Para Web App (PWA)
+  manifest: "/manifest.json",
 
   // --- 3. OPEN GRAPH (WHATSAPP, FACEBOOK, LINKEDIN, ETC.) ---
   openGraph: {
@@ -73,6 +73,18 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} bg-white flex flex-col min-h-screen`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Aqui Tem ODS",
+              url: "https://aquitemods.saquarema.rj.gov.br/",
+              logo: "https://aquitemods.saquarema.rj.gov.br/LogoRedonda.png",
+            }),
+          }}
+        />
         <ConfigProvider
           locale={ptBR}
           theme={{
