@@ -25,14 +25,15 @@ async function fetchApi(path: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      // Limpa o usuário do localStorage
-      localStorage.removeItem("user");
-      // Força o redirecionamento pa ra a página de login
-      window.location.href = "/login";
-
-      // Lança um erro para interromper a execução do código que chamou a API
-      throw new Error("Sessão expirada. Redirecionando para login...");
+      // SÓ REDIRECIONA SE O 401 NÃO VIER DA PÁGINA DE LOGIN
+      if (path !== "/api/auth/login") {
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        throw new Error("Sessão expirada. Redirecionando para login...");
+      }
     }
+
+    // O erro de login (401) vai cair aqui agora
     const errorMessage =
       typeof data === "object" && data.message
         ? data.message

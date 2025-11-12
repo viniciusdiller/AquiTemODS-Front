@@ -9,7 +9,7 @@ import {
   SearchX,
   CalendarDays,
 } from "lucide-react";
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense, useMemo } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
 import "leaflet/dist/leaflet.css";
 import Image from "next/image";
@@ -45,6 +45,7 @@ import FormattedDescription from "@/components/FormattedDescription";
 import OdsTag from "@/components/ui/OdsTag";
 import AvaliacaoModal from "@/components/Pop-up Coments";
 import { ReviewComment } from "@/components/ReviewComments";
+import DOMPurify from "dompurify";
 
 const CustomStarIcon = ({
   fillPercentage = "100%",
@@ -201,6 +202,13 @@ function ProjetoPageContent() {
     };
     initialFetch();
   }, [nomeDoProjeto]);
+
+  const cleanHtmlDescricao = useMemo(() => {
+    if (typeof window !== "undefined" && projeto?.descricao) {
+      return DOMPurify.sanitize(projeto.descricao);
+    }
+    return "";
+  }, [projeto?.descricao]);
 
   if (isLoading) {
     return (
@@ -545,12 +553,11 @@ function ProjetoPageContent() {
                     descricaoExpandida ? "max-h-none" : "max-h-24"
                   }`}
                 >
-                  <p className="text-gray-700 leading-relaxed md:pl-2 break-words">
-                    {" "}
-                    {/* Mudei break-all para break-words */}
-                    <FormattedDescription text={projeto.descricao} />
-                  </p>
-                  {/* Efeito de fade para texto recolhido */}
+                  <div
+                    className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed md:pl-2 break-words prose-p:my-0"
+                    dangerouslySetInnerHTML={{ __html: cleanHtmlDescricao }}
+                  />
+
                   {!descricaoExpandida && (
                     <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                   )}

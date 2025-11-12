@@ -26,7 +26,13 @@ import {
   solicitarAtualizacaoProjeto,
   solicitarExclusaoProjeto,
 } from "@/lib/api";
+import dynamic from "next/dynamic";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "./quill-styles.css";
 
+// (Seu objeto 'categorias' e 'odsRelacionadas' permanecem os mesmos)
+// ... (categorias) ...
+// ... (odsRelacionadas) ...
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",
   "ODS 2 - Fome Zero e Agricultura Sustentável",
@@ -398,6 +404,16 @@ const { TextArea } = Input;
 
 type FlowStep = "initial" | "register" | "update" | "delete" | "submitted";
 
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
 const CadastroProjetoPage: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -413,6 +429,11 @@ const CadastroProjetoPage: React.FC = () => {
   const router = useRouter();
   const toastShownRef = useRef(false);
 
+  // --- INÍCIO DAS NOVAS ADIÇÕES ---
+  const [quillTextLength, setQuillTextLength] = useState(0);
+  const MAX_QUILL_LENGTH = 5000;
+  // --- FIM DAS NOVAS ADIÇÕES ---
+
   const stripEmojis = (value: string) => {
     if (!value) return "";
     return value.replace(
@@ -420,6 +441,32 @@ const CadastroProjetoPage: React.FC = () => {
       ""
     );
   };
+
+  // --- INÍCIO DAS NOVAS ADIÇÕES ---
+  /**
+   * Pega o texto puro de um valor HTML do Quill
+   */
+  const getQuillTextLength = (value: string) => {
+    // Garante que só rode no client-side
+    if (typeof window === "undefined" || !value || value === "<p><br></p>")
+      return 0;
+
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = value;
+    return (tempDiv.textContent || tempDiv.innerText || "").trim().length;
+  };
+
+  /**
+   * Observa mudanças no formulário para atualizar o contador
+   */
+  const handleFormValuesChange = (changedValues: any) => {
+    // Verifica se o campo 'descricao' foi o que mudou
+    if (changedValues.hasOwnProperty("descricao")) {
+      const length = getQuillTextLength(changedValues.descricao);
+      setQuillTextLength(length);
+    }
+  };
+  // --- FIM DAS NOVAS ADIÇÕES ---
 
   const handleLogoChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setLogoFileList(fileList);
@@ -440,6 +487,70 @@ const CadastroProjetoPage: React.FC = () => {
       router.push("/login");
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    if (flowStep === "register" || flowStep === "update") {
+      const translateQuillToolbar = () => {
+        const toolbar = document.querySelector(".ql-toolbar");
+        if (!toolbar) return false;
+
+        const boldButton = toolbar.querySelector(".ql-bold") as HTMLElement;
+        if (boldButton && boldButton.title === "Negrito") {
+          return true;
+        }
+
+        const translations: { [key: string]: string } = {
+          ".ql-bold": "Negrito",
+          ".ql-italic": "Itálico",
+          ".ql-underline": "Sublinhado",
+          ".ql-strike": "Riscado",
+          '.ql-list[value="ordered"]': "Lista ordenada",
+          '.ql-list[value="bullet"]': "Lista com marcadores",
+          ".ql-link": "Inserir link",
+          ".ql-clean": "Remover formatação",
+          ".ql-header .ql-picker-label": "Normal",
+        };
+
+        Object.entries(translations).forEach(([selector, title]) => {
+          const el = toolbar.querySelector(selector) as HTMLElement;
+          if (el) {
+            // Botões usam 'title'
+            if (el.tagName === "BUTTON") {
+              el.title = title;
+            }
+            // O seletor de Header usa 'data-label'
+            else if (el.classList.contains("ql-picker-label")) {
+              el.setAttribute("data-label", title);
+            }
+          }
+        });
+
+        toolbar
+          .querySelectorAll(".ql-header .ql-picker-item")
+          .forEach((item) => {
+            const value = item.getAttribute("data-value");
+            if (value === "1") item.setAttribute("data-label", "Título 1");
+            else if (value === "2") item.setAttribute("data-label", "Título 2");
+            else if (value === "3") item.setAttribute("data-label", "Título 3");
+            else item.setAttribute("data-label", "Normal");
+          });
+
+        return (
+          (toolbar.querySelector(".ql-bold") as HTMLElement)?.title ===
+          "Negrito"
+        );
+      };
+
+      const intervalId = setInterval(() => {
+        const success = translateQuillToolbar();
+        if (success) {
+          clearInterval(intervalId);
+        }
+      }, 200);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [flowStep]);
 
   if (isLoading || !user) {
     return (
@@ -470,7 +581,11 @@ const CadastroProjetoPage: React.FC = () => {
     setPortfolioFileList([]);
     setSelectedCategory(null);
     setFlowStep("initial");
+    setQuillTextLength(0); // Reseta o contador
   };
+
+  // ... (handleRegisterSubmit, handleUpdateSubmit, handleDeleteSubmit, customUploadAction, commonTitle, renderInitialChoice) ...
+  // NENHUMA MUDANÇA NESSAS FUNÇÕES
 
   const handleRegisterSubmit = async (values: any) => {
     setLoading(true);
@@ -478,6 +593,9 @@ const CadastroProjetoPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
+        if (key === "descricao" && (value === "<p><br></p>" || value === "")) {
+          return;
+        }
         if (
           value &&
           key !== "logo" &&
@@ -534,6 +652,9 @@ const CadastroProjetoPage: React.FC = () => {
       const formData = new FormData();
 
       Object.entries(updateData).forEach(([key, value]) => {
+        if (key === "descricao" && (value === "<p><br></p>" || value === "")) {
+          return;
+        }
         if (
           value &&
           key !== "logo" &&
@@ -680,6 +801,7 @@ const CadastroProjetoPage: React.FC = () => {
             onChange={(value) => {
               setSelectedCategory(null);
               form.resetFields();
+              setQuillTextLength(0); // Reseta o contador
               setFlowStep(value as FlowStep);
             }}
             size="large"
@@ -697,15 +819,45 @@ const CadastroProjetoPage: React.FC = () => {
     </>
   );
 
+  // --- INÍCIO DA MODIFICAÇÃO (validateQuill) ---
+  /**
+   * Valida o conteúdo do ReactQuill, verificando o 'required' e o 'maxLength'.
+   * @param required
+   */
+  const validateQuill = (required: boolean) => (_: any, value: string) => {
+    // Usa a nova função auxiliar
+    const textContentLength = getQuillTextLength(value);
+
+    if (required && textContentLength === 0) {
+      return Promise.reject(new Error("Por favor, descreva seu projeto!"));
+    }
+
+    // Usa a nova constante
+    if (textContentLength > MAX_QUILL_LENGTH) {
+      return Promise.reject(
+        new Error(
+          `A descrição não pode ter mais de ${MAX_QUILL_LENGTH} caracteres (atualmente com ${textContentLength}).`
+        )
+      );
+    }
+
+    return Promise.resolve();
+  };
+  // --- FIM DA MODIFICAÇÃO (validateQuill) ---
+
   const renderRegisterForm = () => (
+    // --- INÍCIO DA MODIFICAÇÃO (onValuesChange) ---
     <Form
       form={form}
       layout="vertical"
       onFinish={handleRegisterSubmit}
+      onValuesChange={handleFormValuesChange} // ADICIONADO AQUI
       autoComplete="off"
     >
+      {/* --- FIM DA MODIFICAÇÃO --- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações do Responsável")}
+        {/* ... (Campos de Responsável, Prefeitura, Secretaria) ... */}
         <Row gutter={24}>
           <Col xs={24} md={12}>
             {/* CORREÇÃO: name="prefeitura" */}
@@ -771,6 +923,7 @@ const CadastroProjetoPage: React.FC = () => {
       {/* --------------------- Informações do Projeto --------------------- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações do Projeto")}
+        {/* ... (Campos Nome do Projeto, ODS, Link, PSPE, ODS Relacionadas) ... */}
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
@@ -885,6 +1038,7 @@ const CadastroProjetoPage: React.FC = () => {
       {/* --------------------- Contato e Localização --------------------- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Contato e Localização")}
+        {/* ... (Campos Email e Endereço) ... */}
         <Form.Item
           name="emailContato"
           label="E-mail de Contato do projeto"
@@ -918,6 +1072,7 @@ const CadastroProjetoPage: React.FC = () => {
       {/* --------------------- Detalhes e Mídia --------------------- */}
       <section className="mb-8 border-t pt-5">
         {commonTitle("Descrição do Projeto")}
+        {/* ... (Campo Briefing) ... */}
         <Form.Item
           name="descricaoDiferencial"
           label="Briefing do Projeto"
@@ -939,30 +1094,44 @@ const CadastroProjetoPage: React.FC = () => {
             }}
           />
         </Form.Item>
+
+        {/* --- INÍCIO DA MODIFICAÇÃO (Contador) --- */}
         <Form.Item
           name="descricao"
           label="Descrição detalhada do seu Projeto"
-          rules={[
-            {
-              required: true,
-              message: "Por favor, descreva seu projeto!",
-            },
-          ]}
+          rules={[{ validator: validateQuill(true) }]}
+          // A prop 'help' foi substituída por este JSX:
+          help={
+            <div className="flex justify-end w-full">
+              <span
+                className={
+                  quillTextLength > MAX_QUILL_LENGTH
+                    ? "text-red-500 font-medium"
+                    : "text-gray-500"
+                }
+              >
+                {quillTextLength}/{MAX_QUILL_LENGTH}
+              </span>
+            </div>
+          }
         >
-          <TextArea
-            showCount
-            maxLength={5000}
-            rows={4}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
-            onChange={(e) => {
-              const strippedValue = stripEmojis(e.target.value);
-              form.setFieldsValue({ descricao: strippedValue });
-            }}
+          <ReactQuill
+            theme="snow"
+            modules={quillModules}
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. (Em até 5000 caracteres)"
+            style={{ minHeight: "10px" }}
           />
         </Form.Item>
+        {/* --- FIM DA MODIFICAÇÃO --- */}
+
+        {/* ... (Campos Site, Instagram, Uploads, Checkbox) ... */}
         <Row gutter={24}>
           <Col xs={24} md={12}>
-            <Form.Item name="website" label="Site da Prefeitura">
+            <Form.Item
+              name="website"
+              label="Site da Prefeitura"
+              className="mt-8"
+            >
               <Input
                 placeholder="Cole o link da página da sua Prefeitura"
                 onChange={(e) => {
@@ -973,7 +1142,11 @@ const CadastroProjetoPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item name="instagram" label="Instagram (Opcional)">
+            <Form.Item
+              name="instagram"
+              label="Instagram (Opcional)"
+              className="mt-8"
+            >
               <Input
                 placeholder="Cole o link do seu perfil"
                 onChange={(e) => {
@@ -1059,14 +1232,18 @@ const CadastroProjetoPage: React.FC = () => {
   );
 
   const renderUpdateForm = () => (
+    // --- INÍCIO DA MODIFICAÇÃO (onValuesChange) ---
     <Form
       form={form}
       layout="vertical"
       onFinish={handleUpdateSubmit}
+      onValuesChange={handleFormValuesChange} // ADICIONADO AQUI
       autoComplete="off"
     >
+      {/* --- FIM DA MODIFICAÇÃO --- */}
       <section className="mb-8 border-t pt-4">
         {commonTitle("Identificação do Projeto")}
+        {/* ... (Campos de Identificação: Prefeitura, ID, Secretaria, Responsável, etc.) ... */}
         <p className="text-gray-600 mb-6 -mt-4">
           Para iniciar a atualização, confirme os dados de identificação do
           projeto.
@@ -1210,7 +1387,7 @@ const CadastroProjetoPage: React.FC = () => {
           <strong>Os campos deixados em branco não serão modificados.</strong>
         </p>
 
-        {/* Adiciona upload de Logo como opcional na atualização */}
+        {/* ... (Campos de Atualização: Logo, Briefing) ... */}
         <Form.Item
           label="Nova Logo (Opcional)"
           help="Envie 1 nova imagem para substituir a logo atual."
@@ -1228,6 +1405,7 @@ const CadastroProjetoPage: React.FC = () => {
         </Form.Item>
 
         <Form.Item
+          className="mt-10"
           name="descricaoDiferencial"
           label="Novo Briefing do Projeto (Resumo)"
         >
@@ -1243,20 +1421,37 @@ const CadastroProjetoPage: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item name="descricao" label="Nova Descrição do projeto">
-          <TextArea
-            showCount
-            maxLength={5000}
-            rows={4}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. Essa é a informação que os usuários da plataforma irão ver. (Em até 5000 caracteres)"
-            onChange={(e) => {
-              const strippedValue = stripEmojis(e.target.value);
-              form.setFieldsValue({ descricao: strippedValue });
-            }}
+        {/* --- INÍCIO DA MODIFICAÇÃO (Contador) --- */}
+        <Form.Item
+          name="descricao"
+          label="Nova Descrição do projeto"
+          rules={[{ validator: validateQuill(false) }]}
+          // A prop 'help' foi substituída por este JSX:
+          help={
+            <div className="flex justify-between w-full">
+              <span>Se preenchido, substituirá a descrição atual.</span>
+              <span
+                className={
+                  quillTextLength > MAX_QUILL_LENGTH
+                    ? "text-red-500 font-medium"
+                    : "text-gray-500"
+                }
+              >
+                {quillTextLength}/{MAX_QUILL_LENGTH}
+              </span>
+            </div>
+          }
+        >
+          <ReactQuill
+            theme="snow"
+            modules={quillModules}
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz..."
+            style={{ minHeight: "10px" }}
           />
         </Form.Item>
 
         <Form.Item
+          className="mt-10"
           name="outrasAlteracoes"
           label="Outras Alterações (Opcional)"
           help="Se precisar alterar algo que não está no formulário (ex: site, instagram, endereço), descreva aqui."
@@ -1339,6 +1534,7 @@ const CadastroProjetoPage: React.FC = () => {
         </Form.Item>
 
         <Form.Item
+          className="mt-10"
           name="portfolio"
           label="Novas Fotos do Portfólio (até 4)"
           help="As imagens enviadas aqui irão substituir as atuais."
@@ -1402,6 +1598,7 @@ const CadastroProjetoPage: React.FC = () => {
     >
       <section className="mb-8 border-t pt-4">
         {commonTitle("Exclusão de Cadastro Projeto")}
+        {/* ... (Restante do formulário de exclusão) ... */}
         <p className="text-red-700 bg-red-50 p-4 rounded-md mb-6 -mt-2">
           <b>Atenção:</b> Esta ação é permanente e removerá seu Projeto da nossa
           plataforma. Para voltar, será necessário um novo cadastro. Para
