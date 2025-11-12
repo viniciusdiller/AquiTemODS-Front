@@ -36,6 +36,7 @@ import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
 import { Projeto } from "@/types/Interface-Projeto";
+import FormattedDescription from "@/components/FormattedDescription";
 
 const { Text, Title } = Typography;
 const { Column } = Table;
@@ -141,6 +142,31 @@ const AdminDashboard: React.FC = () => {
       return <Text type="secondary">Não informado</Text>;
     }
 
+    if (key === "descricao") {
+      return (
+        <div
+          className="prose prose-sm max-w-none prose-p:my-1"
+          dangerouslySetInnerHTML={{ __html: value }}
+        />
+      );
+    }
+
+    if (key === "descricaoDiferencial") {
+      return <FormattedDescription text={value} />;
+    }
+
+    if (
+      key === "motivo" ||
+      key === "motivoExclusao" ||
+      key === "outrasAlteracoes"
+    ) {
+      return (
+        <Typography.Paragraph style={{ whiteSpace: "pre-wrap", margin: 0 }}>
+          {String(value)}
+        </Typography.Paragraph>
+      );
+    }
+
     if (key === "createdAt" || key === "updatedAt") {
       try {
         const date = new Date(value);
@@ -242,7 +268,6 @@ const AdminDashboard: React.FC = () => {
     const token = localStorage.getItem("admin_token");
 
     try {
-      // 1. Prepara as opções base
       const fetchOptions: RequestInit = {
         method: "POST",
         headers: {
@@ -250,7 +275,6 @@ const AdminDashboard: React.FC = () => {
         },
       };
 
-      // 2. Adiciona o body APENAS se for "reject"
       if (action === "reject") {
         fetchOptions.headers = {
           ...fetchOptions.headers,
@@ -261,13 +285,11 @@ const AdminDashboard: React.FC = () => {
         });
       }
 
-      // 3. CHAMA O FETCH USANDO a variável fetchOptions
       const response = await fetch(
         `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
         fetchOptions
       );
 
-      // 4. VERIFICA O ERRO ANTES de tentar o .json()
       if (!response.ok) {
         const errorText = await response.text();
         try {
@@ -281,7 +303,6 @@ const AdminDashboard: React.FC = () => {
         }
       }
 
-      // Se passou pela verificação, a resposta é OK e é JSON
       const result = await response.json();
 
       message.success(result.message || `Ação executada com sucesso!`);
@@ -378,7 +399,6 @@ const AdminDashboard: React.FC = () => {
       return null;
     }
 
-    // Mapa de chaves
     const keyMap: { [newKey: string]: { oldKey: string; labelKey: string } } = {
       logo: { oldKey: "logoUrl", labelKey: "logo" },
       imagens: { oldKey: "projetoImg", labelKey: "projetoImg" },
@@ -444,7 +464,6 @@ const AdminDashboard: React.FC = () => {
         fieldConfig[d.key]?.group !== "info"
     );
 
-    // Define a cor do título com base no tipo de alerta
     const titleColor = alertType === "info" ? "#0050b3" : "#d4380d";
 
     const columns = [
@@ -764,7 +783,6 @@ const AdminDashboard: React.FC = () => {
 
             return (
               <>
-                {/* --- Bloco de Identificação --- */}
                 {identificacaoEntries.length > 0 && (
                   <>
                     <Title level={4} className="mt-4">
@@ -783,7 +801,6 @@ const AdminDashboard: React.FC = () => {
                   </>
                 )}
 
-                {/* --- Bloco de Informações --- */}
                 <Title level={4} className="mt-6">
                   Informações do Projeto
                 </Title>
@@ -809,7 +826,6 @@ const AdminDashboard: React.FC = () => {
                   ))}
                 </Descriptions>
 
-                {/* --- Bloco de Metadados --- */}
                 {metaEntries.length > 0 && (
                   <>
                     <Title level={4} className="mt-6">
@@ -847,7 +863,6 @@ const AdminDashboard: React.FC = () => {
         </Modal>
       )}
 
-      {/* ---MODAL DE EDIÇÃO --- */}
       <AdminProjetoModal
         projeto={selectedItem}
         visible={isEditModalVisible}
@@ -862,7 +877,7 @@ const AdminDashboard: React.FC = () => {
         mode="edit-and-approve"
         onEditAndApprove={handleEditAndApproveSubmit}
       />
-      {/* ---  MODAL DE REJEIÇÃO --- */}
+
       <Modal
         title="Confirmar Rejeição"
         open={isRejectModalVisible}

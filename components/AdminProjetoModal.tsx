@@ -21,6 +21,31 @@ import {
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { adminUpdateProjeto } from "@/lib/api";
 import { Projeto, Imagens } from "@/types/Interface-Projeto";
+import dynamic from "next/dynamic";
+import "react-quill/dist/quill.snow.css";
+import "@/app/cadastro-projeto/quill-styles.css";
+
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => (
+    <Spin
+      size="large"
+      style={{ display: "block", margin: "20px auto", minHeight: "150px" }}
+    />
+  ),
+});
+
+const quillModules = {
+  toolbar: [
+    [{ header: "1" }, { header: "2" }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    ["link"],
+    ["clean"],
+  ],
+};
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -70,7 +95,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
   const [outrasAlteracoes, setOutrasAlteracoes] = useState<string | null>(null);
 
   const [currentLogo, setCurrentLogo] = useState<string | null>(null);
-  // ALTERAÇÃO 2: Corrigido de 'ImagemProjeto[]' para 'Imagens[]'
+
   const [currentPortfolio, setCurrentPortfolio] = useState<Imagens[]>([]);
   const [portfolioToDelete, setPortfolioToDelete] = useState<string[]>([]);
   const [logoToDelete, setLogoToDelete] = useState<boolean>(false);
@@ -80,7 +105,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       let dataToEdit: any = { ...projeto };
 
       setCurrentLogo(projeto.logoUrl || null);
-      // Aqui está correto, pois 'projeto.projetoImg' é do tipo 'Imagens[]'
+
       setCurrentPortfolio(projeto.projetoImg || []);
       setPortfolioToDelete([]);
       setLogoToDelete(false);
@@ -175,7 +200,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
     }
   };
 
-  // Mantém a função de URL correta (do dashboard)
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
     if (path.startsWith("http") || path.startsWith("blob:")) {
@@ -235,7 +259,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           <Title level={5} className="mt-4">
             Informações Principais
           </Title>
-          {/* ... (Restante dos Form.Items) ... */}
+
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -349,13 +373,21 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           >
             <TextArea rows={2} />
           </Form.Item>
+
           <Form.Item
             name="descricao"
             label="Descrição Completa"
             rules={[{ required: true }]}
+            className="quill-editor-container"
           >
-            <TextArea rows={5} />
+            <ReactQuill
+              theme="snow"
+              modules={quillModules}
+              placeholder="Descreva o projeto em detalhes, você pode usar negrito, itálico..."
+              style={{ minHeight: "10px" }}
+            />
           </Form.Item>
+
           <Form.Item name="odsRelacionadas" label="ODS Relacionadas">
             <Select mode="multiple" placeholder="Selecione as ODS relacionadas">
               {categorias
@@ -494,7 +526,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               </div>
             </Col>
           </Row>
-          {/* --- FIM DA SEÇÃO --- */}
         </Spin>
       </Form>
     </Modal>
