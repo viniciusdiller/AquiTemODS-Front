@@ -29,6 +29,7 @@ import {
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "./quill-styles.css";
+import { Slider } from "@/components/ui/slider";
 
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",
@@ -396,6 +397,26 @@ const odsRelacionadas: { [key: string]: string[] } = {
   ],
 };
 
+export const ApoioPlanejamento = [
+  {
+    label: "Facilitar o acompanhamento das metas ODS",
+    value: "Facilitar o acompanhamento das metas ODS",
+  },
+  {
+    label: "Integrar projetos e políticas públicas",
+    value: "Integrar projetos e políticas públicas",
+  },
+  {
+    label: "Promover transparência e engajamento social",
+    value: "Promover transparência e engajamento social",
+  },
+  {
+    label: "Apoiar a tomada de decisão baseada em dados",
+    value: "Apoiar a tomada de decisão baseada em dados",
+  },
+  { label: "Outro", value: "Outro" },
+];
+
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -429,6 +450,16 @@ const CadastroProjetoPage: React.FC = () => {
 
   const [quillTextLength, setQuillTextLength] = useState(0);
   const MAX_QUILL_LENGTH = 5000;
+
+  const [sliderValue, setSliderValue] = useState(0);
+  const escalaValue = Form.useWatch("escala", form);
+  const apoioPlanejamentoValue = Form.useWatch("apoio_planejamento", form);
+
+  useEffect(() => {
+    if (escalaValue !== undefined) {
+      setSliderValue(escalaValue);
+    }
+  }, [escalaValue]);
 
   const stripEmojis = (value: string) => {
     if (!value) return "";
@@ -575,18 +606,37 @@ const CadastroProjetoPage: React.FC = () => {
     setLoading(true);
     try {
       const formData = new FormData();
+      if (
+        values.apoio_planejamento &&
+        Array.isArray(values.apoio_planejamento)
+      ) {
+        const apoioArray = values.apoio_planejamento as string[];
+        const outroValue = values.apoio_planejamento_outro;
+
+        if (apoioArray.includes("Outro") && outroValue) {
+          values.apoio_planejamento = apoioArray.map((item) =>
+            item === "Outro" ? `Outro: ${outroValue}` : item
+          );
+        }
+      }
+
+      delete values.apoio_planejamento_outro;
 
       Object.entries(values).forEach(([key, value]) => {
         if (key === "descricao" && (value === "<p><br></p>" || value === "")) {
           return;
         }
+
         if (
           value &&
           key !== "logo" &&
           key !== "projeto" &&
           key !== "venceuPspe"
         ) {
-          if (key === "ODS Relacionadas" && Array.isArray(value)) {
+          if (
+            (key === "ODS Relacionadas" || key === "apoio_planejamento") &&
+            Array.isArray(value)
+          ) {
             formData.append(key, value.join(", "));
           } else {
             formData.append(key, value as string);
@@ -1011,6 +1061,76 @@ const CadastroProjetoPage: React.FC = () => {
             )}
           </Col>
         </Row>
+        <Form.Item
+          name="apoio_planejamento"
+          label="De que forma você acredita que a plataforma Aqui tem ODS pode apoiar o planejamento, monitoramento e a integração das ações da sua secretaria ou setor?"
+          rules={[
+            { required: true, message: "Selecione pelo menos uma opçãi." },
+          ]}
+          help="Selecione todas as opções que se aplicam."
+        >
+          <Checkbox.Group
+            options={ApoioPlanejamento}
+            className="flex flex-col space-y-1 ml-4"
+          />
+        </Form.Item>
+        {Array.isArray(apoioPlanejamentoValue) &&
+          apoioPlanejamentoValue.includes("Outro") && (
+            <Form.Item
+              name="apoio_planejamento_outro"
+              label=" "
+              colon={false}
+              className="ml-2 -mt-8 mb-4"
+              rules={[
+                {
+                  required: true,
+                  message: "Por favor, especifique a outra forma de apoio.",
+                },
+                {
+                  max: 80,
+                  message:
+                    "A especificação não pode ter mais de 80 caracteres.",
+                },
+              ]}
+            >
+              <Input.TextArea
+                placeholder="Especifique a opção 'Outro'..."
+                maxLength={80}
+                showCount
+                rows={2}
+                onChange={(e) => {
+                  const strippedValue = stripEmojis(e.target.value);
+                  form.setFieldsValue({
+                    apoio_planejamento_outro: strippedValue,
+                  });
+                }}
+              />
+            </Form.Item>
+          )}
+
+        {/* Pergunta 2: Escala (Slider) - A "Boa Ideia" */}
+        <Form.Item
+          rules={[{ required: true, message: "Por favor, avalie o impacto!" }]}
+          name="escala"
+          label="Em uma escala de 0 a 10, onde 0 = nenhum impacto e 10 = impacto muito positivo, como você avalia o potencial do Aqui tem ODS para fortalecer a gestão pública sustentável e o alcance das metas da Agenda 2030 em Saquarema?"
+          className="mt-10"
+        >
+          <>
+            <Slider
+              value={[sliderValue]}
+              max={10}
+              step={1}
+              onValueChange={(value) => {
+                setSliderValue(value[0]);
+                form.setFieldsValue({ escala: value[0] });
+              }}
+            />
+            {/* Mostrador numérico */}
+            <div className="text-center font-bold text-lg text-primary mt-2">
+              {sliderValue}
+            </div>
+          </>
+        </Form.Item>
       </section>
 
       {/* --------------------- Contato e Localização --------------------- */}
@@ -1104,7 +1224,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               name="website"
-              label="Site da Prefeitura"
+              label="Site da Prefeitura(Opicional)"
               className="mt-8"
             >
               <Input

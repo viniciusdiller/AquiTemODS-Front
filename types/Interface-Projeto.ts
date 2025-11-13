@@ -16,5 +16,7 @@ export interface Projeto {
   dados_atualizacao?: any;
   status: string;
   venceuPspe: boolean;
+  venda?: string;
+  escala?: number;
   [key: string]: any;
 }

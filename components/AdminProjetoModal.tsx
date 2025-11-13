@@ -17,10 +17,12 @@ import {
   Image as AntdImage,
   Tag,
   Popconfirm,
+  Rate,
 } from "antd";
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { adminUpdateProjeto } from "@/lib/api";
 import { Projeto, Imagens } from "@/types/Interface-Projeto";
+import { ApoioPlanejamento } from "@/app/cadastro-projeto/page";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import "@/app/cadastro-projeto/quill-styles.css";
@@ -145,6 +147,11 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           .split(",")
           .map((s: string) => s.trim());
       }
+      if (typeof dataToEdit.apoio_planejamento === "string") {
+        dataToEdit.apoio_planejamento = dataToEdit.apoio_planejamento
+          .split(",")
+          .map((s: string) => s.trim());
+      }
 
       editForm.setFieldsValue(dataToEdit);
     } else {
@@ -164,6 +171,10 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 
     if (Array.isArray(values.odsRelacionadas)) {
       values.odsRelacionadas = values.odsRelacionadas.join(", ");
+    }
+
+    if (Array.isArray(values.apoio_planejamento)) {
+      values.apoio_planejamento = values.apoio_planejamento.join(", ");
     }
 
     const finalValues = { ...values };
@@ -344,7 +355,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             <Col span={12}>
               <Form.Item
                 name="website"
-                label="Website"
+                label="Site da Prefeitura"
                 rules={[{ type: "url" }]}
               >
                 <Input placeholder="http://..." />
@@ -412,6 +423,31 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               <Option value={true}>Sim</Option>
               <Option value={false}>Não</Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            name="apoio_planejamento"
+            label="De que forma você acredita que a plataforma Aqui tem ODS pode apoiar o planejamento, monitoramento e a integração das ações da sua secretaria ou setor?"
+          >
+            <Select
+              mode="multiple"
+              placeholder="Selecione todas as opções que se aplicam."
+              allowClear
+            >
+              {/* Usamos a constante importada */}
+              {ApoioPlanejamento.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="escala"
+            label="Nota de Impacto (0-10)"
+            help="Nota que o usuário deu sobre o impacto da plataforma."
+          >
+            <Rate count={10} />
           </Form.Item>
 
           {/* --- SEÇÃO DE GERENCIAMENTO DE IMAGENS --- */}

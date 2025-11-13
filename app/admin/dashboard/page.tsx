@@ -94,6 +94,12 @@ const fieldConfig: {
   logo: { label: "Nova Logo", order: 42, group: "info" },
   projetoImg: { label: "Portfólio Atual", order: 43, group: "info" },
   odsRelacionadas: { label: "ODS Relacionadas", order: 50, group: "info" },
+  apoio_planejamento: {
+    label: "Apoio ao Planejamento",
+    order: 60,
+    group: "info",
+  },
+  escala: { label: "Escala de Impacto", order: 61, group: "info" },
 
   // --- Grupo de Metadados ---
   status: { label: "Status Atual", order: 5, group: "meta" },
