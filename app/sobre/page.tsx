@@ -25,7 +25,7 @@ export default function EspacoODSPage() {
               <p className="text-gray-700 leading-relaxed text-lg">
                 O {""}
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-                  AquitemODS{" "}
+                  #AquitemODS{" "}
                 </span>
                 é uma iniciativa da{" "}
                 <strong>Prefeitura Municipal de Saquarema</strong>, idealizada
@@ -49,7 +49,7 @@ export default function EspacoODSPage() {
               <p className="text-gray-700 leading-relaxed text-lg">
                 Mais do que um banco de projetos, o {""}
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-                  AquitemODS{" "}
+                  #AquitemODS{" "}
                 </span>
                 é um ecossistema de conhecimento e colaboração entre gestores,
                 técnicos, servidores e cidadãos comprometidos com o
@@ -72,7 +72,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             A criação do {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             é um{" "}
             <strong>desdobramento direto dos Seminários Saquarema 2030</strong>,
@@ -95,7 +95,7 @@ export default function EspacoODSPage() {
             voltada à criação de soluções inovadoras, experimentação de
             políticas públicas e disseminação de práticas sustentáveis. O {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             é um dos principais produtos desse laboratório — transformando
             conhecimento em ação, e ação em legado.
@@ -112,7 +112,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             A plataforma {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             tem como principal objetivo identificar, valorizar e divulgar
             projetos, programas e políticas públicas implementadas por órgãos
@@ -169,7 +169,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             O {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             representa um avanço significativo na gestão pública municipal, pois
             permite:
@@ -218,7 +218,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg">
             O{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             busca gerar impactos concretos e duradouros:
           </p>
@@ -266,7 +266,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             O{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS{" "}
+              #AquitemODS{" "}
             </span>{" "}
             reforça o compromisso da Prefeitura de Saquarema com a Agenda 2030
             das Nações Unidas, com os princípios de gestão participativa,
@@ -337,7 +337,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg">
             Com o{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS
+              #AquitemODS
             </span>
             , Saquarema reafirma seu papel como{" "}
             <strong>
@@ -354,7 +354,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4 flex">
             E é por isso que —{""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              AquitemODS.
+              #AquitemODS.
             </span>{" "}
             <Heart size={24} className="inline fill-[#D7386E] text-[#D7386E]" />
           </p>
@@ -373,7 +373,7 @@ export default function EspacoODSPage() {
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <img
-                  src="/Logo_aquitemods.png"
+                  src="/#Logo_aquitemods.png"
                   alt="Logo do Aqui Tem ODS"
                   width={400}
                   height={300}
