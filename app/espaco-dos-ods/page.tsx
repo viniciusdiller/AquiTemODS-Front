@@ -352,7 +352,7 @@ export default function SobrePage() {
             <strong>mudanças que o mundo precisa começam em cada cidade</strong>{" "}
             — e em Saquarema,{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS.{" "}
+              #AquiTemODS.{" "}
             </span>
           </p>
         </section>

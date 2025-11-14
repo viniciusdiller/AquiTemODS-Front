@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
+import Link from "next/link";
 
 export default function FAQPage() {
   return (
@@ -64,7 +65,7 @@ export default function FAQPage() {
                 O que é a plataforma Aqui Tem ODS?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                O <strong>AquitemODS</strong> é uma iniciativa da Prefeitura
+                O <strong>AquiTemODS</strong> é uma iniciativa da Prefeitura
                 Municipal de Saquarema, idealizada pela Secretaria de Governança
                 e Sustentabilidade (Lab ISA). É uma plataforma digital criada
                 para reunir, organizar e divulgar boas práticas de gestão
@@ -93,7 +94,7 @@ export default function FAQPage() {
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
                 Além dos 17 ODS originais da ONU, o Brasil incorporou um 18º
                 ODS, criado pela Comissão Nacional dos ODS (CNODS). Este
-                objetivo adicional trata da **Igualdade Étnico/Racial**
+                objetivo adicional trata da <strong>Igualdade Étnico/Racial</strong>
                 (Promoção dos Direitos Humanos e da Cidadania), reforçando o
                 compromisso do país com a inclusão, equidade e justiça social.
               </AccordionContent>
@@ -115,30 +116,40 @@ export default function FAQPage() {
                 Quem pode cadastrar um projeto na plataforma?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                A plataforma é voltada para a gestão pública municipal. O
-                formulário de cadastro é desenhado para ser preenchido por
-                representantes de uma **Prefeitura Municipal** e sua respectiva
-                **Secretaria** responsável pela iniciativa.
+                O cadastro está disponível para servidores públicos que desejem compartilhar boas práticas e projetos desenvolvidos em seu município, alinhados aos Objetivos de Desenvolvimento Sustentável (ODS) da Agenda 2030 da ONU, contribuindo para a valorização, visibilidade e troca de experiências entre gestões comprometidas com o desenvolvimento sustentável.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5">
               <AccordionTrigger className="text-lg text-left font-semibold">
-                Como faço para cadastrar um novo projeto?
+                Como faço para CADASTRAR meu MEI na plataforma?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                1. Você precisa ter um cadastro e estar logado na plataforma.
+                1. Você precisa ter um cadastro de usuário e estar logado. Se
+                não tiver,{" "}
+                <Link href="/cadastro" className="text-blue-600 underline">
+                  clique aqui para se cadastrar
+                </Link>
+                .
                 <br />
-                2. Acesse a página "Cadastro de Projetos" no menu principal.
+                2. Acesse a página{" "}
+                <Link
+                  href="/cadastro-projeto"
+                  className="text-blue-600 underline"
+                >
+                  "Cadastro de Projetos"
+                </Link>{" "}
+                no menu.
                 <br />
-                3. No seletor, escolha a opção "Cadastrar meu projeto na
+                3. No seletor, escolha a opção "Cadastrar meu MEI na
                 plataforma".
                 <br />
                 4. Preencha o formulário completo com as informações do
-                responsável, dados do projeto, descrições, links e imagens.
+                responsável, dados do negócio, descrições, e anexe os arquivos
+                solicitados (CCMEI, Logo, Portfólio).
                 <br />
-                5. Após o envio, seu projeto passará por uma análise antes de
-                ser publicado.
+                5. Após o envio, seu cadastro passará por uma análise do
+                administrador antes de ser publicado.
               </AccordionContent>
             </AccordionItem>
 
@@ -147,7 +158,13 @@ export default function FAQPage() {
                 Como posso ATUALIZAR as informações de um projeto já cadastrado?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                1. Acesse a página "Cadastro de Projetos".
+                1. Acesse a página{" "}
+                <Link
+                  href="/cadastro-projeto"
+                  className="text-blue-600 underline"
+                >
+                  "Cadastro de Projetos"
+                </Link>{" "}
                 <br />
                 2. Escolha a opção "Atualizar uma informação do meu projeto".
                 <br />
@@ -155,7 +172,7 @@ export default function FAQPage() {
                 obrigatórios (ID do Projeto, Prefeitura, Secretaria, Nome do
                 Projeto e E-mail) para confirmar a autoria.
                 <br />
-                4. Em seguida, preencha **apenas** os campos que você deseja
+                4. Em seguida, preencha <strong>apenas</strong> os campos que você deseja
                 alterar. Campos deixados em branco não serão modificados.
               </AccordionContent>
             </AccordionItem>
@@ -165,7 +182,13 @@ export default function FAQPage() {
                 Como posso EXCLUIR um projeto da plataforma?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                1. Acesse a página "Cadastro de Projetos".
+                1. Acesse a página{" "}
+                <Link
+                  href="/cadastro-projeto"
+                  className="text-blue-600 underline"
+                >
+                  "Cadastro de Projetos"
+                </Link>{" "}
                 <br />
                 2. Escolha a opção "Excluir meu projeto da plataforma".
                 <br />
@@ -174,7 +197,7 @@ export default function FAQPage() {
                 para confirmar sua solicitação.
                 <br />
                 4. Após a confirmação, sua solicitação de exclusão será
-                processada. Esta ação é permanente.
+                processada. <strong>Esta ação é permanente e não poderá ser revertida.</strong>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

@@ -25,7 +25,7 @@ export default function EspacoODSPage() {
               <p className="text-gray-700 leading-relaxed text-lg">
                 O {""}
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-                  #AquitemODS{" "}
+                  #AquiTemODS{" "}
                 </span>
                 é uma iniciativa da{" "}
                 <strong>Prefeitura Municipal de Saquarema</strong>, idealizada
@@ -49,7 +49,7 @@ export default function EspacoODSPage() {
               <p className="text-gray-700 leading-relaxed text-lg">
                 Mais do que um banco de projetos, o {""}
                 <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-                  #AquitemODS{" "}
+                  #AquiTemODS{" "}
                 </span>
                 é um ecossistema de conhecimento e colaboração entre gestores,
                 técnicos, servidores e cidadãos comprometidos com o
@@ -66,13 +66,13 @@ export default function EspacoODSPage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              Origem e contexto: dos Seminários Saquarema 2030 ao Lab ISA
+              Origem e contexto: dos Seminários Saquarema 2030 ao Laboratório de Inovação e Sustentabilidade Aplicada - Lab ISA
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             A criação do {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS{" "}
+              #AquiTemODS{" "}
             </span>{" "}
             é um{" "}
             <strong>desdobramento direto dos Seminários Saquarema 2030</strong>,
@@ -81,24 +81,22 @@ export default function EspacoODSPage() {
             para os desafios do futuro.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            A primeira edição do Seminário Saquarema 2030, em maio de 2023,
-            reuniu gestores públicos, especialistas, universidades e
-            representantes da sociedade civil em um espaço de diálogo sobre
-            planejamento territorial, mudanças climáticas, desenvolvimento
-            econômico e políticas públicas integradas. O evento foi um marco de
-            reflexão e construção coletiva, em que se reafirmou a importância do
-            papel dos municípios na concretização dos ODS em nível local.
+           A <strong>primeira edição do Seminário Saquarema 2030</strong>, realizada em maio de 2023, foi um marco na gestão pública municipal. O evento reuniu gestores, especialistas, universidades, instituições parceiras e representantes da sociedade civil, consolidando um espaço de diálogo intersetorial <strong>sobre planejamento territorial, mudanças climáticas, inovação, economia sustentável e políticas públicas integradas.</strong> Nesse encontro, reafirmou-se o papel estratégico dos municípios como protagonistas na implementação dos ODS em nível local.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            A partir desse movimento, nasceu o Laboratório de Inovação e
-            Sustentabilidade Aplicada – Lab ISA, uma iniciativa permanente
-            voltada à criação de soluções inovadoras, experimentação de
-            políticas públicas e disseminação de práticas sustentáveis. O {""}
-            <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS{" "}
+           Como desdobramento desse movimento, surgiu o <strong>Laboratório de Inovação e Sustentabilidade Aplicada – Lab ISA</strong>, uma estrutura permanente de apoio à gestão pública, voltada à criação de <strong>soluções inovadoras, experimentação de políticas públicas, capacitação de servidores e difusão de boas práticas sustentáveis.</strong> O Lab ISA representa o compromisso da Prefeitura de Saquarema com a modernização administrativa, a transparência e a integração entre conhecimento técnico, tecnologia e impacto social.
+          </p>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+           Entre os resultados concretos do Lab ISA destaca-se o projeto  <span className=" bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
+            MEIdeSaquá
             </span>{" "}
-            é um dos principais produtos desse laboratório — transformando
-            conhecimento em ação, e ação em legado.
+           , uma iniciativa de valorização do microempreendedorismo local e de fortalecimento da economia criativa, desenvolvido integralmente por <strong>estagiários do Programa Jovem Cidadão</strong> — jovens talentos vinculados ao <strong>Programa Conexão Universitária da Prefeitura de Saquarema.</strong> Essa integração entre formação acadêmica e prática de inovação pública demonstra o potencial transformador das políticas municipais voltadas à educação, juventude e desenvolvimento econômico sustentável.
+          </p>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+           O <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
+              #AquiTemODS{" "}
+            </span>{" "}
+           nasce, portanto, nesse ecossistema de inovação e governança colaborativa. Mais do que uma plataforma, ele simboliza a consolidação de uma cultura institucional orientada à sustentabilidade, à eficiência e à valorização do conhecimento local. O projeto traduz o compromisso de Saquarema em transformar <strong>ideias em ações concretas</strong> e <strong>ações em legados duradouros</strong>, fortalecendo o papel do município como referência em inovação pública e desenvolvimento sustentável no Estado do Rio de Janeiro.
           </p>
         </section>
 
@@ -112,7 +110,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             A plataforma {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS{" "}
+              #AquiTemODS{" "}
             </span>{" "}
             tem como principal objetivo identificar, valorizar e divulgar
             projetos, programas e políticas públicas implementadas por órgãos
@@ -169,7 +167,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             O {""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS{" "}
+              #AquiTemODS{" "}
             </span>{" "}
             representa um avanço significativo na gestão pública municipal, pois
             permite:
@@ -218,7 +216,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg">
             O{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS{" "}
+              #AquiTemODS{" "}
             </span>{" "}
             busca gerar impactos concretos e duradouros:
           </p>
@@ -337,7 +335,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg">
             Com o{" "}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS
+              #AquiTemODS
             </span>
             , Saquarema reafirma seu papel como{" "}
             <strong>
@@ -354,7 +352,7 @@ export default function EspacoODSPage() {
           <p className="text-gray-700 leading-relaxed text-lg mt-4 flex">
             E é por isso que —{""}
             <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
-              #AquitemODS.
+              #AquiTemODS.
             </span>{" "}
             <Heart size={24} className="inline fill-[#D7386E] text-[#D7386E]" />
           </p>
@@ -373,7 +371,7 @@ export default function EspacoODSPage() {
             >
               <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
                 <img
-                  src="/#Logo_aquitemods.png"
+                  src="/Logo_aquitemods.png"
                   alt="Logo do Aqui Tem ODS"
                   width={400}
                   height={300}
