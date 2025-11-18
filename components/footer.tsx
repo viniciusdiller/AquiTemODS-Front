@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { Mail, MapPin } from "lucide-react";
 
-const address = "R. Cel. Madureira, 77 - Centro, Saquarema - RJ";
+const address = "R. Cel. Madureira, 77, Saquarema - RJ";
 const encodedAddress = encodeURIComponent(address);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
 const Footer = () => {
@@ -23,9 +23,7 @@ const Footer = () => {
               />
             </Link>
             <p className="text-gray-600 max-w-xs mx-auto ">
-              O banco de dados digital que promove a visibilidade dos projetos
-              alinhados aos Objetivos de Desenvolvimento Sustentável (ODS) no
-              estado do Rio de Janeiro.
+              O ecossistema de conhecimento e colaboração entre gestores, técnicos, servidores e cidadãos comprometidos com o desenvolvimento sustentável municipal alinhado aos Objetivos de Desenvolvimento Sustentável.
             </p>
           </div>
 

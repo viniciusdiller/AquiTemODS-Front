@@ -65,12 +65,7 @@ export default function FAQPage() {
                 O que é a plataforma Aqui Tem ODS?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
-                O <strong>AquiTemODS</strong> é uma iniciativa da Prefeitura
-                Municipal de Saquarema, idealizada pela Secretaria de Governança
-                e Sustentabilidade (Lab ISA). É uma plataforma digital criada
-                para reunir, organizar e divulgar boas práticas de gestão
-                pública municipal que estejam alinhadas aos Objetivos de
-                Desenvolvimento Sustentável (ODS) da ONU.
+                O <strong>#AquiTemODS</strong> é uma iniciativa da Prefeitura Municipal de Saquarema, idealizada Secretaria de Governança e Sustentabilidade por meio do Laboratório de Inovação e Sustentabilidade Aplicada (Lab-ISA) . É uma plataforma digital criada para reunir, organizar e divulgar boas práticas de gestão pública municipal que estejam alinhadas aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU.
               </AccordionContent>
             </AccordionItem>
 
@@ -122,7 +117,7 @@ export default function FAQPage() {
 
             <AccordionItem value="item-5">
               <AccordionTrigger className="text-lg text-left font-semibold">
-                Como faço para CADASTRAR meu MEI na plataforma?
+                Como faço para CADASTRAR meu Projeto na plataforma?
               </AccordionTrigger>
               <AccordionContent className="text-gray-700 leading-relaxed text-base">
                 1. Você precisa ter um cadastro de usuário e estar logado. Se
@@ -141,12 +136,12 @@ export default function FAQPage() {
                 </Link>{" "}
                 no menu.
                 <br />
-                3. No seletor, escolha a opção "Cadastrar meu MEI na
+                3. No seletor, escolha a opção "Cadastrar meu Projeto na
                 plataforma".
                 <br />
                 4. Preencha o formulário completo com as informações do
-                responsável, dados do negócio, descrições, e anexe os arquivos
-                solicitados (CCMEI, Logo, Portfólio).
+                responsável, dados do projeto, descrições, e anexe os arquivos
+                solicitados (Logo, Portfólio e Ofício de Adesão).
                 <br />
                 5. Após o envio, seu cadastro passará por uma análise do
                 administrador antes de ser publicado.

@@ -84,6 +84,10 @@ export default function EspacoODSPage() {
            A <strong>primeira edição do Seminário Saquarema 2030</strong>, realizada em maio de 2023, foi um marco na gestão pública municipal. O evento reuniu gestores, especialistas, universidades, instituições parceiras e representantes da sociedade civil, consolidando um espaço de diálogo intersetorial <strong>sobre planejamento territorial, mudanças climáticas, inovação, economia sustentável e políticas públicas integradas.</strong> Nesse encontro, reafirmou-se o papel estratégico dos municípios como protagonistas na implementação dos ODS em nível local.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
+          Entre julho e outubro de 2024, a Prefeitura de Saquarema participou da <strong>Jornada de Formação do Desafio dos ODS, oferecida pela ONU-Habitat</strong>, uma iniciativa voltada a reconhecer e fortalecer políticas públicas alinhadas à Agenda 2030. Essa trajetória culminou na <strong>premiação de Saquarema como vencedora da categoria ODS 16 – Paz, Justiça e Instituições Eficazes</strong>, pelo projeto <strong> Saquarema 2030</strong>, que se destacou como modelo de integração entre planejamento, governança e inovação. A partir desse processo, surgiu a ideia de criar uma <strong> plataforma digital que tornasse o “2030” um espaço permanente de troca, aprendizado e acompanhamento das ações sustentáveis do município</strong>.
+
+          </p>
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
            Como desdobramento desse movimento, surgiu o <strong>Laboratório de Inovação e Sustentabilidade Aplicada – Lab ISA</strong>, uma estrutura permanente de apoio à gestão pública, voltada à criação de <strong>soluções inovadoras, experimentação de políticas públicas, capacitação de servidores e difusão de boas práticas sustentáveis.</strong> O Lab ISA representa o compromisso da Prefeitura de Saquarema com a modernização administrativa, a transparência e a integração entre conhecimento técnico, tecnologia e impacto social.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -96,7 +100,7 @@ export default function EspacoODSPage() {
            O <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               #AquiTemODS{" "}
             </span>{" "}
-           nasce, portanto, nesse ecossistema de inovação e governança colaborativa. Mais do que uma plataforma, ele simboliza a consolidação de uma cultura institucional orientada à sustentabilidade, à eficiência e à valorização do conhecimento local. O projeto traduz o compromisso de Saquarema em transformar <strong>ideias em ações concretas</strong> e <strong>ações em legados duradouros</strong>, fortalecendo o papel do município como referência em inovação pública e desenvolvimento sustentável no Estado do Rio de Janeiro.
+           nasce, portanto, como esse ecossistema de inovação e governança colaborativa. Mais do que uma plataforma, ele simboliza a consolidação de uma cultura institucional orientada à sustentabilidade, à eficiência e à valorização do conhecimento local. O projeto traduz o compromisso de Saquarema em transformar <strong>ideias em ações concretas</strong> e <strong>ações em legados duradouros</strong>, fortalecendo o papel do município como referência em inovação pública e desenvolvimento sustentável no Estado do Rio de Janeiro.
           </p>
         </section>
 
@@ -121,7 +125,7 @@ export default function EspacoODSPage() {
             Cada iniciativa cadastrada é mapeada, descrita e vinculada aos ODS
             correspondentes, permitindo uma leitura integrada das ações da
             gestão municipal e de como elas impactam positivamente a vida da
-            população. Além disso, a plataforma visa:
+            população.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             Além disso, a plataforma visa:
@@ -291,7 +295,9 @@ export default function EspacoODSPage() {
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg">
-            O projeto contribui diretamente com:
+            O <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
+              #AquiTemODS
+            </span> é uma aplicação direta dos ODS 16  E 17:
           </p>
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
@@ -306,6 +312,13 @@ export default function EspacoODSPage() {
               <strong>— Paz, Justiça e Instituições Eficazes:</strong>{" "}
               transparência e governança pública.
             </li>
+            
+          </ul>
+
+          <p className="text-gray-700 leading-relaxed text-lg mt-4">
+            E apoia indiretamente os ODS 11, 13, 4, 9 e 12.
+          </p>
+          <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               {" "}
               <span className="text-[#FB9D24] font-semibold">ODS 11</span>{" "}
@@ -317,12 +330,25 @@ export default function EspacoODSPage() {
               <strong> — Ação Contra a Mudança do Clima:</strong> práticas
               ambientais e soluções inovadoras.
             </li>
+            <li>
+              {" "}
+              <span className="text-[#C5192D] font-semibold">ODS 4</span>{" "}
+              <strong>— Educação de Qualidade:</strong>{" "}
+              oportunidades de aprendizagem e ensino inclusivo.
+            </li>
+            <li>
+              {" "}
+              <span className="text-[#FD6925] font-semibold">ODS 9</span>{" "}
+              <strong>— Indústria, Inovação e Infraestrutura:</strong>{" "}
+              fomento à inovação e infraestruturas resilientes.
+            </li>
+            <li>
+              {" "}
+              <span className="text-[#BF8B2E] font-semibold">ODS 12</span>{" "}
+              <strong>— Consumo e Produção Responsáveis:</strong>{" "}
+              gestão eficiente de recursos e redução de desperdícios.
+            </li>
           </ul>
-
-          <p className="text-gray-700 leading-relaxed text-lg mt-4">
-            E apoia indiretamente os ODS 4, 9 e 12, voltados à educação,
-            inovação e consumo responsável.
-          </p>
         </section>
 
         {/* --- LINK PARA CADASTRO DE PROJETO --- */}

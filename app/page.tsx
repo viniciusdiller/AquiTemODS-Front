@@ -209,17 +209,17 @@ export default function HomePage() {
             className="text-center mb-10"
           >
             <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
-              Banco de{" "}
+              Vitrine de {" "}
               <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-                Projetos
+                Políticas Públicas
               </span>{" "}
-              do Rio de Janeiro
+               da Agenda 2030
             </h2>
             <p className="text-xl font-bold text-gray-700 md:text-gray-600 max-w-2xl mx-auto">
-              O ponto de encontro entre inovação, gestão e sustentabilidade.
+              O Ecossistema de inovação, gestão e sustentabilidade.<br />
               Conheça o{" "}
               <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-                AquiTemODS!
+                #AquiTemODS!
               </span>{" "}
             </p>
             <div className="max-w-md mx-auto mt-6">
@@ -316,7 +316,7 @@ export default function HomePage() {
 
         <div className="mt-auto pt-10 pb-24">
           <div className="text-center text-gray-600 mb-3">
-            <h3>Gostaria que seu Projeto aparecesse na Banca?</h3>
+            <h3>Gostaria que seu Projeto aparecesse na Vitrine?</h3>
           </div>
           <ButtonWrapper />
           <FaleConoscoButton />

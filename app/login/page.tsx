@@ -117,7 +117,7 @@ export default function LoginPage() {
               <CardTitle className="text-2xl">Efetue o Login</CardTitle>
               <CardDescription>
                 Entre com suas credenciais para ter a possibilidade de avaliar
-                os estabelecimentos.
+                ou cadastrar um novo projeto na plataforma.
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleLogin}>
