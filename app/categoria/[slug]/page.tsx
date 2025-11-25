@@ -233,15 +233,18 @@ export default function CategoryPage() {
           className="object-cover z-0"
           priority
         />
+
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-10"></div>
-        <div className="container mx-auto px-4 relative z-20 text-center">
-          <Link
-            href="/"
-            className="absolute top-4 left-4 flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-sm"
-          >
-            <ArrowLeftOutlined />
-            <span>Voltar</span>
-          </Link>
+
+        <Link
+          href="/"
+          className="absolute top-4 left-4 z-30 flex items-center gap-2 px-2 py-1 md:px-4 md:py-2 text-sm font-medium text-white/90 transition-all duration-300 bg-white/10 border border-white/20 rounded-full backdrop-blur-md hover:bg-white/20 hover:text-white hover:scale-105 hover:border-white/40 shadow-sm"
+        >
+          <ArrowLeftOutlined />
+          <span>Voltar</span>
+        </Link>
+
+        <div className="container mx-auto px-4 pt-6 relative z-20 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -322,8 +325,7 @@ export default function CategoryPage() {
                           {projeto.nomeProjeto}
                         </h3>
 
-                        <p className="text-gray-600 my-2 text-sm break-words flex-grow line-clamp-3 pr-4">
-                          {" "}
+                        <p className="text-gray-600 my-2 mt-6 text-sm break-words flex-grow line-clamp-3 pr-4">
                           {projeto.descricaoDiferencial}
                         </p>
 

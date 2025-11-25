@@ -80,8 +80,8 @@ export default function NovaSenha() {
           <div className="text-center mb-6">
             <Link href="/" passHref>
               <Image
-                src="/LogoMeideSaqua.png"
-                alt="Logo MeideSaquá"
+                src="/Logo_aquitemods.png"
+                alt="Logo AquiTemODS"
                 width={150}
                 height={150}
                 className="mx-auto"
