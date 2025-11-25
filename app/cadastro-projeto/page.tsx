@@ -458,6 +458,7 @@ const CadastroProjetoPage: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([]);
+  const [oficioFileList, setOficioFileList] = useState<UploadFile[]>([]);
   const [portfolioFileList, setPortfolioFileList] = useState<UploadFile[]>([]);
   const [flowStep, setFlowStep] = useState<FlowStep>("initial");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -533,6 +534,9 @@ const CadastroProjetoPage: React.FC = () => {
       setQuillTextLength(length);
     }
   };
+
+  const handleOficioChange = ({ fileList }: { fileList: UploadFile[] }) =>
+    setOficioFileList(fileList);
 
   const handleLogoChange = ({ fileList }: { fileList: UploadFile[] }) =>
     setLogoFileList(fileList);
@@ -644,6 +648,7 @@ const CadastroProjetoPage: React.FC = () => {
   const resetAll = () => {
     form.resetFields();
     setLogoFileList([]);
+    setOficioFileList([]);
     setPortfolioFileList([]);
     setSelectedCategory(null);
     setFlowStep("initial");
@@ -697,6 +702,10 @@ const CadastroProjetoPage: React.FC = () => {
 
       if (logoFileList.length > 0 && logoFileList[0].originFileObj) {
         formData.append("logo", logoFileList[0].originFileObj);
+      }
+
+      if (oficioFileList.length > 0 && oficioFileList[0].originFileObj) {
+        formData.append("oficio", oficioFileList[0].originFileObj);
       }
 
       portfolioFileList.forEach((file) => {
@@ -760,6 +769,10 @@ const CadastroProjetoPage: React.FC = () => {
 
       if (logoFileList.length > 0 && logoFileList[0].originFileObj) {
         formData.append("logo", logoFileList[0].originFileObj);
+      }
+
+      if (oficioFileList.length > 0 && oficioFileList[0].originFileObj) {
+        formData.append("oficio", oficioFileList[0].originFileObj);
       }
 
       portfolioFileList.forEach((file) => {
@@ -978,7 +991,7 @@ const CadastroProjetoPage: React.FC = () => {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col xs={24}>
+          <Col xs={24} md={12}>
             <Form.Item
               name="responsavelProjeto"
               label="Responsável pelo Projeto"
@@ -993,6 +1006,43 @@ const CadastroProjetoPage: React.FC = () => {
                   form.setFieldsValue({ responsavelProjeto: strippedValue });
                 }}
               />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="oficio"
+              label="Ofício de Requerimento de Inclusão de Projeto na Plataforma #AquiTemODS"
+              rules={[
+                {
+                  required: true,
+                  message: "O envio do Ofício é obrigatório!",
+                  validator: (_, value) => {
+                    if (oficioFileList && oficioFileList.length > 0) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("O envio do Ofício é obrigatório!")
+                    );
+                  },
+                },
+              ]}
+              help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+            >
+              <Upload
+                customRequest={customUploadAction}
+                fileList={oficioFileList}
+                onChange={handleOficioChange}
+                listType="picture"
+                maxCount={1}
+                accept=".pdf,image/png,image/jpeg,image/jpg"
+                onRemove={() => {
+                  setOficioFileList([]);
+                  form.validateFields(["oficio"]);
+                }}
+              >
+                <Button icon={<UploadOutlined />}>Carregar Ofício</Button>
+              </Upload>
             </Form.Item>
           </Col>
         </Row>
@@ -1529,6 +1579,42 @@ const CadastroProjetoPage: React.FC = () => {
             </Form.Item>
           </Col>
         </Row>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="oficio"
+            label="Ofício de Requerimento de Inclusão de Projeto na Plataforma #AquiTemODS"
+            rules={[
+              {
+                required: true,
+                message: "O envio do Ofício é obrigatório!",
+                validator: (_, value) => {
+                  if (oficioFileList && oficioFileList.length > 0) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("O envio do Ofício é obrigatório!")
+                  );
+                },
+              },
+            ]}
+            help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+          >
+            <Upload
+              customRequest={customUploadAction}
+              fileList={oficioFileList}
+              onChange={handleOficioChange}
+              listType="picture"
+              maxCount={1}
+              accept=".pdf,image/png,image/jpeg,image/jpg"
+              onRemove={() => {
+                setOficioFileList([]);
+                form.validateFields(["oficio"]);
+              }}
+            >
+              <Button icon={<UploadOutlined />}>Carregar Ofício</Button>
+            </Upload>
+          </Form.Item>
+        </Col>
       </section>
       <section className="mb-8 border-t pt-4">
         {commonTitle("Informações para Atualizar")}

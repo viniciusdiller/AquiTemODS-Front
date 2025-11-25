@@ -80,6 +80,8 @@ const fieldConfig: {
     group: "identificacao",
   },
   emailContato: { label: "Email", order: 20, group: "identificacao" },
+  oficioUrl: { label: "Ofício Atual", order: 43, group: "identificacao" },
+  oficio: { label: "Novo Ofício", order: 43, group: "identificacao" },
 
   // --- Grupo de Informações do Projeto ---
   ods: { label: "ODS", order: 4, group: "info" },
@@ -92,6 +94,7 @@ const fieldConfig: {
   instagram: { label: "Instagram", order: 41, group: "info" },
   logoUrl: { label: "Logo Atual", order: 42, group: "info" },
   logo: { label: "Nova Logo", order: 42, group: "info" },
+
   projetoImg: { label: "Portfólio Atual", order: 43, group: "info" },
   odsRelacionadas: { label: "ODS Relacionadas", order: 50, group: "info" },
   apoio_planejamento: {
@@ -225,6 +228,25 @@ const AdminDashboard: React.FC = () => {
       value
     ) {
       return <Image src={getFullImageUrl(value)} alt="Logo" width={150} />;
+    }
+
+    if (
+      (key === "oficioUrl" || key === "oficio") &&
+      typeof value === "string" &&
+      value
+    ) {
+      const url = getFullImageUrl(value);
+      const isPdf = url.toLowerCase().endsWith(".pdf");
+
+      if (isPdf) {
+        return (
+          <Button type="primary" href={url} target="_blank" size="small">
+            Visualizar PDF
+          </Button>
+        );
+      }
+
+      return <Image src={url} alt="Ofício" width={150} />;
     }
 
     if (typeof value === "object" && value !== null)
@@ -408,6 +430,7 @@ const AdminDashboard: React.FC = () => {
     const keyMap: { [newKey: string]: { oldKey: string; labelKey: string } } = {
       logo: { oldKey: "logoUrl", labelKey: "logo" },
       imagens: { oldKey: "projetoImg", labelKey: "projetoImg" },
+      oficio: { oldKey: "oficioUrl", labelKey: "oficio" },
     };
 
     const diffDataAll = Object.entries(selectedItem.dados_atualizacao)

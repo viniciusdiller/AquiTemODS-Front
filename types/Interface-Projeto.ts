@@ -12,6 +12,7 @@ export interface Projeto {
   prefeitura: string;
   responsavelProjeto?: string;
   logoUrl?: string;
+  oficioUrl?: string;
   projetoImg?: Imagens[];
   dados_atualizacao?: any;
   status: string;

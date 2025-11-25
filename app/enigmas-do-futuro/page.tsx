@@ -29,7 +29,7 @@ export default function EnigmasDoFuturoPage() {
 
             <div className="mt-8 md:mt-0 md:w-1/3 flex-shrink-0">
               <a
-                href="https://enigma-do-futuro.vercel.app/"
+                href="https://enigmasdofuturo.saquarema.rj.gov.br/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -96,7 +96,7 @@ export default function EnigmasDoFuturoPage() {
           </h2>
           <div className="flex justify-center">
             <a
-              href="https://enigma-do-futuro.vercel.app/"
+              href="https://enigmasdofuturo.saquarema.rj.gov.br/"
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center w-full sm:w-1/2 lg:w-1/3"

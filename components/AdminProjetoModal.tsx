@@ -80,7 +80,6 @@ interface AdminProjetoModalProps {
   projeto: Projeto | null;
   visible: boolean;
   onClose: (shouldRefresh: boolean) => void;
-
   mode: "edit-and-approve" | "edit-only";
   onEditAndApprove: (values: any) => Promise<void>;
 }
@@ -223,6 +222,12 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
     return `${API_URL}/${cleanPath}`;
   };
 
+  const handleViewOficio = () => {
+    if (projeto?.oficioUrl) {
+      window.open(getFullImageUrl(projeto.oficioUrl), "_blank");
+    }
+  };
+
   return (
     <Modal
       title={
@@ -318,7 +323,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 name="responsavelProjeto"
                 label="Responsável pelo Projeto"
@@ -327,7 +332,32 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
                 <Input />
               </Form.Item>
             </Col>
+
+            <Col span={12}>
+              <Form.Item
+                name="oficio"
+                label="Ofício do Projeto"
+                rules={[{ required: true }]}
+              >
+                {projeto?.oficioUrl ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <Button type="primary" onClick={handleViewOficio}>
+                      Visualizar Ofício Anexado
+                    </Button>
+                  </div>
+                ) : (
+                  <span style={{ color: "red" }}>Nenhum ofício anexado.</span>
+                )}
+              </Form.Item>
+            </Col>
           </Row>
+
           <Title level={5} className="mt-4">
             Contato e Links
           </Title>
