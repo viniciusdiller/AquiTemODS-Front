@@ -92,10 +92,10 @@ const fieldConfig: {
   outrasAlteracoes: { label: "Outras Alterações", order: 32, group: "info" },
   website: { label: "Website", order: 40, group: "info" },
   instagram: { label: "Instagram", order: 41, group: "info" },
-  logoUrl: { label: "Logo Atual", order: 42, group: "info" },
-  logo: { label: "Nova Logo", order: 42, group: "info" },
-
-  projetoImg: { label: "Portfólio Atual", order: 43, group: "info" },
+  linkProjeto: { label: "Link do Projeto", order: 42, group: "info" },
+  logoUrl: { label: "Logo Atual", order: 43, group: "info" },
+  logo: { label: "Nova Logo", order: 44, group: "info" },
+  projetoImg: { label: "Portfólio Atual", order: 45, group: "info" },
   odsRelacionadas: { label: "ODS Relacionadas", order: 50, group: "info" },
   apoio_planejamento: {
     label: "Apoio ao Planejamento",
@@ -151,6 +151,24 @@ const AdminDashboard: React.FC = () => {
       return <Text type="secondary">Não informado</Text>;
     }
 
+    if (key === "linkProjeto") {
+      const Clicavel = String(value);
+      let href = Clicavel;
+      if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#d6386d", textDecoration: "underline" }}
+        >
+          {Clicavel}
+        </a>
+      );
+    }
+
     if (key === "website") {
       const urlString = String(value);
       let href = urlString;
@@ -162,7 +180,7 @@ const AdminDashboard: React.FC = () => {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "#1890ff", textDecoration: "underline" }}
+          style={{ color: "#d6386d", textDecoration: "underline" }}
         >
           {urlString}
         </a>
@@ -187,7 +205,7 @@ const AdminDashboard: React.FC = () => {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "#1890ff", textDecoration: "underline" }}
+          style={{ color: "#d6386d", textDecoration: "underline" }}
         >
           {val}
         </a>

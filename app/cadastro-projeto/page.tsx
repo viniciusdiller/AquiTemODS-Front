@@ -1000,7 +1000,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Ex: João da Silva"
+                placeholder="Escolha Apenas um Responsável Principal"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ responsavelProjeto: strippedValue });
@@ -1103,7 +1103,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Ex: link para um vídeo, site, rede social, etc."
+                placeholder="Insira o link principal do projeto"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ linkProjeto: strippedValue });
@@ -1321,7 +1321,7 @@ const CadastroProjetoPage: React.FC = () => {
           <ReactQuill
             theme="snow"
             modules={quillModules}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. (Em até 5000 caracteres)"
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade, insira mais links da demonstração do projeto caso deseje. (Em até 5000 caracteres)"
             style={{ minHeight: "10px" }}
           />
         </Form.Item>
