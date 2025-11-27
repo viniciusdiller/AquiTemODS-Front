@@ -10,7 +10,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-100 border-t border-gray-200 w-full">
       <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 text-center md:text-left">
           <div className="text-center"></div>
           <div className=" text-center">
             <Link href="/" className="inline-block mb-4">
@@ -23,7 +23,10 @@ const Footer = () => {
               />
             </Link>
             <p className="text-gray-600 max-w-xs mx-auto ">
-              O ecossistema de conhecimento e colaboração entre gestores, técnicos, servidores e cidadãos comprometidos com o desenvolvimento sustentável municipal alinhado aos Objetivos de Desenvolvimento Sustentável.
+              O ecossistema de conhecimento e colaboração entre gestores,
+              técnicos, servidores e cidadãos comprometidos com o
+              desenvolvimento sustentável municipal alinhado aos Objetivos de
+              Desenvolvimento Sustentável.
             </p>
           </div>
 
