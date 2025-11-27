@@ -151,6 +151,49 @@ const AdminDashboard: React.FC = () => {
       return <Text type="secondary">Não informado</Text>;
     }
 
+    if (key === "website") {
+      const urlString = String(value);
+      let href = urlString;
+      if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#1890ff", textDecoration: "underline" }}
+        >
+          {urlString}
+        </a>
+      );
+    }
+
+    if (key === "instagram") {
+      const val = String(value).trim();
+      let href = val;
+
+      if (val.includes("instagram.com") || /^https?:\/\//i.test(val)) {
+        if (!/^https?:\/\//i.test(href)) {
+          href = `https://${href}`;
+        }
+      } else {
+        const handle = val.replace(/^@/, "");
+        href = `https://www.instagram.com/${handle}`;
+      }
+
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#1890ff", textDecoration: "underline" }}
+        >
+          {val}
+        </a>
+      );
+    }
+
     if (key === "descricao") {
       return (
         <div
