@@ -1029,7 +1029,7 @@ const CadastroProjetoPage: React.FC = () => {
                   },
                 },
               ]}
-              help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+              help="Anexe o documento de ofício (.pdf) com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1364,7 +1364,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               label="Logo do seu Projeto"
-              help="Envie 1 imagem para ser a logo do seu projeto."
+              help="Envie 1 imagem para ser a logo do seu projeto. (.jpg, .jpeg ou .png)"
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1381,7 +1381,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               label="Imagens do seu Projeto"
-              help="Envie até 4 imagens."
+              help="Envie até 4 imagens. (.jpg, .jpeg ou .png)"
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1596,7 +1596,7 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               },
             ]}
-            help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+            help="Anexe o documento de ofício (.pdf) com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
           >
             <Upload
               customRequest={customUploadAction}
@@ -1624,7 +1624,7 @@ const CadastroProjetoPage: React.FC = () => {
 
         <Form.Item
           label="Nova Logo (Opcional)"
-          help="Envie 1 nova imagem para substituir a logo atual."
+          help="Envie 1 nova imagem para substituir a logo atual. (.jpg, .jpeg ou .png)"
         >
           <Upload
             customRequest={customUploadAction}
@@ -1768,7 +1768,7 @@ const CadastroProjetoPage: React.FC = () => {
           className="mt-10"
           name="portfolio"
           label="Novas Imagens do Portfólio (até 4)"
-          help="As imagens enviadas aqui irão substituir as atuais."
+          help="As imagens enviadas aqui irão substituir as atuais. (.jpg, .jpeg ou .png)"
         >
           <Upload
             customRequest={customUploadAction}

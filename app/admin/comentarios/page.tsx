@@ -19,7 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftOutlined, CommentOutlined } from "@ant-design/icons";
-import { getAllActiveProjetos } from "@/lib/api";
+import { getAllActiveProjetos, adminGetReviewsByProject } from "@/lib/api";
 import { Projeto } from "@/types/Interface-Projeto";
 
 const { Title, Text } = Typography;
@@ -56,9 +56,39 @@ const AdminComentariosPage: React.FC = () => {
       return;
     }
     try {
-      const data = await getAllActiveProjetos(token);
-      setProjetos(data);
-      setFilteredProjetos(data);
+      const allProjetos = await getAllActiveProjetos(token);
+
+      const projetosComComentarios: Projeto[] = [];
+
+      for (const projeto of allProjetos) {
+        try {
+          const response = await adminGetReviewsByProject(
+            String(projeto.projetoId),
+            token
+          );
+          let reviewsList = [];
+          if (Array.isArray(response)) {
+            reviewsList = response;
+          } else if (response && Array.isArray(response.data)) {
+            reviewsList = response.data;
+          } else if (response && Array.isArray(response.reviews)) {
+            reviewsList = response.reviews;
+          } else if (response && Array.isArray(response.avaliacoes)) {
+            reviewsList = response.avaliacoes;
+          }
+
+          if (reviewsList.length > 0) {
+            projetosComComentarios.push(projeto);
+          }
+        } catch (error) {
+          console.error(
+            `Erro ao verificar reviews do projeto ${projeto.projetoId}:`,
+            error
+          );
+        }
+      }
+      setProjetos(projetosComComentarios);
+      setFilteredProjetos(projetosComComentarios);
     } catch (error: any) {
       message.error(error.message || "Falha ao buscar projetos.");
     } finally {
