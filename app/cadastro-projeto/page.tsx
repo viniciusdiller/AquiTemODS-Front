@@ -1241,10 +1241,10 @@ const CadastroProjetoPage: React.FC = () => {
           name="emailContato"
           label="E-mail de Contato do projeto"
           rules={[
-            { required: true, message: "O e-mail é obrigatório!" },
             {
-              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Formato de e-mail inválido!",
+              required: true,
+              message: "O e-mail é obrigatório para identificação!",
+              type: "email",
             },
           ]}
         >
@@ -1562,10 +1562,7 @@ const CadastroProjetoPage: React.FC = () => {
                 {
                   required: true,
                   message: "O e-mail é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "E-mail inválido!",
+                  type: "email",
                 },
               ]}
             >
@@ -1956,10 +1953,7 @@ const CadastroProjetoPage: React.FC = () => {
                 {
                   required: true,
                   message: "O e-mail é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "E-mail inválido!",
+                  type: "email",
                 },
               ]}
             >

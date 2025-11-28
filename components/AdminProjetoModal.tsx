@@ -337,7 +337,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               <Form.Item
                 name="oficio"
                 label="Ofício do Projeto"
-                rules={[{ required: true }]}
+                rules={[{ required: false }]}
               >
                 {projeto?.oficioUrl ? (
                   <div
