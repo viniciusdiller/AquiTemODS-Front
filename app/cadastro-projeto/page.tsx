@@ -31,6 +31,8 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "./quill-styles.css";
 import { Slider } from "@/components/ui/slider";
 import { set } from "date-fns";
+import "react-quill/dist/quill.snow.css";
+import "@/app/cadastro-projeto/quill-styles.css";
 
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",

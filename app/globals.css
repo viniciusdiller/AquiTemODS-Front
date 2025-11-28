@@ -1,10 +1,20 @@
-/* styles/leaflet-globals.css */
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Importa o CSS nativo do Leaflet */
 @import "leaflet/dist/leaflet.css";
+
+.ql-toolbar button svg {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 100%;
+}
+
+.ql-container {
+  font-family: inherit;
+}
 
 /* Estilos específicos do Leaflet */
 .leaflet-container {
