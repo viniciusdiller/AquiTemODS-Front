@@ -1037,7 +1037,7 @@ const CadastroProjetoPage: React.FC = () => {
                 onChange={handleOficioChange}
                 listType="picture"
                 maxCount={1}
-                accept=".pdf,image/png,image/jpeg,image/jpg"
+                accept=".pdf,image/png, image/jpg,image/jpeg"
                 onRemove={() => {
                   setOficioFileList([]);
                   form.validateFields(["oficio"]);
@@ -1372,7 +1372,7 @@ const CadastroProjetoPage: React.FC = () => {
                 onChange={handleLogoChange}
                 listType="picture"
                 maxCount={1}
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/png, image/jpg, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Logo</Button>
               </Upload>
@@ -1390,7 +1390,7 @@ const CadastroProjetoPage: React.FC = () => {
                 listType="picture"
                 multiple
                 maxCount={4}
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/png, image/jpg, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Portfólio</Button>
               </Upload>
@@ -1604,7 +1604,7 @@ const CadastroProjetoPage: React.FC = () => {
               onChange={handleOficioChange}
               listType="picture"
               maxCount={1}
-              accept=".pdf,image/png,image/jpeg,image/jpg"
+              accept=".pdf,image/png, image/jpg, image/jpeg, image/webp"
               onRemove={() => {
                 setOficioFileList([]);
                 form.validateFields(["oficio"]);
@@ -1632,7 +1632,7 @@ const CadastroProjetoPage: React.FC = () => {
             onChange={handleLogoChange}
             listType="picture"
             maxCount={1}
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpg, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Nova Logo</Button>
           </Upload>
@@ -1767,7 +1767,7 @@ const CadastroProjetoPage: React.FC = () => {
         <Form.Item
           className="mt-10"
           name="portfolio"
-          label="Novas Fotos do Portfólio (até 4)"
+          label="Novas Imagens do Portfólio (até 4)"
           help="As imagens enviadas aqui irão substituir as atuais."
         >
           <Upload
@@ -1777,7 +1777,7 @@ const CadastroProjetoPage: React.FC = () => {
             listType="picture"
             multiple
             maxCount={4}
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpg, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Novas Imagens</Button>
           </Upload>
