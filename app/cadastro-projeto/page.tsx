@@ -31,6 +31,8 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "./quill-styles.css";
 import { Slider } from "@/components/ui/slider";
 import { set } from "date-fns";
+import "react-quill/dist/quill.snow.css";
+import "@/app/cadastro-projeto/quill-styles.css";
 
 const categorias = [
   "ODS 1 - Erradicação da Pobreza",
@@ -1000,7 +1002,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Ex: João da Silva"
+                placeholder="Escolha Apenas um Responsável Principal"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ responsavelProjeto: strippedValue });
@@ -1027,7 +1029,7 @@ const CadastroProjetoPage: React.FC = () => {
                   },
                 },
               ]}
-              help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+              help="Anexe o documento de ofício (.pdf) com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1035,7 +1037,7 @@ const CadastroProjetoPage: React.FC = () => {
                 onChange={handleOficioChange}
                 listType="picture"
                 maxCount={1}
-                accept=".pdf,image/png,image/jpeg,image/jpg"
+                accept=".pdf,image/png, image/jpg,image/jpeg"
                 onRemove={() => {
                   setOficioFileList([]);
                   form.validateFields(["oficio"]);
@@ -1103,7 +1105,7 @@ const CadastroProjetoPage: React.FC = () => {
               ]}
             >
               <Input
-                placeholder="Ex: link para um vídeo, site, rede social, etc."
+                placeholder="Insira o link principal do projeto"
                 onChange={(e) => {
                   const strippedValue = stripEmojis(e.target.value);
                   form.setFieldsValue({ linkProjeto: strippedValue });
@@ -1241,10 +1243,10 @@ const CadastroProjetoPage: React.FC = () => {
           name="emailContato"
           label="E-mail de Contato do projeto"
           rules={[
-            { required: true, message: "O e-mail é obrigatório!" },
             {
-              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Formato de e-mail inválido!",
+              required: true,
+              message: "O e-mail é obrigatório para identificação!",
+              type: "email",
             },
           ]}
         >
@@ -1321,7 +1323,7 @@ const CadastroProjetoPage: React.FC = () => {
           <ReactQuill
             theme="snow"
             modules={quillModules}
-            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade. (Em até 5000 caracteres)"
+            placeholder="Fale um pouco mais detalhadamente sobre o que o seu projeto faz, como ele agrega para a sociedade, insira mais links da demonstração do projeto caso deseje. (Em até 5000 caracteres)"
             style={{ minHeight: "10px" }}
           />
         </Form.Item>
@@ -1362,7 +1364,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               label="Logo do seu Projeto"
-              help="Envie 1 imagem para ser a logo do seu projeto."
+              help="Envie 1 imagem para ser a logo do seu projeto. (.jpg, .jpeg ou .png)"
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1370,7 +1372,7 @@ const CadastroProjetoPage: React.FC = () => {
                 onChange={handleLogoChange}
                 listType="picture"
                 maxCount={1}
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/png, image/jpg, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Logo</Button>
               </Upload>
@@ -1379,7 +1381,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               label="Imagens do seu Projeto"
-              help="Envie até 4 imagens."
+              help="Envie até 4 imagens. (.jpg, .jpeg ou .png)"
             >
               <Upload
                 customRequest={customUploadAction}
@@ -1388,7 +1390,7 @@ const CadastroProjetoPage: React.FC = () => {
                 listType="picture"
                 multiple
                 maxCount={4}
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/png, image/jpg, image/jpeg, image/webp"
               >
                 <Button icon={<UploadOutlined />}>Carregar Portfólio</Button>
               </Upload>
@@ -1562,10 +1564,7 @@ const CadastroProjetoPage: React.FC = () => {
                 {
                   required: true,
                   message: "O e-mail é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "E-mail inválido!",
+                  type: "email",
                 },
               ]}
             >
@@ -1597,7 +1596,7 @@ const CadastroProjetoPage: React.FC = () => {
                 },
               },
             ]}
-            help="Anexe o documento de ofício com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
+            help="Anexe o documento de ofício (.pdf) com anuência do secretário da pasta para a requisição de inclusão de projeto na plataforma."
           >
             <Upload
               customRequest={customUploadAction}
@@ -1605,7 +1604,7 @@ const CadastroProjetoPage: React.FC = () => {
               onChange={handleOficioChange}
               listType="picture"
               maxCount={1}
-              accept=".pdf,image/png,image/jpeg,image/jpg"
+              accept=".pdf,image/png, image/jpg, image/jpeg, image/webp"
               onRemove={() => {
                 setOficioFileList([]);
                 form.validateFields(["oficio"]);
@@ -1625,7 +1624,7 @@ const CadastroProjetoPage: React.FC = () => {
 
         <Form.Item
           label="Nova Logo (Opcional)"
-          help="Envie 1 nova imagem para substituir a logo atual."
+          help="Envie 1 nova imagem para substituir a logo atual. (.jpg, .jpeg ou .png)"
         >
           <Upload
             customRequest={customUploadAction}
@@ -1633,7 +1632,7 @@ const CadastroProjetoPage: React.FC = () => {
             onChange={handleLogoChange}
             listType="picture"
             maxCount={1}
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpg, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Nova Logo</Button>
           </Upload>
@@ -1768,8 +1767,8 @@ const CadastroProjetoPage: React.FC = () => {
         <Form.Item
           className="mt-10"
           name="portfolio"
-          label="Novas Fotos do Portfólio (até 4)"
-          help="As imagens enviadas aqui irão substituir as atuais."
+          label="Novas Imagens do Portfólio (até 4)"
+          help="As imagens enviadas aqui irão substituir as atuais. (.jpg, .jpeg ou .png)"
         >
           <Upload
             customRequest={customUploadAction}
@@ -1778,7 +1777,7 @@ const CadastroProjetoPage: React.FC = () => {
             listType="picture"
             multiple
             maxCount={4}
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpg, image/jpeg, image/webp"
           >
             <Button icon={<UploadOutlined />}>Carregar Novas Imagens</Button>
           </Upload>
@@ -1956,10 +1955,7 @@ const CadastroProjetoPage: React.FC = () => {
                 {
                   required: true,
                   message: "O e-mail é obrigatório para identificação!",
-                },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "E-mail inválido!",
+                  type: "email",
                 },
               ]}
             >

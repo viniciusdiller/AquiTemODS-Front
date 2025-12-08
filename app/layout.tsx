@@ -8,6 +8,8 @@ import { ConditionalFooter } from "@/components/ConditionalFooter";
 import AccessibilityStyles from "@/components/AccessibilityStyles";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { ConditionalAccessibility } from "@/components/ConditionalAccessibility";
+import "react-quill/dist/quill.snow.css";
+import "@/app/cadastro-projeto/quill-styles.css";
 
 import { ConfigProvider } from "antd";
 import ptBR from "antd/locale/pt_BR";

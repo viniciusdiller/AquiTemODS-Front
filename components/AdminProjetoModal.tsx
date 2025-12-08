@@ -238,6 +238,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       open={visible}
       onCancel={() => onClose(false)}
       width={900}
+      destroyOnClose={true}
       footer={[
         <Button key="cancel" onClick={() => onClose(false)}>
           Cancelar
@@ -337,7 +338,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               <Form.Item
                 name="oficio"
                 label="Ofício do Projeto"
-                rules={[{ required: true }]}
+                rules={[{ required: false }]}
               >
                 {projeto?.oficioUrl ? (
                   <div

@@ -92,10 +92,10 @@ const fieldConfig: {
   outrasAlteracoes: { label: "Outras Alterações", order: 32, group: "info" },
   website: { label: "Website", order: 40, group: "info" },
   instagram: { label: "Instagram", order: 41, group: "info" },
-  logoUrl: { label: "Logo Atual", order: 42, group: "info" },
-  logo: { label: "Nova Logo", order: 42, group: "info" },
-
-  projetoImg: { label: "Portfólio Atual", order: 43, group: "info" },
+  linkProjeto: { label: "Link do Projeto", order: 42, group: "info" },
+  logoUrl: { label: "Logo Atual", order: 43, group: "info" },
+  logo: { label: "Nova Logo", order: 44, group: "info" },
+  projetoImg: { label: "Portfólio Atual", order: 45, group: "info" },
   odsRelacionadas: { label: "ODS Relacionadas", order: 50, group: "info" },
   apoio_planejamento: {
     label: "Apoio ao Planejamento",
@@ -149,6 +149,67 @@ const AdminDashboard: React.FC = () => {
   const renderValue = (key: string, value: any): React.ReactNode => {
     if (value === null || value === undefined || value === "") {
       return <Text type="secondary">Não informado</Text>;
+    }
+
+    if (key === "linkProjeto") {
+      const Clicavel = String(value);
+      let href = Clicavel;
+      if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#d6386d", textDecoration: "underline" }}
+        >
+          {Clicavel}
+        </a>
+      );
+    }
+
+    if (key === "website") {
+      const urlString = String(value);
+      let href = urlString;
+      if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#d6386d", textDecoration: "underline" }}
+        >
+          {urlString}
+        </a>
+      );
+    }
+
+    if (key === "instagram") {
+      const val = String(value).trim();
+      let href = val;
+
+      if (val.includes("instagram.com") || /^https?:\/\//i.test(val)) {
+        if (!/^https?:\/\//i.test(href)) {
+          href = `https://${href}`;
+        }
+      } else {
+        const handle = val.replace(/^@/, "");
+        href = `https://www.instagram.com/${handle}`;
+      }
+
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#d6386d", textDecoration: "underline" }}
+        >
+          {val}
+        </a>
+      );
     }
 
     if (key === "descricao") {
@@ -892,20 +953,22 @@ const AdminDashboard: React.FC = () => {
         </Modal>
       )}
 
-      <AdminProjetoModal
-        projeto={selectedItem}
-        visible={isEditModalVisible}
-        onClose={(shouldRefresh) => {
-          setIsEditModalVisible(false);
-          if (shouldRefresh) {
-            setModalVisible(false);
-            setSelectedItem(null);
-            fetchData();
-          }
-        }}
-        mode="edit-and-approve"
-        onEditAndApprove={handleEditAndApproveSubmit}
-      />
+      {isEditModalVisible && (
+        <AdminProjetoModal
+          projeto={selectedItem}
+          visible={isEditModalVisible}
+          onClose={(shouldRefresh) => {
+            setIsEditModalVisible(false);
+            if (shouldRefresh) {
+              setModalVisible(false);
+              setSelectedItem(null);
+              fetchData();
+            }
+          }}
+          mode="edit-and-approve"
+          onEditAndApprove={handleEditAndApproveSubmit}
+        />
+      )}
 
       <Modal
         title="Confirmar Rejeição"

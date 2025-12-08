@@ -8,6 +8,7 @@ import {
   Instagram,
   SearchX,
   CalendarDays,
+  Share2,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, Suspense, useMemo } from "react";
 import { TiltImage } from "@/components/ui/TiltImage";
@@ -172,6 +173,17 @@ function ProjetoPageContent() {
   const sobreProjetoRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copiado para a área de transferência!", {
+        description:
+          "Agora você pode compartilhar esse perfil com quem quiser.",
+        duration: 3000,
+      });
+    }
+  };
+
   const fetchProjetoData = async () => {
     if (!nomeDoProjeto) {
       setIsLoading(false);
@@ -311,6 +323,18 @@ function ProjetoPageContent() {
     })
   );
 
+  const formatInstagramUrl = (handleOrUrl: string) => {
+    if (!handleOrUrl) return "#";
+    const val = handleOrUrl.trim();
+    if (val.includes("instagram.com") || /^https?:\/\//i.test(val)) {
+      if (!/^https?:\/\//i.test(val)) {
+        return `https://${val}`;
+      }
+      return val;
+    }
+    return `https://www.instagram.com/${val.replace(/^@/, "")}`;
+  };
+
   const odsTags = (projeto.odsRelacionadas || "")
     .split(",")
     .map((tag: string) => tag.trim())
@@ -333,17 +357,25 @@ function ProjetoPageContent() {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/80">
-          <div className="w-full px-4 sm:px-6 py-3 grid grid-cols-[auto_1fr_auto] items-center">
+          <div className="relative w-full px-4 sm:px-6 py-3 flex items-center justify-between">
             <Link
               href={`/categoria/${categorySlug}`}
-              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#D7386E] transition-colors p-2 -ml-3 sm:ml-8 md:ml-12 lg:ml-36 rounded-lg"
+              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#D7386E] transition-colors p-2 rounded-lg -ml-3 sm:ml-8 md:ml-12 lg:ml-36"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="font-medium">Voltar</span>
             </Link>
-            <h1 className="absolute left-1/2 -translate-x-1/2 text-md font-semibold text-gray-800 truncate ml-3 break-words max-w-[60%]">
+            <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-md font-semibold text-gray-800 truncate px-4 max-w-[30%] sm:max-w-[40%] text-center pointer-events-none">
               {projeto.nomeProjeto}
             </h1>
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#017DB9] transition-colors p-2 rounded-lg -mr-3 sm:mr-8 md:mr-12 lg:mr-36"
+              title="Copiar link do perfil"
+            >
+              <span className="font-medium">Compartilhar Perfil</span>
+              <Share2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </motion.header>
@@ -405,7 +437,7 @@ function ProjetoPageContent() {
                   <div className="flex items-center gap-6">
                     {projeto.instagram && (
                       <a
-                        href={projeto.instagram}
+                        href={formatInstagramUrl(projeto.instagram)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors hover:cursor-pointer"
@@ -447,12 +479,12 @@ function ProjetoPageContent() {
                 </div>
               </div>
               <div className="flex items-center justify-center md:col-span-1">
-                <div className="max-w-48 mas-h-48 md:max-w-56 md:max-h-56 bg-white rounded-2xl flex items-center justify-center p-4">
+                <div className="relative w-48 h-48 md:w-56 md:h-56 desktop:w-64 desktop:h-64 bg-white rounded-2xl flex items-center justify-center p-4 overflow-hidden">
                   <TiltImage
                     src={
                       (projeto.logoUrl &&
                         `${API_URL}/${normalizeImagePath(projeto.logoUrl)}`) ||
-                      "/logo_aquitemods.png"
+                      "/Logo_aquitemods.png"
                     }
                     alt={`Logo de ${projeto.nomeProjeto}`}
                     width={500}
@@ -465,7 +497,7 @@ function ProjetoPageContent() {
                 <div className="flex items-center gap-6">
                   {projeto.instagram && (
                     <a
-                      href={projeto.instagram}
+                      href={formatInstagramUrl(projeto.instagram)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors"
