@@ -266,3 +266,19 @@ export const adminDeleteReview = (id: number, token: string) =>
       Authorization: `Bearer ${token}`,
     },
   });
+export const adminExportProjetos = async (token: string) => {
+  const response = await fetch(`${API_URL}/api/admin/exportar-projetos`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Falha ao exportar projetos");
+  }
+
+  // Retorna o Blob do arquivo para download
+  return response.blob();
+};

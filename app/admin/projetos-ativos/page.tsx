@@ -23,11 +23,13 @@ import {
   ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import {
   getAllActiveProjetos,
   adminUpdateProjeto, // Esta função não está sendo usada neste arquivo, mas mantida
   adminDeleteProjeto,
+  adminExportProjetos,
 } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
 import { Projeto } from "@/types/Interface-Projeto";
@@ -55,6 +57,7 @@ const ProjetosAtivosPage: React.FC = () => {
   const [filteredProjetos, setFilteredProjetos] = useState<Projeto[]>([]);
   const [selectedItem, setSelectedItem] = useState<Projeto | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const screens = useBreakpoint();
@@ -127,6 +130,39 @@ const ProjetosAtivosPage: React.FC = () => {
     }
   };
 
+  // --- NOVA FUNÇÃO: EXPORTAR PROJETOS ---
+  const handleExport = async () => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
+      message.error("Sessão expirada.");
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const blob = await adminExportProjetos(token);
+
+      // Cria um link temporário para forçar o download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `projetos_AquiTemODS${
+        new Date().toISOString().split("T")[0]
+      }.csv`; // Nome do arquivo com data
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      message.success("Relatório gerado com sucesso!");
+    } catch (error: any) {
+      console.error(error);
+      message.error("Erro ao gerar relatório. Tente novamente.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleTabChange = () => {
     setCurrentPage(1);
   };
@@ -159,11 +195,24 @@ const ProjetosAtivosPage: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8">
-      <Link href="/admin/dashboard" passHref>
-        <Button icon={<ArrowLeftOutlined />} type="text" className="mb-4">
-          Voltar ao Dashboard
+      {/* Cabeçalho com Botão Voltar e Botão Exportar */}
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <Link href="/admin/dashboard" passHref>
+          <Button icon={<ArrowLeftOutlined />} type="text">
+            Voltar ao Dashboard
+          </Button>
+        </Link>
+
+        <Button
+          type="primary"
+          icon={<DownloadOutlined />}
+          onClick={handleExport}
+          loading={exporting}
+          className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
+        >
+          Exportar Planilha (CSV)
         </Button>
-      </Link>
+      </div>
 
       <Title level={2} className="mb-6">
         Gerenciar Projetos Ativos ({projetos.length})
