@@ -1,10 +1,27 @@
 // EPAÇO MEI
+
+"use client";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
+import { useRef, useEffect } from "react";
 
 export default function SobrePage() {
+  const jaContabilizou = useRef(false);
+
+  useEffect(() => {
+    if (!jaContabilizou.current) {
+      jaContabilizou.current = true;
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/ESPACO_ODS`,
+        {
+          method: "POST",
+        }
+      ).catch((err) => console.error("Erro contador Espaço ODS:", err));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">

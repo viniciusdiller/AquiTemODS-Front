@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
@@ -144,6 +144,21 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const jaContabilizou = useRef(false);
+
+  useEffect(() => {
+    if (!jaContabilizou.current) {
+      jaContabilizou.current = true;
+      // Envia "HOME" como identificador
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/HOME`,
+        {
+          method: "POST",
+        }
+      ).catch((err) => console.error("Erro contador Home:", err));
+    }
+  }, []);
+
   useEffect(() => {
     const totalItems = categories.length + 1;
     const timer = setInterval(() => {
@@ -209,14 +224,15 @@ export default function HomePage() {
             className="text-center mb-10"
           >
             <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
-              Vitrine de {" "}
+              Vitrine de{" "}
               <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
                 Políticas Públicas
               </span>{" "}
-               da Agenda 2030
+              da Agenda 2030
             </h2>
             <p className="text-xl font-bold text-gray-700 md:text-gray-600 max-w-2xl mx-auto">
-              O Ecossistema de inovação, gestão e sustentabilidade.<br />
+              O Ecossistema de inovação, gestão e sustentabilidade.
+              <br />
               Conheça o{" "}
               <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
                 #AquiTemODS!

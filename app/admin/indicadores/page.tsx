@@ -18,6 +18,8 @@ import {
   RiseOutlined,
   CheckCircleOutlined,
   BarChartOutlined,
+  HomeOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getAdminStats } from "@/lib/api";
@@ -222,9 +224,36 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
         </Row>
+        {/* --- CONTADOR: HOME E ESPAÇO ODS --- */}
+        <Title
+          level={5}
+          className="mb-4 text-gray-500 uppercase text-xs tracking-widest"
+        >
+          Tráfego do Portal
+        </Title>
+        <Row gutter={[16, 16]} className="mb-8">
+          <Col xs={24} sm={12}>
+            <SummaryCard
+              title="Acessos na Página Inicial"
+              value={data?.pageViews?.home || 0}
+              icon={<HomeOutlined />}
+              colorBg="#E6F7FF"
+              colorText="#0050B3"
+            />
+          </Col>
+          <Col xs={24} sm={12}>
+            <SummaryCard
+              title="Acessos no Espaço ODS"
+              value={data?.pageViews?.espacoOds || 0}
+              icon={<GlobalOutlined />}
+              colorBg="#F0F5FF"
+              colorText="#2F54EB"
+            />
+          </Col>
+        </Row>
 
         <Row gutter={[16, 16]}>
-          {/* --- GRÁFICO 1: INTERESSE PÚBLICO --- */}
+          {/* --- GRÁFICO: INTERESSE PÚBLICO --- */}
           <Col xs={24}>
             <Card
               title={
@@ -294,7 +323,7 @@ export default function AdminIndicadoresPage() {
             </Card>
           </Col>
 
-          {/* --- GRÁFICO 2: APOIO AO PLANEJAMENTO --- */}
+          {/* --- GRÁFICO: APOIO AO PLANEJAMENTO --- */}
           <Col xs={24} lg={12}>
             <Card
               title={
@@ -360,7 +389,7 @@ export default function AdminIndicadoresPage() {
             </Card>
           </Col>
 
-          {/* --- GRÁFICO 3: VENCEDORES PSPE --- */}
+          {/* --- GRÁFICO: VENCEDORES PSPE --- */}
           <Col xs={24} lg={12}>
             <Card
               title={
@@ -429,7 +458,7 @@ export default function AdminIndicadoresPage() {
             </Card>
           </Col>
 
-          {/* --- GRÁFICO 4: DISTRIBUIÇÃO DE ESCALA --- */}
+          {/* --- GRÁFICO: DISTRIBUIÇÃO DE ESCALA --- */}
           <Col xs={24}>
             <Card
               title={
