@@ -92,6 +92,10 @@ const chartConfigViews = {
   views: { label: "Acessos", color: "#8884d8" },
 } satisfies ChartConfig;
 
+const chartConfigProjetos = {
+  qtd: { label: "Projetos", color: "#3C6AB2" },
+} satisfies ChartConfig;
+
 export default function AdminIndicadoresPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
@@ -176,6 +180,7 @@ export default function AdminIndicadoresPage() {
   return (
     <div className="p-6 min-h-screen bg-[#f4f7fe]">
       <div className="max-w-7xl mx-auto">
+        {/* CABEÇALHO */}
         <div className="flex items-center mb-6">
           <Link href="/admin/dashboard" passHref>
             <Button icon={<ArrowLeftOutlined />} type="text" className="mr-4">
@@ -192,7 +197,7 @@ export default function AdminIndicadoresPage() {
           </div>
         </div>
 
-        {/* --- CARDS DE RESUMO --- */}
+        {/* 1. CARDS DE RESUMO GERAL */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={8}>
             <SummaryCard
@@ -224,10 +229,11 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
         </Row>
-        {/* --- CONTADOR: HOME E ESPAÇO ODS --- */}
+
+        {/* 2. CARDS DE TRÁFEGO */}
         <Title
           level={5}
-          className="mb-4 text-gray-500 uppercase text-xs tracking-widest"
+          className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-8"
         >
           Tráfego do Portal
         </Title>
@@ -252,32 +258,39 @@ export default function AdminIndicadoresPage() {
           </Col>
         </Row>
 
+        {/* 3. GRÁFICOS PRINCIPAIS (COMPARATIVO ODS) */}
+        <Title
+          level={5}
+          className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-4"
+        >
+          Análise por ODS (Oferta vs Demanda)
+        </Title>
         <Row gutter={[16, 16]}>
-          {/* --- GRÁFICO: INTERESSE PÚBLICO --- */}
-          <Col xs={24}>
+          {/* OFERTA DE PROJETOS */}
+          <Col xs={24} lg={12}>
             <Card
               title={
                 <>
-                  <BarChartOutlined className="mr-2 text-purple-600" />
-                  Interesse Público (Acessos por ODS)
+                  <BulbOutlined className="mr-2 text-blue-600" />
+                  Oferta de Projetos (Cadastrados)
                 </>
               }
-              className="shadow-sm rounded-lg"
+              className="shadow-sm rounded-lg h-full"
               size="small"
               bordered={false}
             >
               <Text type="secondary" className="block mb-4 text-xs">
-                Categorias mais visitadas pela população (Cores oficiais).
+                Quantidade de projetos ativos em cada ODS.
               </Text>
               <ChartContainer
-                config={chartConfigViews}
+                config={chartConfigProjetos}
                 className="h-[300px] w-full"
               >
                 <BarChart
                   accessibilityLayer
-                  data={data?.chartVisualizacoes}
+                  data={data?.chartProjetosPorOds}
                   margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
-                  barSize={40}
+                  barSize={24}
                 >
                   <CartesianGrid
                     vertical={false}
@@ -291,9 +304,96 @@ export default function AdminIndicadoresPage() {
                     tick={{ fontSize: 11, fill: "#666" }}
                     dy={10}
                     interval={0}
-                    height={40}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
                   />
-                  <YAxis hide />
+                  <YAxis
+                    allowDecimals={false}
+                    width={30}
+                    tick={{ fontSize: 11, fill: "#666" }}
+                  />
+                  <ChartTooltip
+                    cursor={hoverCursorColor}
+                    content={
+                      <ChartTooltipContent
+                        indicator="line"
+                        className="bg-white border border-gray-200 shadow-xl"
+                      />
+                    }
+                  />
+                  <Bar dataKey="qtd" radius={[4, 4, 0, 0]}>
+                    <LabelList
+                      dataKey="qtd"
+                      position="top"
+                      style={{
+                        fill: "#666",
+                        fontWeight: "bold",
+                        fontSize: 12,
+                      }}
+                    />
+                    {data?.chartProjetosPorOds?.map(
+                      (entry: any, index: number) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={getOdsColor(entry.ods)}
+                        />
+                      )
+                    )}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </Card>
+          </Col>
+
+          {/* INTERESSE PÚBLICO */}
+          <Col xs={24} lg={12}>
+            <Card
+              title={
+                <>
+                  <BarChartOutlined className="mr-2 text-purple-600" />
+                  Interesse Público (Acessos)
+                </>
+              }
+              className="shadow-sm rounded-lg h-full"
+              size="small"
+              bordered={false}
+            >
+              <Text type="secondary" className="block mb-4 text-xs">
+                Categorias mais visitadas pela população.
+              </Text>
+              <ChartContainer
+                config={chartConfigViews}
+                className="h-[300px] w-full"
+              >
+                <BarChart
+                  accessibilityLayer
+                  data={data?.chartVisualizacoes}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
+                  barSize={24}
+                >
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    stroke="#eee"
+                  />
+                  <XAxis
+                    dataKey="ods"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 11, fill: "#666" }}
+                    dy={10}
+                    interval={0}
+                    height={60}
+                    angle={-45}
+                    textAnchor="end"
+                  />
+                  <YAxis
+                    hide
+                    allowDecimals={false}
+                    width={30}
+                    tick={{ fontSize: 11, fill: "#666" }}
+                  />
                   <ChartTooltip
                     cursor={hoverCursorColor}
                     content={
@@ -307,7 +407,11 @@ export default function AdminIndicadoresPage() {
                     <LabelList
                       dataKey="views"
                       position="top"
-                      style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+                      style={{
+                        fill: "#666",
+                        fontWeight: "bold",
+                        fontSize: 12,
+                      }}
                     />
                     {data?.chartVisualizacoes?.map(
                       (entry: any, index: number) => (
@@ -322,8 +426,11 @@ export default function AdminIndicadoresPage() {
               </ChartContainer>
             </Card>
           </Col>
+        </Row>
 
-          {/* --- GRÁFICO: APOIO AO PLANEJAMENTO --- */}
+        {/* 4. GRÁFICOS SECUNDÁRIOS */}
+        <Row gutter={[16, 16]} className="mt-6">
+          {/* APOIO AO PLANEJAMENTO */}
           <Col xs={24} lg={12}>
             <Card
               title={
@@ -337,7 +444,7 @@ export default function AdminIndicadoresPage() {
               bordered={false}
             >
               <Text type="secondary" className="block mb-4 text-xs">
-                Frequência das categorias citadas.
+                Frequência das categorias citadas pelos gestores.
               </Text>
               <ChartContainer
                 config={chartConfigApoio}
@@ -381,7 +488,11 @@ export default function AdminIndicadoresPage() {
                     <LabelList
                       dataKey="value"
                       position="right"
-                      style={{ fontSize: 12, fontWeight: "bold", fill: "#666" }}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: "bold",
+                        fill: "#666",
+                      }}
                     />
                   </Bar>
                 </BarChart>
@@ -389,77 +500,8 @@ export default function AdminIndicadoresPage() {
             </Card>
           </Col>
 
-          {/* --- GRÁFICO: VENCEDORES PSPE --- */}
+          {/* DISTRIBUIÇÃO DE ESCALA */}
           <Col xs={24} lg={12}>
-            <Card
-              title={
-                <>
-                  <TrophyOutlined className="mr-2 text-pink-600" />
-                  Prêmio Prefeitura Empreendedora
-                </>
-              }
-              className="shadow-sm rounded-lg h-full"
-              size="small"
-              bordered={false}
-            >
-              <div className="flex flex-col justify-center items-center h-full pb-4">
-                <ChartContainer
-                  config={chartConfigPspe}
-                  className="aspect-square h-[250px]"
-                >
-                  <PieChart>
-                    <Pie
-                      data={data?.statsPspe}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={70}
-                      outerRadius={110}
-                      paddingAngle={2}
-                      stroke="#fff"
-                      strokeWidth={2}
-                    >
-                      {data?.statsPspe.map((entry: any, index: number) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.fill}
-                          style={{
-                            filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.1))",
-                          }}
-                        />
-                      ))}
-                      <LabelList
-                        dataKey="value"
-                        position="inside"
-                        style={{
-                          fill: "white",
-                          fontWeight: "bold",
-                          fontSize: "14px",
-                        }}
-                        formatter={(value: any) => (value > 0 ? value : "")}
-                      />
-                    </Pie>
-                    <ChartTooltip
-                      cursor={false}
-                      content={
-                        <ChartTooltipContent
-                          hideLabel
-                          indicator="dot"
-                          className="bg-white border border-gray-200 shadow-xl"
-                        />
-                      }
-                    />
-                    <ChartLegend
-                      content={<ChartLegendContent />}
-                      className="mt-4"
-                    />
-                  </PieChart>
-                </ChartContainer>
-              </div>
-            </Card>
-          </Col>
-
-          {/* --- GRÁFICO: DISTRIBUIÇÃO DE ESCALA --- */}
-          <Col xs={24}>
             <Card
               title={
                 <>
@@ -467,7 +509,7 @@ export default function AdminIndicadoresPage() {
                   Distribuição da Escala de Impacto
                 </>
               }
-              className="shadow-sm rounded-lg"
+              className="shadow-sm rounded-lg h-full"
               size="small"
               bordered={false}
             >
@@ -476,7 +518,7 @@ export default function AdminIndicadoresPage() {
               </Text>
               <ChartContainer
                 config={chartConfigEscala}
-                className="h-[250px] w-full"
+                className="h-[300px] w-full"
               >
                 <BarChart
                   accessibilityLayer
@@ -514,7 +556,11 @@ export default function AdminIndicadoresPage() {
                     <LabelList
                       dataKey="votos"
                       position="top"
-                      style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+                      style={{
+                        fill: "#666",
+                        fontWeight: "bold",
+                        fontSize: 12,
+                      }}
                     />
                   </Bar>
                 </BarChart>
