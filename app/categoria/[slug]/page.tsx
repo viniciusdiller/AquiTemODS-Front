@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -170,6 +170,21 @@ export default function CategoryPage() {
       fetchProjetos();
     }
   }, [slug]);
+
+  //TRAVA DE SEGURANÇA PARA ENVIAR APENAS 1 REQUISIÇÃO PARA O BACKEND
+  const jaContabilizou = useRef(false);
+  useEffect(() => {
+    if (params.slug && !jaContabilizou.current) {
+      jaContabilizou.current = true;
+
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/${params.slug}`,
+        {
+          method: "POST",
+        }
+      ).catch((err) => console.error("Falha silenciosa no contador:", err));
+    }
+  }, [params.slug]);
 
   const filteredProjetos = useMemo(
     () =>

@@ -24,6 +24,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   DownloadOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import {
   getAllActiveProjetos,
@@ -195,7 +196,6 @@ const ProjetosAtivosPage: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8">
-      {/* Cabeçalho com Botão Voltar e Botão Exportar */}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
         <Link href="/admin/dashboard" passHref>
           <Button icon={<ArrowLeftOutlined />} type="text">
@@ -203,15 +203,27 @@ const ProjetosAtivosPage: React.FC = () => {
           </Button>
         </Link>
 
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          onClick={handleExport}
-          loading={exporting}
-          className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
-        >
-          Exportar Planilha (CSV)
-        </Button>
+        <div className="flex gap-3 flex-wrap">
+          <Link href="/admin/indicadores" passHref>
+            <Button
+              type="primary"
+              icon={<BarChartOutlined />}
+              className="bg-[#D7386E] hover:!bg-[#b32e5a] border-[#D7386E] hover:!border-[#2e5491] text-white"
+            >
+              Ver Indicadores
+            </Button>
+          </Link>
+
+          <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            onClick={handleExport}
+            loading={exporting}
+            className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
+          >
+            Exportar Planilha (CSV)
+          </Button>
+        </div>
       </div>
 
       <Title level={2} className="mb-6">

@@ -266,6 +266,7 @@ export const adminDeleteReview = (id: number, token: string) =>
       Authorization: `Bearer ${token}`,
     },
   });
+
 export const adminExportProjetos = async (token: string) => {
   const response = await fetch(`${API_URL}/api/admin/exportar-projetos`, {
     method: "GET",
@@ -282,3 +283,11 @@ export const adminExportProjetos = async (token: string) => {
   // Retorna o Blob do arquivo para download
   return response.blob();
 };
+
+export const getAdminStats = (token: string) =>
+  fetchApi("/api/admin/stats", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
