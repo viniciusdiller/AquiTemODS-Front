@@ -1,6 +1,15 @@
 // Enigmas do Futuro
+"use client";
 import React from "react";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const handleGameClick = () => {
+  fetch(`${API_URL}/api/projetos/visualizacao/GAME_CLICK`, {
+    method: "POST",
+  }).catch((err) => console.error("Erro ao registrar clique:", err));
+};
 
 export default function EnigmasDoFuturoPage() {
   return (
@@ -30,6 +39,7 @@ export default function EnigmasDoFuturoPage() {
             <div className="mt-8 md:mt-0 md:w-1/3 flex-shrink-0">
               <a
                 href="https://enigmasdofuturo.saquarema.rj.gov.br/"
+                onClick={handleGameClick}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -97,6 +107,7 @@ export default function EnigmasDoFuturoPage() {
           <div className="flex justify-center">
             <a
               href="https://enigmasdofuturo.saquarema.rj.gov.br/"
+              onClick={handleGameClick}
               target="_blank"
               rel="noopener noreferrer"
               className="group block text-center w-full sm:w-1/2 lg:w-1/3"

@@ -20,6 +20,8 @@ import {
   BarChartOutlined,
   HomeOutlined,
   GlobalOutlined,
+  UserOutlined,
+  RocketOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getAdminStats } from "@/lib/api";
@@ -74,11 +76,6 @@ const getOdsColor = (odsName: string) => {
 };
 
 // --- CONFIGURAÇÃO DE LABELS ---
-const chartConfigPspe = {
-  votos: { label: "Projetos" },
-  sim: { label: "Venceu PSPE", color: "#D7386E" },
-  nao: { label: "Não Venceu", color: "#3C6AB2" },
-} satisfies ChartConfig;
 
 const chartConfigEscala = {
   votos: { label: "Qtd. Projetos", color: "#00AEEF" },
@@ -235,25 +232,46 @@ export default function AdminIndicadoresPage() {
           level={5}
           className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-8"
         >
-          Tráfego do Portal
+          Tráfego e Engajamento
         </Title>
         <Row gutter={[16, 16]} className="mb-8">
-          <Col xs={24} sm={12}>
+          <Col xs={24} sm={6}>
             <SummaryCard
-              title="Acessos na Página Inicial"
+              title="Usuários Cadastrados"
+              value={data?.totalUsuarios || 0}
+              icon={<UserOutlined />}
+              colorBg="#F6FFED"
+              colorText="#389E0D"
+            />
+          </Col>
+
+          <Col xs={24} sm={6}>
+            <SummaryCard
+              title="Acessos Página Inicial"
               value={data?.pageViews?.home || 0}
               icon={<HomeOutlined />}
               colorBg="#E6F7FF"
               colorText="#0050B3"
             />
           </Col>
-          <Col xs={24} sm={12}>
+
+          <Col xs={24} sm={6}>
             <SummaryCard
-              title="Acessos no Espaço ODS"
+              title="Acessos Espaço ODS"
               value={data?.pageViews?.espacoOds || 0}
               icon={<GlobalOutlined />}
               colorBg="#F0F5FF"
               colorText="#2F54EB"
+            />
+          </Col>
+
+          <Col xs={24} sm={6}>
+            <SummaryCard
+              title="Cliques 'Enigmas do Futuro'"
+              value={data?.pageViews?.gameClick || 0}
+              icon={<RocketOutlined />}
+              colorBg="#FFF2E8"
+              colorText="#D4380D"
             />
           </Col>
         </Row>
@@ -436,7 +454,7 @@ export default function AdminIndicadoresPage() {
               title={
                 <>
                   <CheckCircleOutlined className="mr-2 text-yellow-500" />
-                  Apoio ao Planejamento
+                  De que forma a plataforma pode Apoiar ao Planejamento
                 </>
               }
               className="shadow-sm rounded-lg h-full"
