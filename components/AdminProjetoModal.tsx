@@ -26,6 +26,7 @@ import { ApoioPlanejamento } from "@/app/cadastro-projeto/page";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import "@/app/cadastro-projeto/quill-styles.css";
+import GerarCertificadoButton from "./GerarCertificadoButton";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -243,6 +244,18 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
         <Button key="cancel" onClick={() => onClose(false)}>
           Cancelar
         </Button>,
+
+        projeto && (
+          <GerarCertificadoButton
+            key="certificado"
+            nomeProjeto={projeto.nomeProjeto}
+            nomeResponsavel={projeto.responsavelProjeto || ""}
+            ods={projeto.ods}
+            dataCadastro={
+              projeto.createdAt?.toString() || new Date().toISOString()
+            }
+          />
+        ),
         <Button
           key="submit"
           type="primary"
@@ -414,6 +427,20 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             rules={[{ required: true }]}
           >
             <TextArea rows={2} />
+          </Form.Item>
+
+          <Form.Item
+            name="descricao"
+            label="Descrição Completa"
+            rules={[{ required: true }]}
+            className="quill-editor-container"
+          >
+            <ReactQuill
+              theme="snow"
+              modules={quillModules}
+              placeholder="Descreva o projeto em detalhes, você pode usar negrito, itálico..."
+              style={{ minHeight: "10px" }}
+            />
           </Form.Item>
 
           <Form.Item

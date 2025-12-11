@@ -54,6 +54,7 @@
     "gsap": "^3.13.0",
     "input-otp": "1.4.1",
     "jsdom": "^27.2.0",
+    "jspdf": "^3.0.4",
     "leaflet": "latest",
     "lucide-react": "^0.454.0",
     "motion": "^12.23.12",
