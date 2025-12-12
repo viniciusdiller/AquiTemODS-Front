@@ -22,6 +22,8 @@ import {
   GlobalOutlined,
   UserOutlined,
   RocketOutlined,
+  ShareAltOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getAdminStats } from "@/lib/api";
@@ -45,6 +47,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { number } from "framer-motion";
 
 const { Title, Text } = Typography;
 
@@ -117,6 +120,115 @@ export default function AdminIndicadoresPage() {
     fetchStats();
   }, [router]);
 
+  const handleExportIndicators = () => {
+    if (!data) {
+      message.warning("Aguarde o carregamento dos dados.");
+      return;
+    }
+
+    try {
+      const dataAtual = new Date();
+      const dataFormatada = dataAtual.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
+      const metaRows = [
+        ["Relatório de Indicadores - Aqui Tem ODS"],
+        ["Gerado em", dataFormatada],
+        [],
+      ];
+
+      const headers = ["Categoria", "Indicador", "Valor"];
+
+      const fixedRows = [
+        ["Resumo Geral", "Projetos Ativos", data.totalProjetos || 0],
+        ["Resumo Geral", "Média de Escala (0-10)", data.mediaEscala || 0],
+        ["Resumo Geral", "Premiados PSPE", data.statsPspe?.[0]?.value || 0],
+        ["Resumo Geral", "Não Premiados", data.statsPspe?.[1]?.value || 0],
+        ["Trafego", "Usuários Cadastrados", data.totalUsuarios || 0],
+        ["Trafego", "Acessos Home", data.pageViews?.home || 0],
+        ["Trafego", "Acessos Espaço ODS", data.pageViews?.espacoOds || 0],
+        [
+          "Trafego",
+          "Cliques Enigmas do Futuro",
+          data.pageViews?.gameClick || 0,
+        ],
+        [
+          "Trafego",
+          "Compartilhamentos de Perfil",
+          data.pageViews?.compartilhamento || 0,
+        ],
+      ];
+
+      const ofertaRows = (data.chartProjetosPorOds || []).map((item: any) => [
+        "Oferta (Projetos Cadastrados)",
+        item.ods,
+        item.qtd,
+      ]);
+
+      const demandaRows = (data.chartVisualizacoes || []).map((item: any) => [
+        "Demanda (Visualizações/Interesse)",
+        item.ods,
+        item.views,
+      ]);
+
+      const apoioRows = (data.chartApoio || []).map((item: any) => [
+        "Apoio ao Planejamento",
+        item.label,
+        item.value,
+      ]);
+
+      const escalaRows = (data.chartEscala || []).map((item: any) => [
+        "Distribuição da Escala de Impacto",
+        item.nota,
+        item.votos,
+      ]);
+
+      const allRows = [
+        ...metaRows,
+        headers,
+        ...fixedRows,
+        ...ofertaRows,
+        ...demandaRows,
+        ...apoioRows,
+        ...escalaRows,
+      ];
+
+      const csvContent =
+        "\uFEFF" +
+        allRows
+          .map((row) =>
+            row.map((item: string | number) => `"${item}"`).join(";")
+          )
+          .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const nomeArquivoDate = dataAtual.toISOString().split("T")[0];
+      link.setAttribute(
+        "download",
+        `indicadores_aquitemods_${nomeArquivoDate}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      message.success("Relatório gerado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar CSV:", error);
+      message.error("Erro ao gerar o arquivo.");
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -177,21 +289,31 @@ export default function AdminIndicadoresPage() {
   return (
     <div className="p-6 min-h-screen bg-[#f4f7fe]">
       <div className="max-w-7xl mx-auto">
-        {/* CABEÇALHO */}
-        <div className="flex items-center mb-6">
-          <Link href="/admin/dashboard" passHref>
-            <Button icon={<ArrowLeftOutlined />} type="text" className="mr-4">
-              Voltar
-            </Button>
-          </Link>
-          <div>
-            <Title level={3} style={{ margin: 0, color: "#333" }}>
-              Painel de Indicadores
-            </Title>
-            <Text type="secondary">
-              Visão geral do impacto dos projetos ativos.
-            </Text>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <div className="flex items-center">
+            <Link href="/admin/dashboard" passHref>
+              <Button icon={<ArrowLeftOutlined />} type="text" className="mr-4">
+                Voltar
+              </Button>
+            </Link>
+            <div>
+              <Title level={3} style={{ margin: 0, color: "#333" }}>
+                Painel de Indicadores
+              </Title>
+              <Text type="secondary">
+                Visão geral do impacto dos projetos ativos.
+              </Text>
+            </div>
           </div>
+
+          <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            onClick={handleExportIndicators}
+            style={{ backgroundColor: "#1D6F42", borderColor: "#1D6F42" }}
+          >
+            Exportar Indicadores (Excel)
+          </Button>
         </div>
 
         {/* 1. CARDS DE RESUMO GERAL */}
@@ -272,6 +394,16 @@ export default function AdminIndicadoresPage() {
               icon={<RocketOutlined />}
               colorBg="#FFF2E8"
               colorText="#D4380D"
+            />
+          </Col>
+
+          <Col xs={24} sm={5}>
+            <SummaryCard
+              title="Compartilhamento de Projetos"
+              value={data?.pageViews?.compartilhamento || 0}
+              icon={<ShareAltOutlined />}
+              colorBg="#FFF0F6"
+              colorText="#EB2F96"
             />
           </Col>
         </Row>

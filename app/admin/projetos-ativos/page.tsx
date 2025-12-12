@@ -221,7 +221,7 @@ const ProjetosAtivosPage: React.FC = () => {
             loading={exporting}
             className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
           >
-            Exportar Planilha (CSV)
+            Exportar Projetos Ativos (CSV)
           </Button>
         </div>
       </div>

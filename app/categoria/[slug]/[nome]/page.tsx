@@ -18,6 +18,7 @@ import {
   getProjetoByNome,
   deleteReview,
   formatarDataParaMesAno,
+  registerShareClick,
 } from "@/lib/api";
 import {
   Pagination,
@@ -173,7 +174,7 @@ function ProjetoPageContent() {
   const sobreProjetoRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
       toast.success("Link copiado para a área de transferência!", {
@@ -181,6 +182,12 @@ function ProjetoPageContent() {
           "Agora você pode compartilhar esse perfil com quem quiser.",
         duration: 3000,
       });
+
+      try {
+        await registerShareClick();
+      } catch (error) {
+        console.error("Erro ao registrar compartilhamento", error);
+      }
     }
   };
 

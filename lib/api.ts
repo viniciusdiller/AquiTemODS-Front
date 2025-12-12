@@ -291,3 +291,8 @@ export const getAdminStats = (token: string) =>
       Authorization: `Bearer ${token}`,
     },
   });
+
+export const registerShareClick = () =>
+  fetchApi("/api/projetos/visualizacao/COMPARTILHAMENTO", {
+    method: "POST",
+  });
