@@ -1363,8 +1363,8 @@ const CadastroProjetoPage: React.FC = () => {
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
-              label="Logo do seu Projeto"
-              help="Envie 1 imagem para ser a logo do seu projeto. (.jpg, .jpeg ou .png)"
+              label="Logo da Prefeitura"
+              help="Envie 1 imagem da Logo da sua Prefeitura. (.jpg, .jpeg ou .png)"
             >
               <Upload
                 customRequest={customUploadAction}
