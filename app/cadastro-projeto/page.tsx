@@ -1332,7 +1332,7 @@ const CadastroProjetoPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Form.Item
               name="website"
-              label="Site da Prefeitura(Opicional)"
+              label="Site da Prefeitura (Opcional)"
               className="mt-8"
             >
               <Input
