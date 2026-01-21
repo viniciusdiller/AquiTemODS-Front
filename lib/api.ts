@@ -63,7 +63,7 @@ export const confirmAccount = (token: string) =>
 
 export const updateUserProfile = (
   data: { nomeCompleto?: string; email?: string },
-  token: string
+  token: string,
 ) =>
   fetchApi("/api/users/profile", {
     method: "POST",
@@ -75,7 +75,7 @@ export const updateUserProfile = (
 
 export const changeUserPassword = (
   data: { currentPassword?: string; newPassword?: string },
-  token: string
+  token: string,
 ) =>
   fetchApi("/api/users/password", {
     method: "PUT",
@@ -102,7 +102,9 @@ export const deleteUserAccount = (token: string) =>
 export const getAllProjetos = () => fetchApi("/api/projetos");
 
 export const getProjetosByOds = (ods: string) =>
-  fetchApi(`/api/projetos/categoria/${encodeURIComponent(ods)}`);
+  fetchApi(
+    `/api/projetos/categoria/${encodeURIComponent(encodeURIComponent(ods))}`,
+  );
 
 export const getProjetoById = (id: string) => fetchApi(`/api/projetos/${id}`);
 
@@ -176,7 +178,7 @@ export const removeEmojis = (text: string): string => {
   // Regex que corresponde aos emojis para substituí-los por uma string vazia
   return text.replace(
     /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu,
-    ""
+    "",
   );
 };
 
@@ -213,7 +215,7 @@ export const getAllActiveProjetos = async (token: string) => {
 export const adminUpdateProjeto = async (
   id: number,
   data: any,
-  token: string
+  token: string,
 ) => {
   const response = await fetch(`${API_URL}/api/admin/projeto/${id}`, {
     method: "PATCH",
@@ -249,7 +251,7 @@ export const adminDeleteProjeto = async (id: number, token: string) => {
 
 export const adminGetReviewsByProject = (
   projetoId: string,
-  token: string // <--- MUDOU
+  token: string, // <--- MUDOU
 ) =>
   fetchApi(`/api/admin/avaliacoes/projeto/${projetoId}`, {
     // <--- MUDOU
