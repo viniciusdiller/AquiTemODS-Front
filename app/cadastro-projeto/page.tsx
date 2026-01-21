@@ -411,7 +411,7 @@ const cidadesRJ = [
   "Nova Friburgo", "Nova Iguaçu", "Paracambi", "Paraíba do Sul", "Paraty", "Paty do Alferes",
   "Petrópolis", "Pinheiral", "Piraí", "Porciúncula", "Porto Real", "Quatis", "Queimados",
   "Quissamã", "Resende", "Rio Bonito", "Rio Claro", "Rio das Flores", "Rio das Ostras",
-  "Rio de Janeiro", "Rio Jorge", "Santo Antônio de Pádua", "Santa Maria Madalena",
+  "Rio de Janeiro", "Santo Antônio de Pádua", "Santa Maria Madalena",
   "São Fidélis", "São Francisco de Itabapoana", "São Gonçalo", "São João da Barra",
   "São João de Meriti", "São José de Ubá", "São José do Vale do Rio Preto", "São Pedro da Aldeia",
   "São Sebastião do Alto", "Sapucaia", "Saquarema", "Seropédica", "Silva Jardim", "Sumidouro",
