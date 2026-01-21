@@ -399,6 +399,25 @@ const odsRelacionadas: { [key: string]: string[] } = {
     "ODS 17",
   ],
 };
+const cidadesRJ = [
+  "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios", "Arraial do Cabo",
+  "Barra do Piraí", "Barra Mansa", "Belford Roxo", "Bom Jardim", "Bom Jesus do Itabapoana",
+  "Cabo Frio", "Cachoeiras de Macacu", "Cambuci", "Campos dos Goytacazes", "Cantagalo",
+  "Carapebus", "Cardoso Moreira", "Carmo", "Casimiro de Abreu", "Comendador Levy Gasparian",
+  "Conceição de Macabu", "Cordeiro", "Duas Barras", "Duque de Caxias", "Engenheiro Paulo de Frontin",
+  "Guapimirim", "Iguaba Grande", "Itaboraí", "Itaguaí", "Italva", "Itaocara", "Itaperuna",
+  "Itatiaia", "Japeri", "Laje do Muriaé", "Macaé", "Macuco", "Magé", "Mangaratiba", "Maricá",
+  "Mendes", "Mesquita", "Miguel Pereira", "Miracema", "Natividade", "Nilópolis", "Niterói",
+  "Nova Friburgo", "Nova Iguaçu", "Paracambi", "Paraíba do Sul", "Paraty", "Paty do Alferes",
+  "Petrópolis", "Pinheiral", "Piraí", "Porciúncula", "Porto Real", "Quatis", "Queimados",
+  "Quissamã", "Resende", "Rio Bonito", "Rio Claro", "Rio das Flores", "Rio das Ostras",
+  "Rio de Janeiro", "Rio Jorge", "Santo Antônio de Pádua", "Santa Maria Madalena",
+  "São Fidélis", "São Francisco de Itabapoana", "São Gonçalo", "São João da Barra",
+  "São João de Meriti", "São José de Ubá", "São José do Vale do Rio Preto", "São Pedro da Aldeia",
+  "São Sebastião do Alto", "Sapucaia", "Saquarema", "Seropédica", "Silva Jardim", "Sumidouro",
+  "Tanguá", "Teresópolis", "Trajano de Moraes", "Três Rios", "Valença", "Varre-Sai",
+  "Vassouras", "Volta Redonda"
+];
 
 export const ApoioPlanejamento = [
   {
@@ -956,19 +975,26 @@ const CadastroProjetoPage: React.FC = () => {
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item
-              name="prefeitura"
-              label="Nome da Prefeitura"
-              rules={[
-                { required: true, message: "Insira o nome da Prefeitura!" },
-              ]}
+               name="prefeitura"
+               label="Projeto da Prefeitura Municipal"
+               rules={[
+               { required: true, message: "Insira o nome da Prefeitura!" },
+               ]}
             >
-              <Input
-                placeholder="Ex: Prefeitura Municipal de Saquarema"
-                onChange={(e) => {
-                  const strippedValue = stripEmojis(e.target.value);
-                  form.setFieldsValue({ prefeitura: strippedValue });
-                }}
-              />
+          <Select
+            showSearch
+            placeholder="Selecione a Prefeitura"
+            optionFilterProp="label"
+      // A linha abaixo gera as opções com o prefixo solicitado
+            options={cidadesRJ.map((cidade) => ({
+            value: `Prefeitura Municipal de ${cidade}`,
+            label: `Prefeitura Municipal de ${cidade}`,
+            }))}
+      // A busca continua funcionando se digitar apenas o nome da cidade (ex: "Angra")
+            filterOption={(input, option) =>
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+      }
+    />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -1452,24 +1478,29 @@ const CadastroProjetoPage: React.FC = () => {
         </p>
 
         <Row gutter={24}>
-          <Col xs={24} md={12}>
+
+            <Col xs={24} md={12}>
             <Form.Item
-              name="prefeitura"
-              label="Nome da Prefeitura"
-              rules={[
-                {
-                  required: true,
-                  message: "O nome é obrigatório para identificação!",
-                },
-              ]}
+               name="prefeitura"
+               label="Projeto da Prefeitura Municipal"
+               rules={[
+               { required: true, message: "Insira o nome da Prefeitura!" },
+               ]}
             >
-              <Input
-                placeholder="Ex: Prefeitura Municipal de Saquarema"
-                onChange={(e) => {
-                  const strippedValue = stripEmojis(e.target.value);
-                  form.setFieldsValue({ prefeitura: strippedValue });
-                }}
-              />
+          <Select
+            showSearch
+            placeholder="Selecione a Prefeitura"
+            optionFilterProp="label"
+      // A linha abaixo gera as opções com o prefixo solicitado
+            options={cidadesRJ.map((cidade) => ({
+            value: `Prefeitura Municipal de ${cidade}`,
+            label: `Prefeitura Municipal de ${cidade}`,
+            }))}
+      // A busca continua funcionando se digitar apenas o nome da cidade (ex: "Angra")
+            filterOption={(input, option) =>
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+      }
+    />
             </Form.Item>
             <Form.Item
               name="projetoId"

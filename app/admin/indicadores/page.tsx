@@ -316,6 +316,39 @@ export default function AdminIndicadoresPage() {
           </Button>
         </div>
 
+{/* NOVO: CARD DE NAVEGAÇÃO PARA PREFEITURAS */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24}>
+            <Link href="/admin/indicadores/prefeituras">
+              <Card
+                hoverable
+                className="cursor-pointer shadow-sm border-l-4 border-l-[#1D6F42]"
+                bodyStyle={{ padding: "20px" }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-green-100 rounded-full text-[#1D6F42]">
+                      <HomeOutlined style={{ fontSize: "24px" }} />
+                    </div>
+                    <div>
+                      <Title level={4} style={{ margin: 0, color: "#333" }}>
+                        Relatório por Prefeitura
+                      </Title>
+                      <Text type="secondary">
+                        Clique para visualizar a distribuição de projetos entre
+                        as 92 prefeituras.
+                      </Text>
+                    </div>
+                  </div>
+                  <ArrowLeftOutlined
+                    style={{ fontSize: "20px", transform: "rotate(180deg)" }}
+                    className="text-gray-400"
+                  />
+                </div>
+              </Card>
+            </Link>
+          </Col>
+        </Row>
         {/* 1. CARDS DE RESUMO GERAL */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={8}>
