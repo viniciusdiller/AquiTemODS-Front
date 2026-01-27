@@ -164,6 +164,7 @@ export default function AdminIndicadoresPage() {
           "Compartilhamentos de Perfil",
           data.pageViews?.compartilhamento || 0,
         ],
+        ["Trafego", "Acessos SustentAí", data.pageViews?.sustentAiNav || 0],
       ];
 
       const ofertaRows = (data.chartProjetosPorOds || []).map((item: any) => [
@@ -383,7 +384,7 @@ export default function AdminIndicadoresPage() {
           </Col>
         </Row>
 
-        {/* 2. CARDS DE TRÁFEGO */}
+        {/* 2. CARDS DE TRÁFEGO (Ajustado para 3 colunas por linha) */}
         <Title
           level={5}
           className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-8"
@@ -391,7 +392,8 @@ export default function AdminIndicadoresPage() {
           Tráfego e Engajamento
         </Title>
         <Row gutter={[16, 16]} className="mb-8">
-          <Col xs={24} sm={6}>
+          {/* Usuários - Alterado de sm={6} para sm={8} */}
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Usuários Cadastrados"
               value={data?.totalUsuarios || 0}
@@ -401,7 +403,8 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
-          <Col xs={24} sm={6}>
+          {/* Home - Alterado de sm={6} para sm={8} */}
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Acessos Página Inicial"
               value={data?.pageViews?.home || 0}
@@ -411,7 +414,8 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
-          <Col xs={24} sm={6}>
+          {/* Espaço ODS - Alterado de sm={6} para sm={8} */}
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Acessos Espaço ODS"
               value={data?.pageViews?.espacoOds || 0}
@@ -421,7 +425,8 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
-          <Col xs={24} sm={6}>
+          {/* Enigmas - Alterado de sm={6} para sm={8} */}
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Cliques 'Enigmas do Futuro'"
               value={data?.pageViews?.gameClick || 0}
@@ -431,7 +436,7 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
-          <Col xs={24} sm={6}>
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Acessos SustentAí"
               value={data?.pageViews?.sustentAiNav || 0}
@@ -441,7 +446,7 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
-          <Col xs={24} sm={5}>
+          <Col xs={24} sm={8}>
             <SummaryCard
               title="Compartilhamento de Projetos"
               value={data?.pageViews?.compartilhamento || 0}
