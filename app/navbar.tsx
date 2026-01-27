@@ -2,7 +2,7 @@
 
 import { MotionConfig, motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, useRef, ReactElement } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Instagram,
@@ -13,6 +13,7 @@ import {
   MessageCircleQuestion,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { registerSustentAiNavClick } from "@/lib/api";
 
 const AnimatedLogo = () => {
   const logos = [
@@ -139,6 +140,10 @@ const AnimatedHamburgerButton = ({
   );
 };
 
+const handleNavClick = () => {
+  registerSustentAiNavClick().catch(console.error);
+};
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout, isLoading } = useAuth();
@@ -179,6 +184,7 @@ export function Navbar() {
             <Link
               href="/sustentai"
               className="text-gray-700 hover:text-[#D7386E] transition-colors"
+              onClick={handleNavClick}
             >
               SustentAí
             </Link>
@@ -294,7 +300,10 @@ export function Navbar() {
             <Link
               href="/sustentai"
               className="text-gray-700 hover:text-[#D7386E]  transition-colors font-medium"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                handleNavClick();
+              }}
             >
               SustentAí
             </Link>

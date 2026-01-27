@@ -29,6 +29,8 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { BarChartOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const { Title, Text } = Typography;
 
@@ -205,6 +207,7 @@ const AdminSustentAi = () => {
       {/* Header com Gradiente */}
       <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* LADO ESQUERDO: Botão Voltar + Título */}
           <div className="flex items-center gap-4">
             <Button
               shape="circle"
@@ -224,6 +227,16 @@ const AdminSustentAi = () => {
               </Text>
             </div>
           </div>
+
+          {/* LADO DIREITO: Botão de Indicadores */}
+          <Link href="/admin/newsletter/indicadores">
+            <Button
+              icon={<BarChartOutlined />}
+              className="hover:text-[#D7386E] hover:border-[#D7386E]"
+            >
+              Ver Indicadores Detalhados
+            </Button>
+          </Link>
         </div>
       </div>
 

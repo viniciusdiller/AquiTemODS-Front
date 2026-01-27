@@ -298,3 +298,9 @@ export const registerShareClick = () =>
   fetchApi("/api/projetos/visualizacao/COMPARTILHAMENTO", {
     method: "POST",
   });
+
+export const registerSustentAiNavClick = () =>
+  fetchApi("/api/sustentai/click-nav", { method: "POST" });
+
+export const registerSustentAiCardClick = (id: number) =>
+  fetchApi(`/api/sustentai/click-card/${id}`, { method: "POST" });

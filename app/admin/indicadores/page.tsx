@@ -48,6 +48,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { number } from "framer-motion";
+import { Newspaper } from "lucide-react";
 
 const { Title, Text } = Typography;
 
@@ -203,7 +204,7 @@ export default function AdminIndicadoresPage() {
         "\uFEFF" +
         allRows
           .map((row) =>
-            row.map((item: string | number) => `"${item}"`).join(";")
+            row.map((item: string | number) => `"${item}"`).join(";"),
           )
           .join("\n");
 
@@ -214,7 +215,7 @@ export default function AdminIndicadoresPage() {
       const nomeArquivoDate = dataAtual.toISOString().split("T")[0];
       link.setAttribute(
         "download",
-        `indicadores_aquitemods_${nomeArquivoDate}.csv`
+        `indicadores_aquitemods_${nomeArquivoDate}.csv`,
       );
       document.body.appendChild(link);
       link.click();
@@ -316,7 +317,7 @@ export default function AdminIndicadoresPage() {
           </Button>
         </div>
 
-{/* NOVO: CARD DE NAVEGAÇÃO PARA PREFEITURAS */}
+        {/* NOVO: CARD DE NAVEGAÇÃO PARA PREFEITURAS */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24}>
             <Link href="/admin/indicadores/prefeituras">
@@ -430,6 +431,16 @@ export default function AdminIndicadoresPage() {
             />
           </Col>
 
+          <Col xs={24} sm={6}>
+            <SummaryCard
+              title="Acessos SustentAí"
+              value={data?.pageViews?.sustentAiNav || 0}
+              icon={<Newspaper size={28} />}
+              colorBg="#FFF0F6"
+              colorText="#D7386E"
+            />
+          </Col>
+
           <Col xs={24} sm={5}>
             <SummaryCard
               title="Compartilhamento de Projetos"
@@ -521,7 +532,7 @@ export default function AdminIndicadoresPage() {
                           key={`cell-${index}`}
                           fill={getOdsColor(entry.ods)}
                         />
-                      )
+                      ),
                     )}
                   </Bar>
                 </BarChart>
@@ -602,7 +613,7 @@ export default function AdminIndicadoresPage() {
                           key={`cell-${index}`}
                           fill={getOdsColor(entry.ods)}
                         />
-                      )
+                      ),
                     )}
                   </Bar>
                 </BarChart>

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
 import { Loader2, Newspaper, MessageCircle } from "lucide-react";
+import { registerSustentAiCardClick } from "@/lib/api";
 
 interface SustentAiCard {
   id: number;
@@ -22,18 +23,23 @@ export default function SustentAiPage() {
     fetch(`${API_URL}/api/sustentai`)
       .then((res) => res.json())
       .then((data) => {
-        setCards(data);
+        if (Array.isArray(data)) {
+          setCards(data);
+        } else {
+          console.error("Resposta da API inválida:", data);
+          setCards([]);
+        }
         setLoading(false);
       })
       .catch((err) => {
         console.error("Erro ao buscar dados SustentAí:", err);
+        setCards([]);
         setLoading(false);
       });
   }, [API_URL]);
 
-  // Função auxiliar para garantir URL completa da imagem
   const getFullImageUrl = (path: string) => {
-    if (!path) return "/placeholder-image.png"; // Fallback
+    if (!path) return "/placeholder-image.png";
     if (path.startsWith("http")) return path;
     return `${API_URL}${path}`;
   };
@@ -110,6 +116,7 @@ export default function SustentAiPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block text-center h-full flex flex-col"
+                  onClick={() => registerSustentAiCardClick(card.id)}
                 >
                   <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3]">
                     <Image
