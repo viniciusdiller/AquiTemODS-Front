@@ -1,6 +1,6 @@
 // Espaço dos Aqui Tem ODS React from "react";
 import CarouselSobre from "@/components/CarouselSobre";
-import { Heart } from "lucide-react";
+import { Heart, Link } from "lucide-react";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
 
 export default function EspacoODSPage() {
@@ -66,7 +66,8 @@ export default function EspacoODSPage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-              Origem e contexto: dos Seminários Saquarema 2030 ao Laboratório de Inovação e Sustentabilidade Aplicada - Lab ISA
+              Origem e contexto: dos Seminários Saquarema 2030 ao Laboratório de
+              Inovação e Sustentabilidade Aplicada - Lab ISA
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -81,26 +82,94 @@ export default function EspacoODSPage() {
             para os desafios do futuro.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-           A <strong>primeira edição do Seminário Saquarema 2030</strong>, realizada em maio de 2023, foi um marco na gestão pública municipal. O evento reuniu gestores, especialistas, universidades, instituições parceiras e representantes da sociedade civil, consolidando um espaço de diálogo intersetorial <strong>sobre planejamento territorial, mudanças climáticas, inovação, economia sustentável e políticas públicas integradas.</strong> Nesse encontro, reafirmou-se o papel estratégico dos municípios como protagonistas na implementação dos ODS em nível local.
+            A <strong>primeira edição do Seminário Saquarema 2030</strong>,
+            realizada em maio de 2023, foi um marco na gestão pública municipal.
+            O evento reuniu gestores, especialistas, universidades, instituições
+            parceiras e representantes da sociedade civil, consolidando um
+            espaço de diálogo intersetorial{" "}
+            <strong>
+              sobre planejamento territorial, mudanças climáticas, inovação,
+              economia sustentável e políticas públicas integradas.
+            </strong>{" "}
+            Nesse encontro, reafirmou-se o papel estratégico dos municípios como
+            protagonistas na implementação dos ODS em nível local.
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-          Entre julho e outubro de 2024, a Prefeitura de Saquarema participou da <strong>Jornada de Formação do Desafio dos ODS, oferecida pela ONU-Habitat</strong>, uma iniciativa voltada a reconhecer e fortalecer políticas públicas alinhadas à Agenda 2030. Essa trajetória culminou na <strong>premiação de Saquarema como vencedora da categoria ODS 16 – Paz, Justiça e Instituições Eficazes</strong>, pelo projeto <strong> Saquarema 2030</strong>, que se destacou como modelo de integração entre planejamento, governança e inovação. A partir desse processo, surgiu a ideia de criar uma <strong> plataforma digital que tornasse o “2030” um espaço permanente de troca, aprendizado e acompanhamento das ações sustentáveis do município</strong>.
-
+            Entre julho e outubro de 2024, a Prefeitura de Saquarema participou
+            da{" "}
+            <strong>
+              Jornada de Formação do Desafio dos ODS, oferecida pela ONU-Habitat
+            </strong>
+            , uma iniciativa voltada a reconhecer e fortalecer políticas
+            públicas alinhadas à Agenda 2030. Essa trajetória culminou na{" "}
+            <strong>
+              premiação de Saquarema como vencedora da categoria ODS 16 – Paz,
+              Justiça e Instituições Eficazes
+            </strong>
+            , pelo projeto <strong> Saquarema 2030</strong>, que se destacou
+            como modelo de integração entre planejamento, governança e inovação.
+            A partir desse processo, surgiu a ideia de criar uma{" "}
+            <strong>
+              {" "}
+              plataforma digital que tornasse o “2030” um espaço permanente de
+              troca, aprendizado e acompanhamento das ações sustentáveis do
+              município
+            </strong>
+            .
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-           Como desdobramento desse movimento, surgiu o <strong>Laboratório de Inovação e Sustentabilidade Aplicada – Lab ISA</strong>, uma estrutura permanente de apoio à gestão pública, voltada à criação de <strong>soluções inovadoras, experimentação de políticas públicas, capacitação de servidores e difusão de boas práticas sustentáveis.</strong> O Lab ISA representa o compromisso da Prefeitura de Saquarema com a modernização administrativa, a transparência e a integração entre conhecimento técnico, tecnologia e impacto social.
+            Como desdobramento desse movimento, surgiu o{" "}
+            <strong>
+              Laboratório de Inovação e Sustentabilidade Aplicada – Lab ISA
+            </strong>
+            , uma estrutura permanente de apoio à gestão pública, voltada à
+            criação de{" "}
+            <strong>
+              soluções inovadoras, experimentação de políticas públicas,
+              capacitação de servidores e difusão de boas práticas sustentáveis.
+            </strong>{" "}
+            O Lab ISA representa o compromisso da Prefeitura de Saquarema com a
+            modernização administrativa, a transparência e a integração entre
+            conhecimento técnico, tecnologia e impacto social.{"  "}
+            <a
+              href="https://transparencia.saquarema.rj.gov.br/wp-content/uploads/2025/12/DEC-3114-2025.pdf"
+              className="text-blue-500 -bottom-1 text-sm underline"
+              target="_blank"
+            >
+              (Decreto LAB-ISA)
+            </a>
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-           Entre os resultados concretos do Lab ISA destaca-se o projeto  <span className=" bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
-            MEIdeSaquá
+            Entre os resultados concretos do Lab ISA destaca-se o projeto{" "}
+            <span className=" bg-gradient-to-r from-[#017DB9] to-[#22c362] bg-clip-text text-transparent">
+              MEIdeSaquá
             </span>{" "}
-           , uma iniciativa de valorização do microempreendedorismo local e de fortalecimento da economia criativa, desenvolvido integralmente por <strong>estagiários do Programa Jovem Cidadão</strong> — jovens talentos vinculados ao <strong>Programa Conexão Universitária da Prefeitura de Saquarema.</strong> Essa integração entre formação acadêmica e prática de inovação pública demonstra o potencial transformador das políticas municipais voltadas à educação, juventude e desenvolvimento econômico sustentável.
+            , uma iniciativa de valorização do microempreendedorismo local e de
+            fortalecimento da economia criativa, desenvolvido integralmente por{" "}
+            <strong>estagiários do Programa Jovem Cidadão</strong> — jovens
+            talentos vinculados ao{" "}
+            <strong>
+              Programa Conexão Universitária da Prefeitura de Saquarema.
+            </strong>{" "}
+            Essa integração entre formação acadêmica e prática de inovação
+            pública demonstra o potencial transformador das políticas municipais
+            voltadas à educação, juventude e desenvolvimento econômico
+            sustentável.{"   "}
           </p>
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
-           O <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
+            O{" "}
+            <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               #AquiTemODS{" "}
             </span>{" "}
-           nasce, portanto, como esse ecossistema de inovação e governança colaborativa. Mais do que uma plataforma, ele simboliza a consolidação de uma cultura institucional orientada à sustentabilidade, à eficiência e à valorização do conhecimento local. O projeto traduz o compromisso de Saquarema em transformar <strong>ideias em ações concretas</strong> e <strong>ações em legados duradouros</strong>, fortalecendo o papel do município como referência em inovação pública e desenvolvimento sustentável no Estado do Rio de Janeiro.
+            nasce, portanto, como esse ecossistema de inovação e governança
+            colaborativa. Mais do que uma plataforma, ele simboliza a
+            consolidação de uma cultura institucional orientada à
+            sustentabilidade, à eficiência e à valorização do conhecimento
+            local. O projeto traduz o compromisso de Saquarema em transformar{" "}
+            <strong>ideias em ações concretas</strong> e{" "}
+            <strong>ações em legados duradouros</strong>, fortalecendo o papel
+            do município como referência em inovação pública e desenvolvimento
+            sustentável no Estado do Rio de Janeiro.
           </p>
         </section>
 
@@ -133,14 +202,16 @@ export default function EspacoODSPage() {
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               Incentivar o{" "}
-              <strong>intercâmbio de experiências entre municípios</strong>;{" "}
+              <strong>intercâmbio de experiências entre municípios</strong>
+              ;{" "}
             </li>
             <li>
               Estimular a <strong>gestão baseada em evidências</strong> e
               resultados;
             </li>
             <li>
-              Fortalecer a <strong>transparência e o controle social</strong>;{" "}
+              Fortalecer a <strong>transparência e o controle social</strong>
+              ;{" "}
             </li>
             <li>
               {" "}
@@ -295,9 +366,11 @@ export default function EspacoODSPage() {
             </span>
           </h2>
           <p className="text-gray-700 leading-relaxed text-lg">
-            O <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
+            O{" "}
+            <span className=" bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent font-bold">
               #AquiTemODS
-            </span> é uma aplicação direta dos ODS 16  E 17:
+            </span>{" "}
+            é uma aplicação direta dos ODS 16 E 17:
           </p>
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
@@ -312,7 +385,6 @@ export default function EspacoODSPage() {
               <strong>— Paz, Justiça e Instituições Eficazes:</strong>{" "}
               transparência e governança pública.
             </li>
-            
           </ul>
 
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
@@ -333,20 +405,20 @@ export default function EspacoODSPage() {
             <li>
               {" "}
               <span className="text-[#C5192D] font-semibold">ODS 4</span>{" "}
-              <strong>— Educação de Qualidade:</strong>{" "}
-              oportunidades de aprendizagem e ensino inclusivo.
+              <strong>— Educação de Qualidade:</strong> oportunidades de
+              aprendizagem e ensino inclusivo.
             </li>
             <li>
               {" "}
               <span className="text-[#FD6925] font-semibold">ODS 9</span>{" "}
-              <strong>— Indústria, Inovação e Infraestrutura:</strong>{" "}
-              fomento à inovação e infraestruturas resilientes.
+              <strong>— Indústria, Inovação e Infraestrutura:</strong> fomento à
+              inovação e infraestruturas resilientes.
             </li>
             <li>
               {" "}
               <span className="text-[#BF8B2E] font-semibold">ODS 12</span>{" "}
-              <strong>— Consumo e Produção Responsáveis:</strong>{" "}
-              gestão eficiente de recursos e redução de desperdícios.
+              <strong>— Consumo e Produção Responsáveis:</strong> gestão
+              eficiente de recursos e redução de desperdícios.
             </li>
           </ul>
         </section>
