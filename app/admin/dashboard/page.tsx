@@ -32,6 +32,7 @@ import {
   CommentOutlined,
   HomeOutlined,
   ReadOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -810,6 +811,21 @@ const AdminDashboard: React.FC = () => {
                 className={isMobile ? "w-full" : ""}
               >
                 Gerenciar Comentários
+              </Button>
+            </Link>
+            
+            <Link href="/admin/usuarios" passHref>
+              <Button
+                icon={<TeamOutlined />}
+                size="large"
+                style={{
+                  backgroundColor: "#52c41a",
+                  color: "#fff",
+                  borderColor: "#52c41a",
+                }}
+                className={isMobile ? "w-full" : ""}
+              >
+                Gerenciar Usuários
               </Button>
             </Link>
           </div>
