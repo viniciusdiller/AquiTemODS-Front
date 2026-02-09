@@ -252,7 +252,7 @@ const AdminSustentAi = () => {
                   ) : (
                     <PlusOutlined className="text-[#D7386E]" />
                   )}
-                  <span>{editingId ? `Editar Box` : "Nova Box"}</span>
+                  <span>{editingId ? `Editar Newsletter` : "Nova Newsletter"}</span>
                 </div>
               }
               className={`shadow-md border-t-4 sticky top-24 ${editingId ? "border-t-blue-500" : "border-t-[#D7386E]"}`}
@@ -347,7 +347,7 @@ const AdminSustentAi = () => {
                       : "bg-[#D7386E] hover:bg-[#b02e5a] hover:scale-[1.02]"
                   }`}
                 >
-                  {editingId ? "Salvar Alterações" : "Cadastrar Box"}
+                  {editingId ? "Salvar Alterações" : "Cadastrar Newsletter"}
                 </Button>
               </div>
             </Card>
@@ -360,7 +360,7 @@ const AdminSustentAi = () => {
               title={
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
                   <span className="text-lg">
-                    Boxes Ativas ({filteredCards.length})
+                    Newsletter Ativas ({filteredCards.length})
                   </span>
                   <Input
                     placeholder="Buscar por título..."

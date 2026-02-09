@@ -443,20 +443,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             />
           </Form.Item>
 
-          <Form.Item
-            name="descricao"
-            label="Descrição Completa"
-            rules={[{ required: true }]}
-            className="quill-editor-container"
-          >
-            <ReactQuill
-              theme="snow"
-              modules={quillModules}
-              placeholder="Descreva o projeto em detalhes, você pode usar negrito, itálico..."
-              style={{ minHeight: "10px" }}
-            />
-          </Form.Item>
-
           <Form.Item name="odsRelacionadas" label="ODS Relacionadas">
             <Select mode="multiple" placeholder="Selecione as ODS relacionadas">
               {categorias

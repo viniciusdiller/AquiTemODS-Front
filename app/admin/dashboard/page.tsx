@@ -21,6 +21,8 @@ import {
   Select,
   Pagination,
   Grid,
+  Dropdown, // <--- ADICIONADO
+  MenuProps, // <--- ADICIONADO
 } from "antd";
 import {
   UserAddOutlined,
@@ -33,6 +35,8 @@ import {
   HomeOutlined,
   ReadOutlined,
   TeamOutlined,
+  MenuOutlined, // <--- ADICIONADO
+  BookOutlined, // <--- ADICIONADO (Para Cursos)
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -139,6 +143,50 @@ const AdminDashboard: React.FC = () => {
 
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+
+  // --- CONFIGURAÇÃO DO MENU HAMBÚRGUER ---
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "home",
+      label: (
+        <Link href="/" target="_blank" rel="noopener noreferrer">
+          Ir para Home (Site)
+        </Link>
+      ),
+      icon: <HomeOutlined />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "projetos",
+      label: (
+        <Link href="/admin/projetos-ativos">Gerenciar Projetos Ativos</Link>
+      ),
+      icon: <DatabaseOutlined style={{ color: "#1890ff" }} />,
+    },
+    {
+      key: "sustentai",
+      label: <Link href="/admin/newsletter">Gerenciar SustentAí</Link>,
+      icon: <ReadOutlined style={{ color: "#D7386E" }} />,
+    },
+    {
+      key: "cursos", // <--- ITEM NOVO
+      label: <Link href="/admin/cursos">Gerenciar Cursos (Espaço ODS)</Link>,
+      icon: <BookOutlined style={{ color: "#52c41a" }} />,
+    },
+    {
+      key: "comentarios",
+      label: <Link href="/admin/comentarios">Gerenciar Comentários</Link>,
+      icon: <CommentOutlined style={{ color: "#3C6AB2" }} />,
+    },
+    {
+      key: "usuarios",
+      label: <Link href="/admin/usuarios">Gerenciar Usuários</Link>,
+      icon: <TeamOutlined style={{ color: "#52c41a" }} />,
+    },
+  ];
+  // ---------------------------------------
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
@@ -352,7 +400,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleAction = async (
     action: "approve" | "reject",
-    motivoRejeicao?: string,
+    motivoRejeicao?: string
   ) => {
     if (!selectedItem) return;
 
@@ -379,7 +427,7 @@ const AdminDashboard: React.FC = () => {
 
       const response = await fetch(
         `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
-        fetchOptions,
+        fetchOptions
       );
 
       if (!response.ok) {
@@ -390,7 +438,7 @@ const AdminDashboard: React.FC = () => {
         } catch (e) {
           console.error("Erro não-JSON da API:", errorText);
           throw new Error(
-            "Falha na comunicação com o servidor. (Recebeu HTML)",
+            "Falha na comunicação com o servidor. (Recebeu HTML)"
           );
         }
       }
@@ -404,7 +452,7 @@ const AdminDashboard: React.FC = () => {
 
         (Object.keys(newData) as Array<keyof PendingData>).forEach((key) => {
           newData[key] = newData[key].filter(
-            (item) => item.projetoId !== selectedItem.projetoId,
+            (item) => item.projetoId !== selectedItem.projetoId
           );
         });
         return newData;
@@ -460,7 +508,7 @@ const AdminDashboard: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(values),
-        },
+        }
       );
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
@@ -481,7 +529,7 @@ const AdminDashboard: React.FC = () => {
     status: "pendente_atualizacao" | "pendente_exclusao",
     alertType: "info" | "error",
     title: string,
-    keysToFilter: string[] = [],
+    keysToFilter: string[] = []
   ) => {
     if (
       !selectedItem ||
@@ -524,12 +572,12 @@ const AdminDashboard: React.FC = () => {
       .sort(
         (a, b) =>
           (fieldConfig[a.newKey]?.order ?? 999) -
-          (fieldConfig[b.newKey]?.order ?? 999),
+          (fieldConfig[b.newKey]?.order ?? 999)
       );
 
     // 2. Extrai 'outrasAlteracoes' dos dados
     const outrasAlteracoesUpdate = diffDataAll.find(
-      (d) => d.newKey === "outrasAlteracoes",
+      (d) => d.newKey === "outrasAlteracoes"
     );
 
     const diffData = diffDataAll.filter((d) => d.newKey !== "outrasAlteracoes");
@@ -538,13 +586,13 @@ const AdminDashboard: React.FC = () => {
     const identificacaoDiff = diffData.filter(
       (d) =>
         fieldConfig[d.newKey]?.group === "identificacao" ||
-        fieldConfig[d.key]?.group === "identificacao",
+        fieldConfig[d.key]?.group === "identificacao"
     );
 
     const infoDiff = diffData.filter(
       (d) =>
         fieldConfig[d.newKey]?.group === "info" ||
-        fieldConfig[d.key]?.group === "info",
+        fieldConfig[d.key]?.group === "info"
     );
 
     const metaDiff = diffData.filter(
@@ -554,7 +602,7 @@ const AdminDashboard: React.FC = () => {
         fieldConfig[d.newKey]?.group !== "identificacao" &&
         fieldConfig[d.key]?.group !== "identificacao" &&
         fieldConfig[d.newKey]?.group !== "info" &&
-        fieldConfig[d.key]?.group !== "info",
+        fieldConfig[d.key]?.group !== "info"
     );
 
     const titleColor = alertType === "info" ? "#0050b3" : "#d4380d";
@@ -605,7 +653,7 @@ const AdminDashboard: React.FC = () => {
                   >
                     {renderValue(
                       "outrasAlteracoes",
-                      outrasAlteracoesUpdate.newValue,
+                      outrasAlteracoesUpdate.newValue
                     )}
                   </Typography.Paragraph>
                 }
@@ -687,13 +735,13 @@ const AdminDashboard: React.FC = () => {
   const renderList = (
     title: string,
     listData: Projeto[],
-    listKey: keyof PendingData,
+    listKey: keyof PendingData
   ) => {
     const totalCount = listData.length;
     const currentPage = currentPages[listKey];
     const pagedData = listData.slice(
       (currentPage - 1) * DASHBOARD_PAGE_SIZE,
-      currentPage * DASHBOARD_PAGE_SIZE,
+      currentPage * DASHBOARD_PAGE_SIZE
     );
 
     return (
@@ -764,71 +812,23 @@ const AdminDashboard: React.FC = () => {
             Painel de Administração
           </Title>
 
-          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-            <Link href="/" passHref target="_blank" rel="noopener noreferrer">
+          {/* --- SUBSTITUIÇÃO: BOTÕES POR MENU HAMBÚRGUER --- */}
+          <div className="w-full md:w-auto flex justify-center md:justify-end">
+            <Dropdown
+              menu={{ items: menuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
               <Button
-                icon={<HomeOutlined />}
                 size="large"
-                className={isMobile ? "w-full" : ""}
+                icon={<MenuOutlined />}
+                className="flex items-center gap-2"
               >
-                Ir para Home
+                Navegar pelo Sistema
               </Button>
-            </Link>
+            </Dropdown>
           </div>
-
-          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-            <Link href="/admin/projetos-ativos" passHref>
-              <Button
-                type="primary"
-                icon={<DatabaseOutlined />}
-                size="large"
-                className={isMobile ? "w-full" : ""}
-              >
-                Gerenciar Projetos Ativos
-              </Button>
-            </Link>
-
-            <Link href="/admin/newsletter" about="_blank" passHref>
-              <Button
-                icon={<ReadOutlined />}
-                size="large"
-                style={{
-                  backgroundColor: "#D7386E",
-                  color: "#fff",
-                  borderColor: "#D7386E",
-                }}
-                className={isMobile ? "w-full" : ""}
-              >
-                Gerenciar SustentAí
-              </Button>
-            </Link>
-
-            <Link href="/admin/comentarios" passHref>
-              <Button
-                icon={<CommentOutlined />}
-                size="large"
-                style={{ backgroundColor: "#3C6AB2", color: "#fff" }}
-                className={isMobile ? "w-full" : ""}
-              >
-                Gerenciar Comentários
-              </Button>
-            </Link>
-            
-            <Link href="/admin/usuarios" passHref>
-              <Button
-                icon={<TeamOutlined />}
-                size="large"
-                style={{
-                  backgroundColor: "#52c41a",
-                  color: "#fff",
-                  borderColor: "#52c41a",
-                }}
-                className={isMobile ? "w-full" : ""}
-              >
-                Gerenciar Usuários
-              </Button>
-            </Link>
-          </div>
+          {/* -------------------------------------------------- */}
         </div>
 
         <Row gutter={[16, 16]}>
@@ -898,22 +898,22 @@ const AdminDashboard: React.FC = () => {
                   key !== "logoUrl" &&
                   key !== "projetoImg" &&
                   key !== "status" &&
-                  fieldConfig[key],
+                  fieldConfig[key]
               )
               .sort(
                 ([keyA], [keyB]) =>
                   (fieldConfig[keyA]?.order ?? 999) -
-                  (fieldConfig[keyB]?.order ?? 999),
+                  (fieldConfig[keyB]?.order ?? 999)
               );
 
             const identificacaoEntries = allEntries.filter(
-              ([key]) => fieldConfig[key]?.group === "identificacao",
+              ([key]) => fieldConfig[key]?.group === "identificacao"
             );
             const infoEntries = allEntries.filter(
-              ([key]) => fieldConfig[key]?.group === "info",
+              ([key]) => fieldConfig[key]?.group === "info"
             );
             const metaEntries = allEntries.filter(
-              ([key]) => fieldConfig[key]?.group === "meta",
+              ([key]) => fieldConfig[key]?.group === "meta"
             );
 
             return (
@@ -986,14 +986,14 @@ const AdminDashboard: React.FC = () => {
             "pendente_exclusao",
             "error",
             "Solicitação de Exclusão",
-            ["projetoId", "confirmacao"],
+            ["projetoId", "confirmacao"]
           )}
 
           {renderDiffTable(
             "pendente_atualizacao",
             "info",
             "Dados para Atualizar",
-            ["motivoExclusao"],
+            ["motivoExclusao"]
           )}
         </Modal>
       )}

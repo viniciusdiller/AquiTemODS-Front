@@ -1,16 +1,27 @@
-// EPAÇO MEI
-
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
-import { useRef, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+
+// Definição do tipo de dado que vem do backend
+interface Curso {
+  id: number;
+  titulo: string;
+  linkDestino: string;
+  imagemUrl: string;
+}
 
 export default function SobrePage() {
   const jaContabilizou = useRef(false);
+  
+  // Estados para gerenciar os dados dinâmicos
+  const [cursos, setCursos] = useState<Curso[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 1. Lógica do Contador de Visualizações (Mantida)
     if (!jaContabilizou.current) {
       jaContabilizou.current = true;
       fetch(
@@ -20,7 +31,33 @@ export default function SobrePage() {
         }
       ).catch((err) => console.error("Erro contador Espaço ODS:", err));
     }
+
+    // 2. Busca os cursos do Backend
+    const fetchCursos = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos`);
+        if (res.ok) {
+          const data = await res.json();
+          setCursos(data);
+        } else {
+          console.error("Erro ao buscar cursos: Resposta não OK");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar cursos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCursos();
   }, []);
+
+  // Função auxiliar para resolver a URL da imagem
+  const getFullImageUrl = (path: string) => {
+    if (!path) return "/placeholder.svg"; // Imagem padrão caso venha vazio
+    if (path.startsWith("http")) return path; // Se já for link externo
+    return `${process.env.NEXT_PUBLIC_API_URL}${path}`; // Concatena com a URL da API
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
@@ -179,7 +216,7 @@ export default function SobrePage() {
           </p>
         </section>
 
-        {/* --- SEÇÃO DE CURSOS --- */}
+        {/* --- SEÇÃO DE CURSOS (DINÂMICA) --- */}
         <section className="mt-12 border-t pt-6">
           <h2 className="text-3xl font-semibold text-center mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
@@ -188,172 +225,37 @@ export default function SobrePage() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Exemplo de Curso */}
-            <Link
-              href="https://brasil.un.org/sites/default/files/2020-09/agenda2030-pt-br.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/1.png"
-                  alt="Agenda 2030"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
+            {loading ? (
+              <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center items-center py-10">
+                <Loader2 className="animate-spin text-[#D7386E] w-10 h-10" />
               </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Transformando Nosso Mundo: A Agenda 2030 para o Desenvolvimento
-                Sustentável
-              </p>
-            </Link>
-
-            <Link
-              href="https://www.gov.br/culturaviva/pt-br/biblioteca-cultura-viva/documentos-e-publicacoes/cartilhas/nacoes-unidas-objetivos-de-desenvolvimento-sustentavel-agenda-2030.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/2.png"
-                  alt="Cartilha dos ODS"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
+            ) : cursos.length === 0 ? (
+              <div className="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-10 text-gray-500">
+                Nenhuma capacitação encontrada no momento.
               </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Cartilha dos ODS
-              </p>
-            </Link>
-
-            <Link
-              href="https://www.escolavirtual.gov.br/curso/719"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso1.png"
-                  alt="curso1"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Agenda para o desenvolvimento sustentável: conceitos,
-                mobilização e articulação
-              </p>
-            </Link>
-
-            <Link
-              href="https://www.escolavirtual.gov.br/curso/841"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso2.png"
-                  alt="Agenda 2030 para o desenvolvimento sustentável: desafios para a
-                implementação"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Agenda 2030 para o desenvolvimento sustentável: desafios para a
-                implementação
-              </p>
-            </Link>
-
-            <Link
-              href="https://www.escolaaberta3setor.org.br/sebrades-cursos/esg-e-os-objetivos-do-desenvolvimento-sustentavel/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso3.jpg"
-                  alt="ESG e os Objetivos do Desenvolvimento Sustentável"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                ESG e os Objetivos do Desenvolvimento Sustentável
-              </p>
-            </Link>
-
-            <Link
-              href="https://procids.ufms.br/curso-multiplicadores-dos-ods/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso4.png"
-                  alt="Curso Multiplicadores dos ODS"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Curso Multiplicadores dos ODS
-              </p>
-            </Link>
-            <Link
-              href="https://emasp.prefeitura.sp.gov.br/formacoes/monitoramento-e-avaliacao-dos-objetivos-de-desenvolvimento-sustentavel-em-cidades-ibero-americanas-ead/?utm_source=chatgpt.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso5.png"
-                  alt="Monitoramento e Avaliação dos Objetivos de Desenvolvimento
-                Sustentável em Cidades Ibero Americanas"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                Monitoramento e Avaliação dos Objetivos de Desenvolvimento
-                Sustentável em Cidades Ibero Americanas
-              </p>
-            </Link>
-
-            <Link
-              href="https://suap.enap.gov.br/vitrine/curso/1847/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block text-center"
-            >
-              <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300">
-                <Image
-                  src="/Cursos/curso6.png"
-                  alt="ODS na prática: Agenda 2030 como estratégia de desenvolvimento local"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
-                ODS na prática: Agenda 2030 como estratégia de desenvolvimento
-                local
-              </p>
-            </Link>
+            ) : (
+              cursos.map((curso) => (
+                <Link
+                  key={curso.id}
+                  href={curso.linkDestino}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block text-center"
+                >
+                  <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3] bg-gray-50">
+                    <Image
+                      src={getFullImageUrl(curso.imagemUrl)}
+                      alt={curso.titulo}
+                      fill
+                      className="object-cover transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <p className="mt-3 text-md font-semibold text-gray-800 group-hover:text-[#D7386E] transition-colors duration-300">
+                    {curso.titulo}
+                  </p>
+                </Link>
+              ))
+            )}
           </div>
         </section>
 
