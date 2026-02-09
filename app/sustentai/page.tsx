@@ -126,7 +126,7 @@ export default function SustentAiPage() {
           {loading ? (
             <div className="text-center text-gray-500 py-10">
               <Loader2 className="animate-spin mx-auto mb-2" />
-              Carregando iniciativas...
+              Carregando newsletters...
             </div>
           ) : cards.length === 0 ? (
             <div className="text-center text-gray-500 py-10">

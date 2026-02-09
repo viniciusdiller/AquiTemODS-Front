@@ -21,7 +21,7 @@ export default function SobrePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Lógica do Contador de Visualizações (Mantida)
+    // 1. Lógica do Contador de Visualizações da Página (Mantida)
     if (!jaContabilizou.current) {
       jaContabilizou.current = true;
       fetch(
@@ -35,7 +35,10 @@ export default function SobrePage() {
     // 2. Busca os cursos do Backend
     const fetchCursos = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos`);
+        // --- CORREÇÃO IMPORTANTE AQUI ---
+        // Alinhado com o Backend que espera ?status=ativo
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos?status=ativo`);
+        
         if (res.ok) {
           const data = await res.json();
           setCursos(data);
@@ -57,6 +60,19 @@ export default function SobrePage() {
     if (!path) return "/placeholder.svg"; // Imagem padrão caso venha vazio
     if (path.startsWith("http")) return path; // Se já for link externo
     return `${process.env.NEXT_PUBLIC_API_URL}${path}`; // Concatena com a URL da API
+  };
+
+  // --- NOVA LÓGICA: Função para registrar o clique no curso ---
+  const handleCursoClick = async (id: number) => {
+    try {
+      // Chama a rota PATCH criada no backend. 
+      // Não precisamos de 'await' aqui pois não queremos travar a abertura do link.
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos/${id}/click`, {
+        method: "PATCH",
+      });
+    } catch (error) {
+      console.error("Erro ao registrar clique:", error);
+    }
   };
 
   return (
@@ -241,6 +257,7 @@ export default function SobrePage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block text-center"
+                  onClick={() => handleCursoClick(curso.id)} // <--- CLIQUE REGISTRADO AQUI
                 >
                   <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3] bg-gray-50">
                     <Image
