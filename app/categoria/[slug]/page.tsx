@@ -132,7 +132,7 @@ export default function CategoryPage() {
 
   const category = useMemo(
     () => categories.find((cat) => cat.id === slug),
-    [slug]
+    [slug],
   );
 
   const getImageUrl = (url?: string) => {
@@ -181,7 +181,7 @@ export default function CategoryPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/${params.slug}`,
         {
           method: "POST",
-        }
+        },
       ).catch((err) => console.error("Falha silenciosa no contador:", err));
     }
   }, [params.slug]);
@@ -189,9 +189,9 @@ export default function CategoryPage() {
   const filteredProjetos = useMemo(
     () =>
       projetos.filter((projeto) =>
-        projeto.nomeProjeto.toLowerCase().includes(searchTerm.toLowerCase())
+        projeto.nomeProjeto.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [projetos, searchTerm]
+    [projetos, searchTerm],
   );
 
   useEffect(() => {
@@ -311,7 +311,7 @@ export default function CategoryPage() {
                   {paginatedProjetos.map((projeto, index) => (
                     <Link
                       href={`/categoria/${slug}/${encodeURIComponent(
-                        projeto.nomeProjeto
+                        projeto.nomeProjeto,
                       )}`}
                       key={projeto.projetoId}
                       className="block"
@@ -328,7 +328,7 @@ export default function CategoryPage() {
                           className="absolute top-4 right-4 w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm z-10" // Posicionamento e estilo redondo
                         >
                           <Image
-                            src={getImageUrl(projeto.logoUrl)}
+                            src="/logomobilesq.png"
                             alt={`Logo ${projeto.nomeProjeto}`}
                             fill
                             sizes="48px"

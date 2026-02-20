@@ -327,7 +327,7 @@ function ProjetoPageContent() {
     (image: any, index: number) => ({
       id: `${projeto.projetoId}-${index}`,
       img: `${API_URL}/${normalizeImagePath(image.url)}`,
-    })
+    }),
   );
 
   const formatInstagramUrl = (handleOrUrl: string) => {
@@ -351,7 +351,7 @@ function ProjetoPageContent() {
   const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
   const paginatedReviews = reviews.slice(
     (currentPage - 1) * REVIEWS_PER_PAGE,
-    currentPage * REVIEWS_PER_PAGE
+    currentPage * REVIEWS_PER_PAGE,
   );
 
   return (
@@ -488,11 +488,7 @@ function ProjetoPageContent() {
               <div className="flex items-center justify-center md:col-span-1">
                 <div className="relative w-48 h-48 md:w-56 md:h-56 desktop:w-64 desktop:h-64 bg-white rounded-2xl flex items-center justify-center p-4 overflow-hidden">
                   <TiltImage
-                    src={
-                      (projeto.logoUrl &&
-                        `${API_URL}/${normalizeImagePath(projeto.logoUrl)}`) ||
-                      "/Logo_aquitemods.png"
-                    }
+                    src="/logo2sq.png"
                     alt={`Logo de ${projeto.nomeProjeto}`}
                     width={500}
                     height={500}
