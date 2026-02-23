@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Table,
@@ -9,9 +9,9 @@ import {
   Spin,
   Row,
   Col,
-  Statistic,
   Tag,
   Empty,
+  DatePicker, // Adicionado DatePicker
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -21,6 +21,7 @@ import {
   ThunderboltFilled,
   BarChartOutlined,
   RiseOutlined,
+  CalendarOutlined, // Ícone adicionado
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import {
@@ -34,8 +35,10 @@ import {
   Cell,
 } from "recharts";
 import type { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs"; // Adicionado para manipulação de datas
 
 const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
 
 // Paleta de cores oficial do projeto
 const COLORS = {
@@ -50,45 +53,63 @@ export default function SustentAiIndicatorsPage() {
   const [loading, setLoading] = useState(true);
   const [cards, setCards] = useState<any[]>([]);
   const [navClicks, setNavClicks] = useState(0);
+
+  // Estado para armazenar as datas selecionadas
+  const [dateRange, setDateRange] = useState<
+    [dayjs.Dayjs | null, dayjs.Dayjs | null] | null
+  >(null);
+
   const router = useRouter();
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [resCards, resStats] = await Promise.all([
-          fetch(`${API_URL}/api/sustentai`),
-          fetch(`${API_URL}/api/admin/stats`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
-            },
-          }),
-        ]);
+  // Função isolada para poder ser chamada quando as datas mudarem
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      let queryParams = "";
 
-        const dataCards = await resCards.json();
-        const dataStats = await resStats.json();
-
-        if (Array.isArray(dataCards)) {
-          setCards(dataCards);
-        } else {
-          setCards([]);
-        }
-
-        if (dataStats?.pageViews?.sustentAiNav) {
-          setNavClicks(dataStats.pageViews.sustentAiNav);
-        } else {
-          setNavClicks(0);
-        }
-      } catch (err) {
-        console.error("Erro ao carregar indicadores:", err);
-        setCards([]);
-      } finally {
-        setLoading(false);
+      // Se tiver datas selecionadas, cria a string de parâmetros
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const startDate = dateRange[0].format("YYYY-MM-DD");
+        const endDate = dateRange[1].format("YYYY-MM-DD");
+        queryParams = `?startDate=${startDate}&endDate=${endDate}`;
       }
-    };
 
+      const [resCards, resStats] = await Promise.all([
+        fetch(`${API_URL}/api/sustentai${queryParams}`),
+        fetch(`${API_URL}/api/admin/stats${queryParams}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+          },
+        }),
+      ]);
+
+      const dataCards = await resCards.json();
+      const dataStats = await resStats.json();
+
+      if (Array.isArray(dataCards)) {
+        setCards(dataCards);
+      } else {
+        setCards([]);
+      }
+
+      if (dataStats?.pageViews?.sustentAiNav) {
+        setNavClicks(dataStats.pageViews.sustentAiNav);
+      } else {
+        setNavClicks(0);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar indicadores:", err);
+      setCards([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [API_URL, dateRange]);
+
+  // Dispara o fetch na montagem e sempre que dateRange mudar
+  useEffect(() => {
     fetchData();
-  }, [API_URL]);
+  }, [fetchData]);
 
   // --- CÁLCULOS ---
   const totalClicksCards = Array.isArray(cards)
@@ -186,27 +207,40 @@ export default function SustentAiIndicatorsPage() {
   ];
 
   return (
-    // CORREÇÃO: overflow-x-hidden para evitar scroll lateral
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-6 font-sans overflow-x-hidden w-full">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6 md:mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Button
-            type="text"
-            icon={<ArrowLeftOutlined />}
-            onClick={() => router.back()}
-            className="text-gray-500 hover:bg-gray-200 rounded-full"
-          />
-          <Title
-            level={3}
-            style={{ margin: 0, color: "#1e293b", fontSize: "1.5rem" }}
-          >
-            Dashboard SustentAí
-          </Title>
+      {/* Header com Filtro de Data */}
+      <div className="max-w-7xl mx-auto mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <Button
+              type="text"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => router.back()}
+              className="text-gray-500 hover:bg-gray-200 rounded-full"
+            />
+            <Title
+              level={3}
+              style={{ margin: 0, color: "#1e293b", fontSize: "1.5rem" }}
+            >
+              Dashboard SustentAí
+            </Title>
+          </div>
+          <Text className="text-gray-500 ml-0 md:ml-11 block text-sm md:text-base">
+            Visão geral de performance e interesse nas edições.
+          </Text>
         </div>
-        <Text className="text-gray-500 ml-0 md:ml-11 block text-sm md:text-base">
-          Visão geral de performance e interesse nas iniciativas.
-        </Text>
+
+        {/* Componente RangePicker adicionado aqui */}
+        <div className="flex items-center bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+          <CalendarOutlined className="text-gray-400 mr-2 ml-2" />
+          <RangePicker
+            format="DD/MM/YYYY"
+            placeholder={["Data Inicial", "Data Final"]}
+            bordered={false}
+            onChange={(dates) => setDateRange(dates as any)}
+            className="w-full sm:w-auto"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -216,8 +250,8 @@ export default function SustentAiIndicatorsPage() {
         </div>
       ) : (
         <div className="max-w-7xl mx-auto space-y-6 w-full">
-          {/* 1. KPIs Cards */}
-          {/* Use gutter menor em mobile para evitar overflow das margens negativas */}
+          {/* ... Restante do código das métricas e gráficos fica exatamente igual ... */}
+
           <Row gutter={[16, 16]}>
             {/* KPI 1: Acessos Navbar */}
             <Col xs={24} md={8}>
@@ -229,7 +263,7 @@ export default function SustentAiIndicatorsPage() {
                 <div className="flex justify-between items-start z-10 relative">
                   <div>
                     <Text className="text-gray-500 font-medium uppercase text-[10px] sm:text-xs tracking-wider">
-                      Tráfego da Página
+                      Acessos a Página SustentAí
                     </Text>
                     <Title
                       level={2}
@@ -262,7 +296,7 @@ export default function SustentAiIndicatorsPage() {
                 <div className="flex justify-between items-start z-10 relative">
                   <div>
                     <Text className="text-gray-500 font-medium uppercase text-[10px] sm:text-xs tracking-wider">
-                      Interesse Total
+                      Cliques totais nas edições
                     </Text>
                     <Title
                       level={2}
@@ -275,7 +309,7 @@ export default function SustentAiIndicatorsPage() {
                       {totalClicksCards}
                     </Title>
                     <div className="mt-2 text-xs text-pink-600 bg-pink-50 inline-block px-2 py-1 rounded-md font-medium">
-                      <ThunderboltFilled /> Cliques Cards
+                      <ThunderboltFilled /> Cliques newsletter
                     </div>
                   </div>
                   <div className="p-2 sm:p-3 bg-pink-50 rounded-xl text-pink-500">
@@ -295,7 +329,7 @@ export default function SustentAiIndicatorsPage() {
                 <div className="flex justify-between items-start z-10 relative">
                   <div className="w-full">
                     <Text className="text-yellow-600 font-bold uppercase text-[10px] sm:text-xs tracking-wider flex items-center gap-1">
-                      <TrophyOutlined /> Destaque
+                      <TrophyOutlined /> Edição Destaque
                     </Text>
 
                     {mostPopularBox ? (
@@ -323,7 +357,6 @@ export default function SustentAiIndicatorsPage() {
             </Col>
           </Row>
 
-          {/* 2. Charts & Tables Section */}
           <Row gutter={[16, 16]}>
             {/* Gráfico de Barras */}
             <Col xs={24} lg={16}>
@@ -386,7 +419,7 @@ export default function SustentAiIndicatorsPage() {
                     </ResponsiveContainer>
                   ) : (
                     <Empty
-                      description="Sem dados"
+                      description="Sem dados para este período"
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                     />
                   )}
