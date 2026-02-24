@@ -286,13 +286,31 @@ export const adminExportProjetos = async (token: string) => {
   return response.blob();
 };
 
-export const getAdminStats = (token: string) =>
-  fetchApi("/api/admin/stats", {
+export const getAdminStats = async (
+  token: string,
+  startDate?: string,
+  endDate?: string,
+) => {
+  let queryParams = "";
+
+  if (startDate && endDate) {
+    queryParams = `?startDate=${startDate}&endDate=${endDate}`;
+  }
+
+  // ATENÇÃO PARA ESTA LINHA: ela precisa concatenar o queryParams na URL
+  const response = await fetch(`${API_URL}/api/admin/stats${queryParams}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar estatísticas do painel.");
+  }
+
+  return response.json();
+};
 
 export const registerShareClick = () =>
   fetchApi("/api/projetos/visualizacao/COMPARTILHAMENTO", {
