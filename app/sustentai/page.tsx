@@ -11,14 +11,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { registerSustentAiCardClick } from "@/lib/api";
-
-// Imports da UI de Paginação
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
+import NewsletterDestaque from "@/components/NewsletterDestaque";
 
 interface SustentAiCard {
   id: number;
@@ -121,6 +120,7 @@ export default function SustentAiPage() {
           </div>
         </section>
 
+        <NewsletterDestaque />
         {/* Grid de Cards */}
         <section id="cards-section" className="mt-8 border-t pt-8">
           {loading ? (
