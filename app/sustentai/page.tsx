@@ -17,7 +17,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
-import NewsletterDestaque from "@/components/NewsletterDestaque";
+import NewsletterDestaque from "@/components/sustentai/NewsletterDestaque";
 
 interface SustentAiCard {
   id: number;
