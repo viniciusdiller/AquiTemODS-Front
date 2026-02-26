@@ -22,12 +22,13 @@ const header = {
   subtitulo: "Segunda Edição",
   data: "Abril de 2025",
 };
+
 const acoesSustentai = [
   {
     id: 1,
     titulo: "Sala do Empreendedor",
     descricao:
-      "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico. Inclui formalização de MEI e orientação sobre crédito.",
+      "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico.",
     imagemUrl:
       "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
     linkTexto: "Saiba mais sobre a Sala",
@@ -40,10 +41,10 @@ const acoesSustentai = [
     id: 2,
     titulo: "Emprega Saquá",
     descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades e talentos de toda a nossa região.",
+      "Buscando emprego ou procurando funcionários? Acesse nosso portal de talentos.",
     imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Acessar portal de vagas",
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&h=800&auto=format&fit=crop&q=60",
+    linkTexto: "Acessar portal",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#3C6AB2]",
     corFundo: "bg-blue-50/30",
@@ -51,12 +52,12 @@ const acoesSustentai = [
   },
   {
     id: 3,
-    titulo: "Sala do Empreendedor",
+    titulo: "Apoio ao Artesão",
     descricao:
-      "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico. Inclui formalização de MEI e orientação sobre crédito.",
+      "Valorizando nossos talentos locais que movimentam a economia criativa.",
     imagemUrl:
-      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Saiba mais sobre a Sala",
+      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=600&h=300&auto=format&fit=crop&q=60",
+    linkTexto: "Conheça mais",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#D7386E]",
     corFundo: "bg-pink-50/30",
@@ -64,9 +65,9 @@ const acoesSustentai = [
   },
   {
     id: 4,
-    titulo: "Emprega Saquá",
+    titulo: "Emprega Saquá 2",
     descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades e talentos de toda a nossa região.",
+      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
     imagemUrl: "/Cursos/vivi.png",
     linkTexto: "Acessar portal de vagas",
     linkDestino: "https://www.flamengo.com.br/",
@@ -76,24 +77,59 @@ const acoesSustentai = [
   },
   {
     id: 5,
-    titulo: "Sala do Empreendedor",
+    titulo: "Cursos Sebrae",
     descricao:
-      "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico. Inclui formalização de MEI e orientação sobre crédito.",
+      "Ferramentas e estratégias gratuitas para empreender com sucesso.",
     imagemUrl:
       "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Saiba mais sobre a Sala",
+    linkTexto: "Ver cursos",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#D7386E]",
     corFundo: "bg-pink-50/30",
     corBorda: "border-pink-100",
   },
   {
-    id: 6,
-    titulo: "Emprega Saquá",
+    id: 4,
+    titulo: "Emprega Saquá 2",
     descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades e talentos de toda a nossa região.",
+      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
+    imagemUrl: "/Cursos/vivi.png",
+    linkTexto: "Acessar portal de vagas",
+    linkDestino: "https://www.flamengo.com.br/",
+    corDestaque: "text-[#3C6AB2]",
+    corFundo: "bg-blue-50/30",
+    corBorda: "border-blue-100",
+  },
+  {
+    id: 6,
+    titulo: "Inovação",
+    descricao: "Entenda mais sobre economia criativa e inovação.",
     imagemUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
+    linkTexto: "Saiba mais",
+    linkDestino: "https://www.flamengo.com.br/",
+    corDestaque: "text-[#3C6AB2]",
+    corFundo: "bg-blue-50/30",
+    corBorda: "border-blue-100",
+  },
+  {
+    id: 6,
+    titulo: "Inovação",
+    descricao: "Entenda mais sobre economia criativa e inovação.",
+    imagemUrl:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
+    linkTexto: "Saiba mais",
+    linkDestino: "https://www.flamengo.com.br/",
+    corDestaque: "text-[#3C6AB2]",
+    corFundo: "bg-blue-50/30",
+    corBorda: "border-blue-100",
+  },
+  {
+    id: 4,
+    titulo: "Emprega Saquá 2",
+    descricao:
+      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
+    imagemUrl: "/Cursos/vivi.png",
     linkTexto: "Acessar portal de vagas",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#3C6AB2]",
@@ -106,8 +142,9 @@ const genteQueConstroi = [
   {
     id: 1,
     nome: "Carolina Guilhon",
-    cargo: "Dona da casa do Empreendedor",
-    descricao: "Chefe da Laila.",
+    cargo: "Sala do Empreendedor",
+    descricao:
+      "Exemplo de dedicação e proatividade na construção de um ambiente de trabalho positivo.",
     imagemUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
   },
@@ -116,16 +153,16 @@ const genteQueConstroi = [
     nome: "Telma Cavalcante",
     cargo: "Diretora de Cultura",
     descricao:
-      "Referência na valorização do artesanato, idealizadora da ExpoArte Saquarema, transformando cultura em pertencimento.",
+      "Referência na valorização do artesanato, idealizadora da ExpoArte Saquarema.",
     imagemUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
   },
   {
     id: 3,
     nome: "Leticia Majosene",
-    cargo: "Diretora de Projetos Estratégicos",
+    cargo: "Projetos Estratégicos",
     descricao:
-      "Idealizadora do Emprega Saquá. Seu compromisso com uma política pública centrada no cidadão garantiu o sucesso do projeto.",
+      "Idealizadora do Emprega Saquá. Seu compromisso garantiu o sucesso do projeto.",
     imagemUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
   },
@@ -133,7 +170,7 @@ const genteQueConstroi = [
 
 export default function NewsletterDestaque() {
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 4;
+  const ITEMS_PER_PAGE = 9;
 
   const totalPages = Math.ceil(acoesSustentai.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -148,184 +185,195 @@ export default function NewsletterDestaque() {
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
   return (
     <section className="mb-16 bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
-      {/* Cabeçalho Animado */}
-      {}
+      {/* Cabeçalho */}
       <FadeInScroll>
-        <div className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] p-8 text-white text-center">
+        <div className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] p-8 md:p-12 text-white text-center">
           <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
             Prefeitura de Saquarema
           </p>
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
             {header.titulo}
           </h2>
-          <p className="text-lg opacity-90">
+          <p className="text-lg md:text-xl opacity-90">
             {header.subtitulo} - {header.data}
           </p>
         </div>
       </FadeInScroll>
 
-      <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-12">
-          <div id="newsletter-acoes">
-            <FadeInScroll delay={100}>
-              <h3 className="text-2xl font-bold text-gray-800 mb-8">
-                Veja as últimas ações do SustentAí!
+      {/* Container Principal Centralizado */}
+      <div className="p-8 md:p-12 max-w-6xl mx-auto space-y-20">
+        {/* ========================================== */}
+        {/* SEÇÃO 1: AÇÕES (GRID MASONRY CENTRALIZADO) */}
+        {/* ========================================== */}
+        <div id="newsletter-acoes">
+          <FadeInScroll delay={100}>
+            <div className="text-center mb-10">
+              <h3 className="text-3xl font-bold text-gray-800">
+                Veja as últimas autalizações do SustentAí!
               </h3>
-            </FadeInScroll>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-              {currentAcoes.map((acao, index) => (
-                <FadeInScroll
-                  key={`page-${currentPage}-item-${acao.id}`}
-                  delay={index * 150}
-                  className={index % 2 !== 0 ? "md:mt-12" : ""}
-                >
-                  <div
-                    className={`border rounded-2xl overflow-hidden flex flex-col ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-transform duration-300 hover:shadow-md `}
-                  >
-                    <img
-                      src={acao.imagemUrl}
-                      alt={acao.titulo}
-                      className="w-full h-auto object-cover border-b border-white/50"
-                    />
-                    <div className="p-6 flex flex-col flex-grow">
-                      <h4 className="font-bold text-gray-800 text-lg mb-3">
-                        {acao.titulo}
-                      </h4>
-                      <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
-                        {acao.descricao}
-                      </p>
-                      <a
-                        href={acao.linkDestino}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
-                      >
-                        {acao.linkTexto} <ArrowRight className="w-4 h-4" />
-                      </a>
-                    </div>
-                  </div>
-                </FadeInScroll>
-              ))}
+              <p className="text-gray-500 mt-2">
+                Iniciativas que transformam a nossa cidade.
+              </p>
             </div>
+          </FadeInScroll>
 
-            {/* ========================================== */}
-            {/* COMPONENTES DA PAGINAÇÃO                   */}
-            {/* ========================================== */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-12 pt-8 border-t border-gray-100">
-                <Pagination>
-                  <PaginationContent className="gap-2 sm:gap-4">
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage - 1);
-                        }}
-                        className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
-                          currentPage === 1
-                            ? "pointer-events-none opacity-40 text-gray-400"
-                            : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
-                        }`}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </PaginationLink>
-                    </PaginationItem>
-
-                    {/* Números das Páginas */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            href="#"
-                            isActive={page === currentPage}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handlePageChange(page);
-                            }}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${
-                              page === currentPage
-                                ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110"
-                                : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"
-                            }`}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ),
-                    )}
-
-                    {/* Botão Próximo */}
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage + 1);
-                        }}
-                        className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-40 text-gray-400"
-                            : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
-                        }`}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </PaginationLink>
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
+          {/* O grid de Masonry com as colunas */}
+          <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+            {currentAcoes.map((acao, index) => (
+              <FadeInScroll
+                key={`page-${currentPage}-item-${acao.id}`}
+                delay={index * 150}
+                className="break-inside-avoid"
+              >
+                <div
+                  className={`border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-transform duration-300 hover:shadow-md`}
+                >
+                  <img
+                    src={acao.imagemUrl}
+                    alt={acao.titulo}
+                    className="w-full h-auto object-cover border-b border-white/50"
+                  />
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h4 className="font-bold text-gray-800 text-lg mb-3">
+                      {acao.titulo}
+                    </h4>
+                    <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                      {acao.descricao}
+                    </p>
+                    <a
+                      href={acao.linkDestino}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
+                    >
+                      {acao.linkTexto} <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              </FadeInScroll>
+            ))}
           </div>
+
+          {/* PAGINAÇÃO */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 pt-8 border-t border-gray-100">
+              <Pagination>
+                <PaginationContent className="gap-2 sm:gap-4">
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage - 1);
+                      }}
+                      className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
+                        currentPage === 1
+                          ? "pointer-events-none opacity-40 text-gray-400"
+                          : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
+                      }`}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === currentPage}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${
+                            page === currentPage
+                              ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110"
+                              : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"
+                          }`}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ),
+                  )}
+
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage + 1);
+                      }}
+                      className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-40 text-gray-400"
+                          : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
+                      }`}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
 
         {/* ========================================== */}
-        {/* BARRA LATERAL ANIMADA                        */}
+        {/* SEÇÃO 2: GENTE QUE CONSTRÓI (LINHA INFERIOR) */}
         {/* ========================================== */}
-        <div className="h-fit sticky top-8">
-          <FadeInScroll delay={300}>
-            <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-2xl p-6 lg:p-8">
-              <div className="flex items-center gap-2 mb-6">
-                <HeartHandshake className="text-[#D7386E] w-6 h-6" />
-                <h3 className="text-xl font-bold text-gray-800">
-                  Gente que Constrói
-                </h3>
+        <FadeInScroll delay={300}>
+          {/* DIV MÃE sem padding lateral no celular para o card encostar nas bordas */}
+          <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-3xl pt-8 md:p-8 lg:p-12 overflow-hidden">
+            <div className="flex flex-col items-center justify-center text-center mb-8 px-6">
+              <div className="bg-pink-100 p-3 rounded-full mb-4">
+                <HeartHandshake className="text-[#D7386E] w-8 h-8" />
               </div>
+              <h3 className="text-3xl font-bold text-gray-800">
+                Gente que Constrói
+              </h3>
+              <p className="text-gray-500 mt-2 max-w-2xl mx-auto">
+                Conheça as pessoas por trás das iniciativas que fazem a
+                diferença em nossa comunidade todos os dias.
+              </p>
+            </div>
 
-              <div className="space-y-6">
-                {genteQueConstroi.map((pessoa, index) => (
-                  <div
-                    key={pessoa.id}
-                    className={
-                      index !== genteQueConstroi.length - 1
-                        ? "pb-8 border-b border-gray-200"
-                        : ""
-                    }
-                  >
-                    <div className="relative w-full h-48 mb-4 rounded-2xl overflow-hidden shadow-sm border border-gray-100 group">
-                      <img
-                        src={pessoa.imagemUrl}
-                        alt={pessoa.nome}
-                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <h4 className="font-bold text-[#3C6AB2] text-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8 w-full">
+              {genteQueConstroi.map((pessoa, index) => (
+                <div
+                  key={pessoa.id}
+                  className="w-full relative group flex flex-col h-full bg-white md:rounded-2xl p-6 md:p-4 md:shadow-sm border-t py-2 md:border border-gray-100 hover:bg-gray-50 md:hover:bg-white md:hover:shadow-md transition-all"
+                >
+                  {/* Imagem Larga e no Topo */}
+                  <div className="relative w-full aspect-video md:aspect-[4/3] mb-5 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100 md:border-none md:shadow-none">
+                    <img
+                      src={pessoa.imagemUrl}
+                      alt={pessoa.nome}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+
+                  {/* Textos Embaixo da Imagem */}
+                  <div className="flex flex-col flex-grow text-left">
+                    <h4 className="font-bold text-[#3C6AB2] text-xl sm:text-2xl md:text-xl">
                       {pessoa.nome}
                     </h4>
-                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                      <strong className="text-gray-700">{pessoa.cargo}.</strong>{" "}
-                      <br />
+                    <p className="text-sm sm:text-base md:text-sm text-[#D7386E] font-bold mt-1 mb-3">
+                      {pessoa.cargo}
+                    </p>
+                    <p className="text-sm sm:text-base md:text-sm text-gray-600 leading-relaxed">
                       {pessoa.descricao}
                     </p>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          </FadeInScroll>
-        </div>
+          </div>
+        </FadeInScroll>
       </div>
     </section>
   );
