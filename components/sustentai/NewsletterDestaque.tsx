@@ -17,15 +17,11 @@ import {
 // ==========================================
 // LISTA DE DADOS FICTÍCIOS (Mock Data)
 // ==========================================
-const header = [
-  {
-    id: 1,
-    titulo: "SustentAí",
-    subtitulo: "Segunda Edição",
-    data: "Abril de 2025",
-  },
-];
-
+const header = {
+  titulo: "SustentAí",
+  subtitulo: "Segunda Edição",
+  data: "Abril de 2025",
+};
 const acoesSustentai = [
   {
     id: 1,
@@ -162,10 +158,10 @@ export default function NewsletterDestaque() {
             Prefeitura de Saquarema
           </p>
           <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-            {header[0].titulo}
+            {header.titulo}
           </h2>
           <p className="text-lg opacity-90">
-            {header[0].subtitulo} - {header[0].data}
+            {header.subtitulo} - {header.data}
           </p>
         </div>
       </FadeInScroll>

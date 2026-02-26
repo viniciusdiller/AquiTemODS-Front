@@ -1,7 +1,7 @@
+"use client";
 import { use, useEffect, useRef, useState } from "react";
 
 use;
-
 export function FadeInScroll({
   children,
   className = "",
