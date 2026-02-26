@@ -128,10 +128,22 @@ export default function AdminSustentaiPage() {
   const [isModalHeaderOpen, setIsModalHeaderOpen] = useState(false);
   const [isModalPessoaOpen, setIsModalPessoaOpen] = useState(false);
   const [isModalAcaoOpen, setIsModalAcaoOpen] = useState(false);
+  const [acaoSendoEditada, setAcaoSendoEditada] = useState<any>(null);
 
   // ==========================================
   // FUNÇÕES DE AÇÃO
   // ==========================================
+  const handleAbrirCriarAcao = () => {
+    setAcaoSendoEditada(null); // Garante que está vazio
+    setIsModalAcaoOpen(true);
+  };
+
+  const handleAbrirEditarAcao = (id: number) => {
+    const acaoClicada = acoes.find((acao) => acao.id === id);
+    setAcaoSendoEditada(acaoClicada);
+    setIsModalAcaoOpen(true);
+  };
+
   const handleSalvarNovaAcao = (acaoSelecionada: any) => {
     // Adiciona a ação selecionada na lista que aparece na tela e fecha o modal
     // Usamos Date.now() apenas para gerar um ID único fictício caso o usuário adicione a mesma ação duas vezes
@@ -202,8 +214,8 @@ export default function AdminSustentaiPage() {
             {/* Componente que renderiza as ações */}
             <PreviewAcoes
               acoes={acoes}
-              onAdd={() => setIsModalAcaoOpen(true)}
-              onEdit={(id) => alert(`Editar ação ${id}`)}
+              onAdd={handleAbrirCriarAcao}
+              onEdit={handleAbrirEditarAcao}
               onDelete={handleDeleteAcao}
             />
 
@@ -222,6 +234,7 @@ export default function AdminSustentaiPage() {
       <ModalAcao
         isOpen={isModalAcaoOpen}
         onClose={() => setIsModalAcaoOpen(false)}
+        acaoAtual={acaoSendoEditada}
       />
       <ModalHeader
         isOpen={isModalHeaderOpen}

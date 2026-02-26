@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import {
   X,
   Save,
@@ -7,17 +6,35 @@ import {
   Link as LinkIcon,
   Type,
   Palette,
+  LayoutTemplate,
 } from "lucide-react";
+import Link from "next/link";
+import React, { useState, useEffect } from "react";
 
 interface ModalAcaoProps {
   isOpen: boolean;
   onClose: () => void;
+  acaoAtual?: any;
   // onSave: (data: any) => void; // Deixei comentado, pois será implementado depois
 }
 
-export default function ModalAcao({ isOpen, onClose }: ModalAcaoProps) {
+export default function ModalAcao({
+  isOpen,
+  onClose,
+  acaoAtual,
+}: ModalAcaoProps) {
   if (!isOpen) return null;
+  const [titulo, setTitulo] = useState("");
 
+  useEffect(() => {
+    if (acaoAtual) {
+      setTitulo(acaoAtual.titulo);
+    } else {
+      setTitulo("");
+    }
+  }, [acaoAtual, isOpen]);
+
+  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -161,16 +178,37 @@ export default function ModalAcao({ isOpen, onClose }: ModalAcaoProps) {
         </div>
 
         {/* Footer do Modal (Botões de Ação) */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center gap-2 hover:opacity-90 transition-opacity shadow-md">
-            <Save className="w-4 h-4" /> Salvar Ação
-          </button>
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* LADO ESQUERDO: Botão de Página Interna (Só aparece se a ação já existe) */}
+          <div>
+            {acaoAtual ? (
+              <Link
+                // Direciona para a página do construtor que criamos usando o ID da ação
+                href={`/admin/sustentai/secao/${acaoAtual.id}`}
+                className="px-4 py-2.5 rounded-xl bg-purple-100 text-purple-700 font-bold flex items-center gap-2 hover:bg-purple-200 transition-colors"
+              >
+                <LayoutTemplate className="w-4 h-4" /> Editar Página Interna
+              </Link>
+            ) : (
+              <span className="text-xs text-gray-400">
+                Salve a ação primeiro para criar o conteúdo interno.
+              </span>
+            )}
+          </div>
+
+          {/* LADO DIREITO: Botões Padrões */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90">
+              <Save className="w-4 h-4" />{" "}
+              {acaoAtual ? "Salvar Alterações" : "Salvar Ação"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
