@@ -5,9 +5,10 @@ import {
   Edit,
   Trash2,
   ArrowRight,
-  ChevronRight,
   ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 import {
   Pagination,
   PaginationContent,
@@ -28,53 +29,68 @@ export default function PreviewAcoes({
   onEdit,
   onDelete,
 }: PreviewAcoesProps) {
-  // 1. ESTADOS PARA PAGINAÇÃO
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 4;
+  const ITEMS_PER_PAGE = 9;
 
   const totalPages = Math.ceil(acoes.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-
   const currentAcoes = acoes.slice(startIndex, endIndex);
 
-  // 3. FUNÇÃO DE TROCA DE PÁGINA
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
+
   return (
-    <div className="lg:col-span-2 space-y-12">
-      <div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-8">
-          Veja as últimas ações do SustentAí!
-        </h3>
+    <div className="w-full">
+      {/* ========================================== */}
+      {/* BOTÃO ADICIONAR (Agora isolado acima de tudo) */}
+      {/* ========================================== */}
+      <div
+        onClick={onAdd}
+        className="w-full mb-16 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:text-[#D7386E] hover:border-[#D7386E] hover:bg-pink-50 cursor-pointer transition-all py-10 shadow-sm"
+      >
+        <Plus className="w-10 h-10 mb-2" />
+        <span className="font-bold text-lg">Adicionar Nova Ação</span>
+        <p className="text-sm font-normal opacity-80 mt-1">
+          Crie um novo card para a vitrine
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-          {/* CAIXA DE ADICIONAR NOVA AÇÃO */}
-          <div
-            onClick={onAdd}
-            className="border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:text-[#D7386E] hover:border-[#D7386E] hover:bg-pink-50 cursor-pointer transition-all h-64"
-          >
-            <Plus className="w-12 h-12 mb-2" />
-            <span className="font-bold">Adicionar Nova Ação</span>
-          </div>
+      <div id="newsletter-acoes">
+        <div className="text-center mb-10">
+          <h3 className="text-3xl font-bold text-gray-800">
+            Veja as últimas atualizações do SustentAí!
+          </h3>
+          <p className="text-gray-500 mt-2">
+            Iniciativas que transformam a nossa cidade.
+          </p>
+        </div>
 
-          {/* CARDS MAP (Invertido para manter a lógica Masonry) */}
-          {currentAcoes.map((acao, index) => (
+        {/* GRID MASONRY (Exatamente igual ao front) */}
+        <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+          {currentAcoes.map((acao) => (
             <div
               key={acao.id}
-              className={`relative group border rounded-2xl overflow-hidden flex flex-col ${acao.corFundo} ${acao.corBorda} transition-all duration-300 ${
-                index % 2 === 0 ? "md:mt-12" : ""
-              }`}
+              className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-all duration-300 hover:shadow-md break-inside-avoid`}
             >
-              <img
-                src={acao.imagemUrl}
-                alt={acao.titulo}
-                className="w-full h-48 object-cover border-b border-white/50"
-              />
-              <div className="p-6 flex flex-col flex-grow">
+              {/* IMAGEM + TAG */}
+              <div className="relative w-full h-auto">
+                <img
+                  src={acao.imagemUrl}
+                  alt={acao.titulo}
+                  className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
+                />
+                {acao.tag && (
+                  <div
+                    className={`absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}
+                  >
+                    {acao.tag}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
                 <h4 className="font-bold text-gray-800 text-lg mb-3">
                   {acao.titulo}
                 </h4>
@@ -82,40 +98,44 @@ export default function PreviewAcoes({
                   {acao.descricao}
                 </p>
                 <span
-                  className={`inline-flex items-center gap-2 font-bold w-fit ${acao.corDestaque}`}
+                  className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
                 >
-                  {acao.linkTexto} <ArrowRight className="w-4 h-4" />
+                  Ler artigo <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
 
-              {/* Overlay de Ações Admin */}
-              <div className="absolute inset-0  flex items-center justify-end gap-3 h-8 mt-2 mr-2">
+              {/* OVERLAY DE ADMIN (Editar/Excluir) */}
+              <div className="absolute inset-0 flex items-start justify-end gap-2 p-2">
                 <button
-                  onClick={() => onEdit(acao.id)}
-                  className="bg-white p-2 rounded-full text-blue-600 hover:scale-110 transition-transform shadow-lg"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onEdit(acao.id);
+                  }}
+                  className="bg-white p-2 rounded-full text-blue-600 hover:scale-110 transition-transform shadow-xl"
                   title="Editar"
                 >
-                  <Edit className="w-5 h-5" />
+                  <Edit className="w-6 h-6" />
                 </button>
                 <button
-                  onClick={() => onDelete(acao.id)}
-                  className="bg-red-500 p-2 rounded-full text-white hover:scale-110 transition-transform shadow-lg"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onDelete(acao.id);
+                  }}
+                  className="bg-red-500 p-2 rounded-full text-white hover:scale-110 transition-transform shadow-xl"
                   title="Excluir"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-6 h-6" />
                 </button>
               </div>
             </div>
           ))}
         </div>
-        {/* ========================================== */}
-        {/* COMPONENTES DA PAGINAÇÃO                   */}
-        {/* ========================================== */}
+
+        {/* PAGINAÇÃO */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-12 pt-8 border-t border-gray-100">
             <Pagination>
               <PaginationContent className="gap-2 sm:gap-4">
-                {/* Botão Anterior */}
                 <PaginationItem>
                   <PaginationLink
                     href="#"
@@ -123,17 +143,11 @@ export default function PreviewAcoes({
                       e.preventDefault();
                       handlePageChange(currentPage - 1);
                     }}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
-                      currentPage === 1
-                        ? "pointer-events-none opacity-40 text-gray-400"
-                        : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
-                    }`}
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === 1 ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"}`}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </PaginationLink>
                 </PaginationItem>
-
-                {/* Números das Páginas */}
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
                     <PaginationItem key={page}>
@@ -144,19 +158,13 @@ export default function PreviewAcoes({
                           e.preventDefault();
                           handlePageChange(page);
                         }}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${
-                          page === currentPage
-                            ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110"
-                            : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"
-                        }`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${page === currentPage ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110" : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"}`}
                       >
                         {page}
                       </PaginationLink>
                     </PaginationItem>
                   ),
                 )}
-
-                {/* Botão Próximo */}
                 <PaginationItem>
                   <PaginationLink
                     href="#"
@@ -164,11 +172,7 @@ export default function PreviewAcoes({
                       e.preventDefault();
                       handlePageChange(currentPage + 1);
                     }}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
-                      currentPage === totalPages
-                        ? "pointer-events-none opacity-40 text-gray-400"
-                        : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
-                    }`}
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === totalPages ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"}`}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </PaginationLink>

@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Tag,
 } from "lucide-react";
 import { FadeInScroll } from "./Animationcards";
 import {
@@ -13,6 +14,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
+import Link from "next/link";
 
 // ==========================================
 // LISTA DE DADOS FICTÍCIOS (Mock Data)
@@ -36,6 +38,7 @@ const acoesSustentai = [
     corDestaque: "text-[#D7386E]",
     corFundo: "bg-pink-50/30",
     corBorda: "border-pink-100",
+    tag: "Empreendedorismo",
   },
   {
     id: 2,
@@ -229,28 +232,41 @@ export default function NewsletterDestaque() {
                 className="break-inside-avoid"
               >
                 <div
-                  className={`border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-transform duration-300 hover:shadow-md`}
+                  className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105  transition-all duration-300 hover:shadow-md`}
                 >
-                  <img
-                    src={acao.imagemUrl}
-                    alt={acao.titulo}
-                    className="w-full h-auto object-cover border-b border-white/50"
-                  />
-                  <div className="p-6 flex flex-col flex-grow">
+                  {/* DIV DA IMAGEM + TAG */}
+                  <div className="relative w-full h-auto">
+                    <img
+                      src={acao.imagemUrl}
+                      alt={acao.titulo}
+                      className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
+                    />
+                    {/* TAG AQUI */}
+                    {acao.tag && (
+                      <div
+                        className={`absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase 
+                       tracking-wider shadow-sm ${acao.corDestaque}`}
+                      >
+                        {acao.tag}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
                     <h4 className="font-bold text-gray-800 text-lg mb-3">
                       {acao.titulo}
                     </h4>
                     <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
                       {acao.descricao}
                     </p>
-                    <a
-                      href={acao.linkDestino}
-                      target="_blank"
-                      rel="noopener noreferrer"
+
+                    {/* LINK AUTOMÁTICO */}
+                    <Link
+                      href={`/sustentai/${acao.id}`}
                       className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
                     >
-                      {acao.linkTexto} <ArrowRight className="w-4 h-4" />
-                    </a>
+                      Ler artigo <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </FadeInScroll>

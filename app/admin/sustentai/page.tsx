@@ -22,7 +22,7 @@ const initialHeader = {
 const initialAcoes = [
   {
     id: 1,
-    titulo: "Sala do Empreendedor",
+    titulo: "<Sala3></Sala3>r",
     descricao:
       "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico.",
     imagemUrl:
@@ -38,8 +38,7 @@ const initialAcoes = [
     titulo: "Emprega Saquá",
     descricao:
       "Buscando emprego ou procurando funcionários? Acesse nosso portal de talentos.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
+    imagemUrl: "/Cursos/vivi.png",
     linkTexto: "Acessar portal de vagas",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#3C6AB2]",
@@ -48,11 +47,10 @@ const initialAcoes = [
   },
   {
     id: 3,
-    titulo: "Sala do Empreendedor",
+    titulo: "Sala Mídia",
     descricao:
       "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
+    imagemUrl: "/Cursos/vivi.png",
     linkTexto: "Saiba mais sobre a Sala",
     linkDestino: "https://www.flamengo.com.br/",
     corDestaque: "text-[#D7386E]",
@@ -210,7 +208,7 @@ export default function AdminSustentaiPage() {
             </div>
           </div>
 
-          <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="p-8 md:p-12 max-w-6xl mx-auto space-y-20">
             {/* Componente que renderiza as ações */}
             <PreviewAcoes
               acoes={acoes}
