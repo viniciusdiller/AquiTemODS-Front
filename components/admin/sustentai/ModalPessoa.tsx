@@ -1,12 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X, Save, Image as ImageIcon, User, Briefcase } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ModalPessoaProps {
   isOpen: boolean;
   onClose: () => void;
   pessoaAtual?: any; // Recebe dados se for edição
-  onSave: (dados: any) => void; // Envia para a API
+  onSave: (dados: any) => void; // Envia para a API (pode receber FormData)
 }
 
 export default function ModalPessoa({
@@ -15,11 +16,17 @@ export default function ModalPessoa({
   pessoaAtual,
   onSave,
 }: ModalPessoaProps) {
+  const { toast } = useToast();
   // Estados dos inputs
   const [nome, setNome] = useState("");
   const [cargo, setCargo] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [imagemUrl, setImagemUrl] = useState("");
+  // Troquei imagemUrl por selectedFile + preview
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const submittedRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Efeito que preenche os campos quando o modal abre
   useEffect(() => {
@@ -27,25 +34,104 @@ export default function ModalPessoa({
       setNome(pessoaAtual.nome || "");
       setCargo(pessoaAtual.cargo || "");
       setDescricao(pessoaAtual.descricao || "");
-      setImagemUrl(pessoaAtual.imagemUrl || "");
+      setSelectedFile(null);
+      // exibe imagem existente enquanto nenhum arquivo é selecionado
+      setPreviewUrl(pessoaAtual.imagemUrl || null);
     } else {
       setNome("");
       setCargo("");
       setDescricao("");
-      setImagemUrl("");
+      setSelectedFile(null);
+      setPreviewUrl(null);
     }
+    submittedRef.current = false;
+    setIsSubmitting(false);
   }, [pessoaAtual, isOpen]);
 
-  const handleSalvar = () => {
-    // Monta o objeto e envia para a página principal salvar no banco
-    onSave({
-      id: pessoaAtual?.id, // Mantém o ID se for edição
-      nome,
-      cargo,
-      descricao,
-      imagemUrl,
-    });
+  useEffect(() => {
+    if (!selectedFile) return;
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [selectedFile]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) setSelectedFile(file);
   };
+
+  const handlePickFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSalvar = async () => {
+    if (submittedRef.current) return;
+
+    // Validações básicas
+    if (!nome.trim() || !descricao.trim()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Nome e descrição são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Para criação exigimos arquivo (backend pede imagem ou imagemUrl)
+    const isEditing = Boolean(pessoaAtual && pessoaAtual.id);
+    if (!isEditing && !selectedFile) {
+      toast({
+        title: "Imagem necessária",
+        description: "Por favor selecione uma imagem para a pessoa.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    submittedRef.current = true;
+    setIsSubmitting(true);
+
+    try {
+      const form = new FormData();
+      form.append("nome", nome);
+      form.append("cargo", cargo);
+      form.append("descricao", descricao);
+
+      // Se houver arquivo, envia como campo 'imagem' (multer: upload.single('imagem'))
+      if (selectedFile) {
+        form.append("imagem", selectedFile, selectedFile.name);
+      } else if (pessoaAtual?.imagemUrl) {
+        // se estiver editando e não enviou novo arquivo, envia imagemUrl como campo para o backend
+        form.append("imagemUrl", pessoaAtual.imagemUrl);
+      }
+
+      // inclui id quando editar para conveniência do handler pai
+      if (isEditing) form.append("id", String(pessoaAtual.id));
+
+      // Delega ao pai para chamar adminCreatePessoa/adminUpdatePessoa
+      await onSave(form);
+      toast({
+        title: "Sucesso",
+        description: isEditing
+          ? "Pessoa atualizada."
+          : "Pessoa criada com sucesso.",
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      submittedRef.current = false;
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -101,16 +187,49 @@ export default function ModalPessoa({
               className="w-full border border-gray-300 rounded-xl px-4 py-2.5 resize-none"
             />
           </div>
+
+          {/* Upload de imagem */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL da Imagem
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Imagem
             </label>
             <input
-              type="text"
-              value={imagemUrl}
-              onChange={(e) => setImagemUrl(e.target.value)}
-              className="w-full border border-gray-300 rounded-xl px-4 py-2.5"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
             />
+
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handlePickFile}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-medium hover:opacity-90"
+              >
+                <ImageIcon className="w-4 h-4" />
+                {selectedFile ? "Alterar Imagem" : "Selecionar Imagem"}
+              </button>
+
+              {previewUrl ? (
+                <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                  {/* mostra preview local (object URL) ou url retornada */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={previewUrl}
+                    alt="preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center text-gray-400">
+                  <User className="w-6 h-6" />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Envie uma imagem para a pessoa (obrigatório ao criar).
+            </p>
           </div>
         </div>
 
@@ -119,12 +238,14 @@ export default function ModalPessoa({
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200"
+            disabled={isSubmitting}
           >
             Cancelar
           </button>
           <button
             onClick={handleSalvar}
             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center gap-2 hover:opacity-90"
+            disabled={isSubmitting}
           >
             <Save className="w-4 h-4" />{" "}
             {pessoaAtual ? "Salvar Alterações" : "Salvar Pessoa"}

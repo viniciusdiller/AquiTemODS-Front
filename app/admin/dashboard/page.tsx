@@ -167,7 +167,7 @@ const AdminDashboard: React.FC = () => {
     },
     {
       key: "sustentai",
-      label: <Link href="/admin/newsletter">Gerenciar SustentAí</Link>,
+      label: <Link href="/admin/sustentai">Gerenciar SustentAí</Link>,
       icon: <ReadOutlined style={{ color: "#D7386E" }} />,
     },
     {

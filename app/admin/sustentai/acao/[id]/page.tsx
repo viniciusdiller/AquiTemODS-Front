@@ -10,6 +10,7 @@ import {
   Bold,
 } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 // Tipagem dos blocos
 type BlockType = "text" | "image";
@@ -23,6 +24,7 @@ interface Block {
 }
 
 export default function AdminConstrutorAcaoPage() {
+  const { toast } = useToast();
   // Estado inicial simulando que a página começou com um bloco de texto vazio
   const [blocks, setBlocks] = useState<Block[]>([
     {
@@ -70,6 +72,41 @@ export default function AdminConstrutorAcaoPage() {
     setBlocks(blocks.filter((b) => b.id !== id));
   };
 
+  const handleSavePage = async () => {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("admin_token")
+        : null;
+    if (!token) {
+      toast({ title: "Token de admin ausente", description: "Faça login.", variant: "destructive" });
+      return;
+    }
+
+    try {
+      // Monta payload simples — ajuste conforme o backend espera
+      const payload = { blocks };
+      // import dynamic helper to avoid circular imports at runtime
+      const { adminUpdateAcaoConteudo } = await import("@/lib/api");
+
+      // Substitua 1 pelo id real da ação quando estiver integrado com rota; aqui deixamos exemplo
+      const acaoId = Number(
+        (typeof window !== "undefined" &&
+          window.location.pathname.split("/").pop()) ||
+          0
+      );
+      if (!acaoId) {
+        toast({ title: "ID inválido", description: "ID da ação inválido (URL).", variant: "destructive" });
+        return;
+      }
+
+      await adminUpdateAcaoConteudo(acaoId, payload, token);
+      toast({ title: "Sucesso", description: "Conteúdo salvo com sucesso." });
+    } catch (error: any) {
+      console.error("Falha ao salvar conteúdo:", error);
+      toast({ title: "Erro", description: error?.message || "Erro ao salvar.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -91,7 +128,10 @@ export default function AdminConstrutorAcaoPage() {
               </p>
             </div>
           </div>
-          <button className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <button
+            onClick={handleSavePage}
+            className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-opacity"
+          >
             <Save className="w-4 h-4" /> Salvar Página
           </button>
         </div>
@@ -111,7 +151,11 @@ export default function AdminConstrutorAcaoPage() {
                       onClick={() =>
                         updateBlock(block.id, "isBold", !block.isBold)
                       }
-                      className={`p-2 rounded-lg border ${block.isBold ? "bg-gray-200 border-gray-400" : "bg-gray-50 border-gray-200"} hover:bg-gray-200`}
+                      className={`p-2 rounded-lg border ${
+                        block.isBold
+                          ? "bg-gray-200 border-gray-400"
+                          : "bg-gray-50 border-gray-200"
+                      } hover:bg-gray-200`}
                       title="Negrito"
                     >
                       <Bold className="w-4 h-4" />
@@ -158,7 +202,9 @@ export default function AdminConstrutorAcaoPage() {
                     updateBlock(block.id, "content", e.target.value)
                   }
                   placeholder="Digite seu texto aqui..."
-                  className={`w-full min-h-[100px] p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#D7386E]/50 focus:outline-none resize-y ${block.bgColor} ${block.isBold ? "font-bold" : "font-normal"}`}
+                  className={`w-full min-h-[100px] p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#D7386E]/50 focus:outline-none resize-y ${block.bgColor} ${
+                    block.isBold ? "font-bold" : "font-normal"
+                  }`}
                 />
               ) : (
                 <div className="space-y-3">

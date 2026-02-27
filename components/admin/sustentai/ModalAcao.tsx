@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   X,
   Save,
@@ -11,6 +11,10 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
+
+// Adiciona hooks e funções de API para integrar com admin SustentAi
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface ModalAcaoProps {
   isOpen: boolean;
@@ -29,10 +33,18 @@ export default function ModalAcao({
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tag, setTag] = useState("");
-  const [imagemUrl, setImagemUrl] = useState("");
+  // Somente envio por arquivo: armazena o arquivo selecionado e uma URL de preview
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [corDestaque, setCorDestaque] = useState("text-[#D7386E]");
   const [corFundo, setCorFundo] = useState("bg-pink-50/30");
   const [corBorda, setCorBorda] = useState("border-pink-100");
+
+  // Novo estado para submissão
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, isLoading } = useAuth();
+  const { toast } = useToast();
+  const submittedRef = useRef(false);
 
   // Preenche o formulário se for edição, ou limpa se for criação
   useEffect(() => {
@@ -40,7 +52,8 @@ export default function ModalAcao({
       setTitulo(acaoAtual.titulo || "");
       setDescricao(acaoAtual.descricao || "");
       setTag(acaoAtual.tag || "");
-      setImagemUrl(acaoAtual.imagemUrl || "");
+      // mostra preview da imagem já salva (quando existir)
+      setPreviewUrl(acaoAtual.imagemUrl || null);
       setCorDestaque(acaoAtual.corDestaque || "text-[#D7386E]");
       setCorFundo(acaoAtual.corFundo || "bg-pink-50/30");
       setCorBorda(acaoAtual.corBorda || "border-pink-100");
@@ -48,12 +61,130 @@ export default function ModalAcao({
       setTitulo("");
       setDescricao("");
       setTag("");
-      setImagemUrl("");
+      setSelectedFile(null);
+      setPreviewUrl(null);
       setCorDestaque("text-[#D7386E]");
       setCorFundo("bg-pink-50/30");
       setCorBorda("border-pink-100");
     }
   }, [acaoAtual, isOpen]);
+
+  // libera objectURL quando trocar de arquivo para evitar memory leaks
+  useEffect(() => {
+    if (!selectedFile) return;
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [selectedFile]);
+
+  const handleClose = () => {
+    // Reseta o flag para permitir novas submissões quando o modal for fechado
+    submittedRef.current = false;
+    onClose();
+  };
+
+  // Handler para criar/atualizar ação usando API de admin
+  async function handleSave() {
+    // Proteção contra submissões duplicadas rápidas
+    if (submittedRef.current) {
+      console.log("ModalAcao: submissão já em andamento ou já enviada — ignorando");
+      return;
+    }
+
+    submittedRef.current = true;
+    // evita múltiplos cliques
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    // VALIDAÇÃO CLIENT-SIDE: evita enviar payload vazio que o servidor rejeita
+    if (!titulo || !descricao) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha o título e a descrição antes de salvar.",
+      });
+      setIsSubmitting(false);
+      submittedRef.current = false;
+      return;
+    }
+
+    // Agora o fluxo exige um arquivo — validação
+    if (!selectedFile) {
+      toast({ title: "Arquivo obrigatório", description: "Selecione uma imagem para enviar." });
+      setIsSubmitting(false);
+      submittedRef.current = false;
+      return;
+    }
+
+    // Helper: gera um slug simples a partir do título (compatível com a maioria dos backends)
+    const generateSlug = (text: string) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+
+    const payload: any = {
+      titulo,
+      descricao,
+      tag,
+      corDestaque,
+      corFundo,
+      corBorda,
+      slug: acaoAtual?.slug || generateSlug(titulo),
+      publicado: true,
+      ordem: acaoAtual?.ordem ?? 0,
+    };
+
+    // Prepara FormData com o arquivo e os campos
+    const form = new FormData();
+    form.append("imagem", selectedFile, selectedFile.name);
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) form.append(key, String(value));
+    });
+    const bodyToSend = form;
+
+    // feedback inicial (opcional) para indicar que a requisição começou
+    try {
+      toast({ title: "Enviando", description: "Enviando dados para o servidor..." });
+    } catch (e) {
+      // ignore se o toast falhar
+    }
+
+    try {
+      if (acaoAtual && acaoAtual.id) {
+        // inclui o id em um campo textual apenas para acompanhar (o backend usa a rota com id)
+        form.append("id", String(acaoAtual.id));
+      }
+
+      if (onSave) {
+        const maybePromise = onSave(bodyToSend);
+        // Use an explicit null/undefined check to satisfy TypeScript strict null checks
+        if (maybePromise != null && typeof (maybePromise as any).then === "function") {
+          await maybePromise; // aguarda conclusão para dar feedback mais consistente
+        }
+      }
+
+      // Fecha o modal; o handleClose resetará submittedRef
+      handleClose();
+    } catch (error: any) {
+      console.error("Erro ao salvar ação:", error);
+      const message = error?.message || "Ocorreu um erro ao salvar a ação.";
+      const details = error?.data || error?.response?.data;
+      console.warn("Detalhes do erro da API:", details);
+
+      // Permite nova tentativa se houve erro
+      submittedRef.current = false;
+
+      const description = details && typeof details === "object" ? JSON.stringify(details) : String(details || message);
+      toast({ title: "Erro", description: description });
+    } finally {
+      setIsSubmitting(false);
+      // NOTA: não resetar submittedRef aqui em caso de sucesso — handleClose fará isso.
+    }
+  }
 
   if (!isOpen) return null;
 
@@ -66,7 +197,7 @@ export default function ModalAcao({
             {acaoAtual ? "Editar Ação" : "Adicionar Nova Ação"}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 bg-white rounded-full hover:bg-gray-200 transition-colors text-gray-500"
           >
             <X className="w-5 h-5" />
@@ -132,19 +263,39 @@ export default function ModalAcao({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                URL da Imagem de Capa
+                Imagem de Capa
               </label>
-              <input
-                type="text"
-                value={imagemUrl}
-                onChange={(e) => setImagemUrl(e.target.value)}
-                placeholder="https://... ou /Cursos/imagem.png"
-                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#3C6AB2]/50 focus:border-[#3C6AB2]"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                * O link de redirecionamento agora é gerado automaticamente pelo
-                sistema.
-              </p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div>
+                  <label className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-4 py-2 rounded-xl font-medium cursor-pointer shadow-md hover:opacity-90">
+                    <ImageIcon className="w-4 h-4" />
+                    <span className="text-sm">Selecionar imagem</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0] ?? null;
+                        setSelectedFile(f);
+                      }}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+
+                <div className="flex-1">
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
+                  ) : (
+                    <div className="h-24 w-full flex items-center justify-center rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
+                      Nenhuma imagem selecionada
+                    </div>
+                  )}
+                  {selectedFile && (
+                    <p className="text-xs text-gray-500 mt-2">Arquivo selecionado: {selectedFile.name}</p>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">* Envie um arquivo de imagem. O backend deve gravar a imagem e retornar a URL.</p>
             </div>
           </div>
 
@@ -217,13 +368,28 @@ export default function ModalAcao({
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="px-5 py-2.5 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors w-full sm:w-auto"
             >
               Cancelar
             </button>
-            <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto">
-              <Save className="w-4 h-4" /> {acaoAtual ? "Salvar" : "Criar Ação"}
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className={`px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{acaoAtual ? "Salvando..." : "Criando..."}</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" /> {acaoAtual ? "Salvar" : "Criar Ação"}
+                </>
+              )}
             </button>
           </div>
         </div>

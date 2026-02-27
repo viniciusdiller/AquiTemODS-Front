@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Define a base da API. Em desenvolvimento, usa fallback para localhost:3001 para conveniência.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 async function fetchApi(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
@@ -9,19 +10,58 @@ async function fetchApi(path: string, options: RequestInit = {}) {
     headers["Content-Type"] = "application/json";
   }
 
-  if (options.headers && "Authorization" in options.headers) {
-    headers["Authorization"] = (options.headers as Record<string, string>)[
-      "Authorization"
-    ];
+  if (options.headers && (options.headers as Record<string, string>)["Authorization"]) {
+    headers["Authorization"] = (options.headers as Record<string, string>)["Authorization"];
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const url = `${API_URL}${path}`;
 
+  // Debug: logar detalhes da requisição para ajudar a diagnosticar 404/rotas não encontradas
+  try {
+    // Não vaza objetos grandes; converte body stringificada quando for string
+    const bodyPreview = options.body
+      ? typeof options.body === "string"
+        ? options.body
+        : "[non-string body]"
+      : undefined;
+    // eslint-disable-next-line no-console
+    console.debug("fetchApi ->", (options.method || "GET").toUpperCase(), url, { headers, body: bodyPreview });
+  } catch (e) {
+    // ignore
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (networkError: any) {
+    // Erro de rede (backend offline, CORS, DNS, etc.)
+    const message = `Não foi possível conectar ao servidor API em ${API_URL}. Verifique se o backend está rodando.`;
+    const err: any = new Error(message);
+    err.cause = networkError;
+    // eslint-disable-next-line no-console
+    console.error(message, networkError);
+    throw err;
+  }
+
+  const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
-  const data = text ? JSON.parse(text) : {};
+
+  let data: any = {};
+  // Tenta parsear JSON apenas quando o content-type indicar JSON
+  if (contentType.includes("application/json")) {
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {
+      // Se falhar no parse, mantém o texto cru para ajudar no debug
+      data = text;
+    }
+  } else {
+    // Resposta não-JSON (ex.: página de erro HTML) — devolve texto cru
+    data = text;
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -33,12 +73,23 @@ async function fetchApi(path: string, options: RequestInit = {}) {
       }
     }
 
-    // O erro de login (401) vai cair aqui agora
+    // Tenta extrair mensagem útil da resposta
     const errorMessage =
-      typeof data === "object" && data.message
-        ? data.message
-        : `API error: ${response.statusText}`;
-    throw new Error(errorMessage);
+      typeof data === "object" && data && (data.message || data.error)
+        ? data.message || data.error
+        : typeof data === "string" && data.trim()
+        ? data
+        : `API error: ${response.status} ${response.statusText}`;
+
+    // Cria um Error enriquecido com os dados da resposta para facilitar debug no frontend
+    const err: any = new Error(errorMessage);
+    err.status = response.status;
+    err.statusText = response.statusText;
+    err.data = data; // objeto ou texto retornado pela API
+    // compatibilidade: anexa um response com os dados
+    err.response = { status: response.status, statusText: response.statusText, data };
+
+    throw err;
   }
 
   return data;
@@ -381,26 +432,47 @@ export const getAcaoSustentaiById = (id: string | number) =>
   fetchApi(`/api/sustentai/acoes/${id}`);
 
 // ADMIN: Criar nova ação (Precisa do Token de Admin)
-export const adminCreateAcao = (data: any, token: string) =>
-  fetchApi("/api/admin/sustentai/acoes", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify(data),
+export const adminCreateAcao = (data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi('/api/admin/sustentai/acoes', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
   });
+};
 
 // ADMIN: Atualizar ação existente (Precisa do Token de Admin)
-export const adminUpdateAcao = (id: number, data: any, token: string) =>
-  fetchApi(`/api/admin/sustentai/acoes/${id}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify(data),
+export const adminUpdateAcao = (id: number, data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi(`/api/admin/sustentai/acoes/${id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
   });
+};
 
 // ADMIN: Deletar ação (Precisa do Token de Admin)
 export const adminDeleteAcao = (id: number, token: string) =>
   fetchApi(`/api/admin/sustentai/acoes/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
+  });
+
+// ADMIN: Atualizar conteúdo da página interna da ação (Precisa do Token de Admin)
+export const adminUpdateAcaoConteudo = (id: number, data: any, token: string) =>
+  fetchApi(`/api/admin/sustentai/acoes/${id}/conteudo`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
   });
 
 // ==========================================
@@ -411,20 +483,30 @@ export const adminDeleteAcao = (id: number, token: string) =>
 export const getPessoasSustentai = () => fetchApi("/api/sustentai/pessoas");
 
 // ADMIN: Criar nova pessoa
-export const adminCreatePessoa = (data: any, token: string) =>
-  fetchApi("/api/admin/sustentai/pessoas", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify(data),
+export const adminCreatePessoa = (data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi('/api/admin/sustentai/pessoas', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
   });
+};
 
 // ADMIN: Atualizar pessoa
-export const adminUpdatePessoa = (id: number, data: any, token: string) =>
-  fetchApi(`/api/admin/sustentai/pessoas/${id}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify(data),
+export const adminUpdatePessoa = (id: number, data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi(`/api/admin/sustentai/pessoas/${id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
   });
+};
 
 // ADMIN: Deletar pessoa
 export const adminDeletePessoa = (id: number, token: string) =>

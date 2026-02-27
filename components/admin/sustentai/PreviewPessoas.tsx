@@ -15,6 +15,15 @@ export default function PreviewPessoas({
   onEdit,
   onDelete,
 }: PreviewPessoasProps) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const getFullImageUrl = (path?: string) => {
+    if (!path) return "/placeholder-user.jpg";
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    const normalized = path.replace(/\\/g, "/");
+    return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
+  };
+
   return (
     <div className="w-full">
       {/* ========================================== */}
@@ -57,7 +66,7 @@ export default function PreviewPessoas({
               {/* Imagem Larga e no Topo */}
               <div className="relative w-full aspect-video md:aspect-[4/3] mb-5 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100 md:border-none md:shadow-none">
                 <img
-                  src={pessoa.imagemUrl}
+                  src={getFullImageUrl(pessoa.imagemUrl)}
                   alt={pessoa.nome}
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 group-hover:brightness-50"
                 />

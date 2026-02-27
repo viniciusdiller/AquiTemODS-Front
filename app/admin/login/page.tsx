@@ -28,6 +28,18 @@ const AdminLoginPage: React.FC = () => {
       if (response.ok && data.token) {
         // Armazena o token no localStorage para ser usado em outras páginas
         localStorage.setItem("admin_token", data.token);
+        // Compatibilidade: também grava um objeto 'user' contendo o token
+        try {
+          localStorage.setItem("user", JSON.stringify({ token: data.token }));
+        } catch (e) {
+          console.warn("Falha ao gravar user no localStorage", e);
+        }
+        // Alguns trechos do app leem 'token' diretamente
+        try {
+          localStorage.setItem("token", data.token);
+        } catch (e) {
+          console.warn("Falha ao gravar token no localStorage", e);
+        }
         message.success("Login bem-sucedido!");
         router.push("/admin/dashboard");
       } else {

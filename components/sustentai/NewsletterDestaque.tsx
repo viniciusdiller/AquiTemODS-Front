@@ -36,30 +36,68 @@ export default function NewsletterDestaque() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const getFullImageUrl = (path: string) => {
+    if (!path) return "/placeholder-image.png";
+    if (path.startsWith("http")) return path;
+    return `${API_URL}${path}`;
+  };
+
   // 3. O EFEITO MÁGICO (Roda sozinho ao abrir a página)
   useEffect(() => {
-    const buscarDadosDoBackend = async () => {
-      try {
-        // Promise.all faz as duas buscas ao mesmo tempo na API!
-        const [acoes, pessoas, header] = await Promise.all([
-          getAcoesSustentai(),
-          getPessoasSustentai(),
-          getHeaderSustentai(),
-        ]);
+    let mounted = true;
 
-        // Quando os dados chegam, salvamos nos estados
-        setAcoesSustentai(acoes);
-        setGenteQueConstroi(pessoas);
-        setHeader(header);
-      } catch (error) {
-        console.error("Erro ao carregar os dados:", error);
-      } finally {
-        // Independente de dar certo ou errado, desliga a animação de carregamento
+    const buscarDadosDoBackend = async () => {
+      setIsLoading(true);
+
+      // Buscas separadas para evitar falha em cascata
+      const [acoesResult, pessoasResult, headerResult] = await Promise.all([
+        getAcoesSustentai().catch((err) => {
+          console.error("Erro ao buscar ações SustentAí:", err);
+          return [] as any[];
+        }),
+        getPessoasSustentai().catch((err) => {
+          console.error("Erro ao buscar pessoas SustentAí:", err);
+          return [] as any[];
+        }),
+        getHeaderSustentai().catch((err) => {
+          console.error("Erro ao buscar header SustentAí:", err);
+          return { titulo: "", subtitulo: "", data: "" };
+        }),
+      ]);
+
+      if (!mounted) return;
+
+      // Normalize shape e prefixa imagens relativas
+      const mappedAcoes = Array.isArray(acoesResult)
+        ? acoesResult.map((a: any) => ({
+            ...a,
+            imagemUrl: getFullImageUrl(a.imagemUrl || a.imagem || a.imagem_url || ""),
+            linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
+          }))
+        : [];
+
+      const mappedPessoas = Array.isArray(pessoasResult)
+        ? pessoasResult.map((p: any) => ({
+            ...p,
+            imagemUrl: getFullImageUrl(p.imagemUrl || p.imagem || p.imagem_url || ""),
+          }))
+        : [];
+
+      if (mounted) {
+        setAcoesSustentai(mappedAcoes);
+        setGenteQueConstroi(mappedPessoas);
+        setHeader(headerResult || { titulo: "", subtitulo: "", data: "" });
         setIsLoading(false);
       }
     };
 
     buscarDadosDoBackend();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // 4. A TELA DE CARREGAMENTO (Enquanto isLoading for true, o código para aqui)

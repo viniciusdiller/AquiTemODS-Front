@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Edit, Newspaper, LayoutDashboard, Loader2 } from "lucide-react";
 import PreviewAcoes from "@/components/admin/sustentai/PreviewAcoes";
@@ -19,8 +19,10 @@ import {
   adminDeletePessoa,
   adminUpdateHeader,
 } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminSustentaiPage() {
+  const { toast } = useToast();
   const [header, setHeader] = useState({ titulo: "", subtitulo: "", data: "" });
   const [acoes, setAcoes] = useState<any[]>([]);
   const [pessoas, setPessoas] = useState<any[]>([]);
@@ -42,14 +44,56 @@ export default function AdminSustentaiPage() {
   useEffect(() => {
     const carregarPainel = async () => {
       try {
-        const [dadosAcoes, dadosPessoas, dadosHeader] = await Promise.all([
-          getHeaderSustentai(),
-          getAcoesSustentai(),
-          getPessoasSustentai(),
-        ]);
-        setHeader(dadosHeader);
-        setAcoes(dadosAcoes);
-        setPessoas(dadosPessoas);
+        // Faz chamadas individualmente para lidar melhor com 404/erros de servidor
+        try {
+          const dadosHeader = await getHeaderSustentai();
+          setHeader(dadosHeader);
+        } catch (err) {
+          console.warn("Falha ao buscar header SustentAí:", err);
+          toast({
+            title: "Backend não respondeu (header)",
+            description:
+              "Não foi possível carregar o cabeçalho. Verifique se o servidor backend está rodando e se NEXT_PUBLIC_API_URL está correto.",
+            variant: "destructive",
+          });
+        }
+
+        try {
+          const dadosAcoes = await getAcoesSustentai();
+          // Normaliza nomes de campo para garantir compatibilidade com o preview
+          const mappedAcoes = Array.isArray(dadosAcoes)
+            ? dadosAcoes.map((a: any) => ({
+                ...a,
+                imagemUrl: a.imagemUrl || a.imagem || a.imagem_url || "",
+              }))
+            : [];
+          setAcoes(mappedAcoes);
+        } catch (err) {
+          console.warn("Falha ao buscar ações SustentAí:", err);
+          toast({
+            title: "Backend não respondeu (ações)",
+            description: "Não foi possível carregar as ações. Verifique o backend.",
+            variant: "destructive",
+          });
+        }
+
+        try {
+          const dadosPessoas = await getPessoasSustentai();
+          const mappedPessoas = Array.isArray(dadosPessoas)
+            ? dadosPessoas.map((p: any) => ({
+                ...p,
+                imagemUrl: p.imagemUrl || p.imagem || p.imagem_url || "",
+              }))
+            : [];
+          setPessoas(mappedPessoas);
+        } catch (err) {
+          console.warn("Falha ao buscar pessoas SustentAí:", err);
+          toast({
+            title: "Backend não respondeu (pessoas)",
+            description: "Não foi possível carregar as pessoas. Verifique o backend.",
+            variant: "destructive",
+          });
+        }
       } catch (error) {
         console.error("Erro ao carregar dados do admin:", error);
       } finally {
@@ -60,10 +104,40 @@ export default function AdminSustentaiPage() {
   }, []);
 
   // 2. FUNÇÃO: SALVAR OU EDITAR AÇÃO
-  const handleSalvarAcao = async (dadosDaAcao: any) => {
-    if (!token) return alert("Sessão expirada. Faça login novamente.");
+  const savingRef = useRef(false);
 
+  const handleSalvarAcao = async (dadosDaAcao: any) => {
+    if (savingRef.current) {
+      console.warn("handleSalvarAcao: já existe uma solicitação em andamento — ignorando");
+      return null;
+    }
+    savingRef.current = true;
+    // Se o Modal já realizou a requisição e nos passou o objeto criado/atualizado,
+    // ele virá com um `id` — então apenas atualizamos o estado local sem chamar a API.
     try {
+      if (!dadosDaAcao) return;
+
+      if (dadosDaAcao.id) {
+        const resultado = dadosDaAcao;
+        if (acaoSendoEditada) {
+          setAcoes(acoes.map((a) => (a.id === resultado.id ? resultado : a)));
+        } else {
+          setAcoes([...acoes, resultado]);
+        }
+        setIsModalAcaoOpen(false);
+        savingRef.current = false;
+        return resultado;
+      }
+
+      // Caso o Modal apenas nos envie os dados (payload) e não tenha feito a chamada,
+      // seguimos com o fluxo antigo: chamamos a API aqui.
+      if (!token) {
+        toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+        savingRef.current = false;
+        return null;
+      }
+
+      let resultado: any = null;
       if (acaoSendoEditada) {
         // Chama a API de Atualização (PUT)
         const acaoAtualizada = await adminUpdateAcao(
@@ -75,22 +149,31 @@ export default function AdminSustentaiPage() {
         setAcoes(
           acoes.map((a) => (a.id === acaoAtualizada.id ? acaoAtualizada : a)),
         );
+        resultado = acaoAtualizada;
       } else {
         // Chama a API de Criação (POST)
         const novaAcao = await adminCreateAcao(dadosDaAcao, token);
         // Adiciona a nova ação no final da lista
         setAcoes([...acoes, novaAcao]);
+        resultado = novaAcao;
       }
       setIsModalAcaoOpen(false); // Fecha o modal
+      savingRef.current = false;
+      return resultado;
     } catch (error) {
-      alert("Erro ao salvar a ação no servidor.");
+      console.error('Erro ao salvar a ação:', error);
+      toast({ title: "Erro", description: "Erro ao salvar a ação no servidor.", variant: "destructive" });
+      savingRef.current = false;
+      return null;
     }
   };
 
   // 3. FUNÇÃO: EXCLUIR AÇÃO
   const handleDeleteAcao = async (id: number) => {
-    if (!token) return alert("Sessão expirada. Faça login novamente.");
-
+    if (!token) {
+      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      return;
+    }
     if (
       confirm(
         "Tem certeza que deseja excluir esta ação do banco de dados? Esta ação é irreversível.",
@@ -102,13 +185,16 @@ export default function AdminSustentaiPage() {
         // Remove o card da tela
         setAcoes(acoes.filter((a) => a.id !== id));
       } catch (error) {
-        alert("Erro ao excluir.");
+        toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
       }
     }
   };
 
   const handleSalvarPessoa = async (dados: any) => {
-    if (!token) return alert("Sessão expirada.");
+    if (!token) {
+      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      return;
+    }
     try {
       if (pessoaSendoEditada) {
         // EDIÇÃO (PUT)
@@ -129,24 +215,30 @@ export default function AdminSustentaiPage() {
       }
       setIsModalPessoaOpen(false);
     } catch (error) {
-      alert("Erro ao salvar pessoa.");
+      toast({ title: "Erro", description: "Erro ao salvar pessoa.", variant: "destructive" });
     }
   };
 
   const handleDeletePessoa = async (id: number) => {
-    if (!token) return alert("Sessão expirada.");
+    if (!token) {
+      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      return;
+    }
     if (confirm("Deseja excluir este membro da equipe?")) {
       try {
         await adminDeletePessoa(id, token); // DELETE
         setPessoas(pessoas.filter((p) => p.id !== id));
       } catch (error) {
-        alert("Erro ao excluir.");
+        toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
       }
     }
   };
 
   const handleSalvarHeader = async (dados: any) => {
-    if (!token) return alert("Sessão expirada. Faça login novamente.");
+    if (!token) {
+      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      return;
+    }
 
     try {
       const headerAtualizado = await adminUpdateHeader(dados, token);
@@ -154,7 +246,7 @@ export default function AdminSustentaiPage() {
       setHeader(headerAtualizado);
       setIsModalHeaderOpen(false);
     } catch (error) {
-      alert("Erro ao atualizar o cabeçalho. Tente novamente.");
+      toast({ title: "Erro", description: "Erro ao atualizar o cabeçalho. Tente novamente.", variant: "destructive" });
     }
   };
 
@@ -242,9 +334,9 @@ export default function AdminSustentaiPage() {
             />
             <PreviewPessoas
               pessoas={pessoas}
-              onAdd={() => alert("Modal Pendente")}
-              onEdit={() => alert("Modal Pendente")}
-              onDelete={() => alert("API Pendente")}
+              onAdd={handleAbrirCriarPessoa}
+              onEdit={handleAbrirEditarPessoa}
+              onDelete={handleDeletePessoa}
             />
           </div>
         </section>

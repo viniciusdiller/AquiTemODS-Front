@@ -1,60 +1,112 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Share2 } from "lucide-react";
-
-// ==========================================
-// MOCK DATA (Simulando o JSON que viria do Backend)
-// ==========================================
-const mockDadosDaAcao = {
-  titulo: "Sala do Empreendedor concorre ao Selo de Referência do Sebrae",
-  data: "10 de Abril de 2025",
-  autor: "Equipe SustentAí",
-  blocos: [
-    {
-      id: "1",
-      type: "text",
-      content:
-        "A Sala do Empreendedor de Saquarema está vivendo um momento histórico! Estamos concorrendo ao cobiçado Selo de Referência em Atendimento do Sebrae, um reconhecimento que demonstra o nosso compromisso diário com o desenvolvimento da economia local e o apoio aos nossos empreendedores.",
-      bgColor: "bg-white",
-      isBold: true,
-    },
-    {
-      id: "2",
-      type: "image",
-      content:
-        "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=1200&auto=format&fit=crop&q=80",
-      bgColor: "bg-transparent",
-      isBold: false,
-    },
-    {
-      id: "3",
-      type: "text",
-      content:
-        "Para continuarmos oferecendo o melhor atendimento, a nossa equipe passou por um treinamento intensivo focado em resolução rápida de problemas de microempreendedores individuais (MEIs).\n\nNosso objetivo é desburocratizar processos e fazer com que quem quer abrir ou expandir um negócio em Saquarema tenha todo o suporte necessário, desde a formalização até a captação de crédito.",
-      bgColor: "bg-pink-50",
-      isBold: false,
-    },
-    {
-      id: "4",
-      type: "image",
-      content: "/enigmas_do_futuro.png",
-      bgColor: "bg-transparent",
-      isBold: false,
-    },
-    {
-      id: "5",
-      type: "text",
-      content:
-        "Venha nos visitar e conhecer de perto nossos serviços!\nEstamos funcionando de segunda a sexta, das 09h às 17h, no centro da cidade. Esperamos por você!",
-      bgColor: "bg-blue-50",
-      isBold: true,
-    },
-  ],
-};
+import { useParams } from "next/navigation";
+import { getAcaoSustentaiById } from "@/lib/api";
 
 export default function PaginaAcaoInterna() {
-  const acao = mockDadosDaAcao;
+  const params = useParams() as { slug?: string };
+  const slug = params?.slug || "";
+
+  const [acao, setAcao] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const getFullImageUrl = (path: string) => {
+    if (!path) return "/enigmas_do_futuro.png";
+    if (path.startsWith("http")) return path;
+    return `${API_URL}${path}`;
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    const carregar = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        if (!slug) throw new Error("ID da ação não informado");
+        const dados = await getAcaoSustentaiById(slug);
+
+        // Normaliza shape: pode vir como { conteudo: [...] } ou { blocos: [...] } ou { body: string }
+        let blocos: any[] = [];
+        if (!dados) {
+          throw new Error("Ação não encontrada");
+        }
+
+        if (Array.isArray(dados.conteudo)) {
+          blocos = dados.conteudo;
+        } else if (Array.isArray(dados.blocos)) {
+          blocos = dados.blocos;
+        } else if (typeof dados.conteudo === "string" && dados.conteudo.trim()) {
+          try {
+            const parsed = JSON.parse(dados.conteudo);
+            if (Array.isArray(parsed)) blocos = parsed;
+          } catch (e) {
+            // fallback: transformar o string em um único bloco de texto
+            blocos = [
+              { id: "1", type: "text", content: dados.conteudo, bgColor: "bg-white", isBold: false },
+            ];
+          }
+        } else if (Array.isArray(dados.body)) {
+          blocos = dados.body;
+        } else if (typeof dados.body === "string" && dados.body.trim()) {
+          try {
+            const parsed = JSON.parse(dados.body);
+            if (Array.isArray(parsed)) blocos = parsed;
+          } catch (e) {
+            blocos = [
+              { id: "1", type: "text", content: dados.body, bgColor: "bg-white", isBold: false },
+            ];
+          }
+        }
+
+        const normalized = {
+          titulo: dados.titulo || dados.title || "",
+          data: dados.data || dados.createdAt || "",
+          autor: dados.autor || dados.author || "",
+          blocos: blocos.map((b: any, i: number) => {
+            if (b.type === "image") {
+              return { ...b, content: getFullImageUrl(b.content || b.url || b.imagemUrl || b.imagem || "") };
+            }
+            return b;
+          }),
+        };
+
+        if (mounted) setAcao(normalized);
+      } catch (err: any) {
+        console.error("Erro ao carregar ação: ", err);
+        if (mounted) setError(err.message || "Erro ao carregar conteúdo");
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    carregar();
+    return () => {
+      mounted = false;
+    };
+  }, [slug]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-20">
+        <div className="text-center text-gray-500">Carregando conteúdo do artigo...</div>
+      </div>
+    );
+  }
+
+  if (error || !acao) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-20">
+        <div className="max-w-2xl text-center">
+          <p className="text-red-600 font-bold mb-4">{error || "Artigo não encontrado"}</p>
+          <Link href="/sustentai" className="text-[#D7386E] font-semibold">Voltar para SustentAí</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
@@ -99,17 +151,14 @@ export default function PaginaAcaoInterna() {
         {/* RENDERIZADOR DE BLOCOS (O CONTEÚDO)        */}
         {/* ========================================== */}
         <div className="p-8 md:p-12 lg:p-16 space-y-8 md:space-y-10 bg-gray-50/30">
-          {acao.blocos.map((bloco) => {
+          {acao.blocos.map((bloco: any, idx: number) => {
             // 1. Renderiza Bloco de Imagem
             if (bloco.type === "image") {
               return (
-                <div
-                  key={bloco.id}
-                  className="w-full rounded-2xl overflow-hidden shadow-md my-10 group"
-                >
+                <div key={bloco.id || idx} className="w-full rounded-2xl overflow-hidden shadow-md my-10 group">
                   <img
                     src={bloco.content}
-                    alt="Ilustração da ação"
+                    alt={acao.titulo}
                     className="w-full h-auto max-h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>
@@ -120,22 +169,11 @@ export default function PaginaAcaoInterna() {
             if (bloco.type === "text") {
               // Se o fundo for branco, tira o padding excessivo para parecer texto corrido de blog.
               // Se tiver cor, coloca padding para virar uma "Caixa de Destaque".
-              const isColoredBox = bloco.bgColor !== "bg-white";
+              const isColoredBox = bloco.bgColor && bloco.bgColor !== "bg-white";
 
               return (
-                <div
-                  key={bloco.id}
-                  className={`
-                    ${isColoredBox ? `p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 ${bloco.bgColor}` : "py-2"}
-                  `}
-                >
-                  <p
-                    className={`
-                      text-lg md:text-xl leading-relaxed whitespace-pre-wrap
-                      ${bloco.isBold ? "font-bold text-gray-900" : "text-gray-700"}
-                      ${isColoredBox && !bloco.isBold ? "text-gray-800" : ""}
-                    `}
-                  >
+                <div key={bloco.id || idx} className={`${isColoredBox ? `p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 ${bloco.bgColor}` : "py-2"}`}>
+                  <p className={`text-lg md:text-xl leading-relaxed whitespace-pre-wrap ${bloco.isBold ? "font-bold text-gray-900" : "text-gray-700"} ${isColoredBox && !bloco.isBold ? "text-gray-800" : ""}`}>
                     {bloco.content}
                   </p>
                 </div>

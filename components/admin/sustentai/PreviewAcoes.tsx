@@ -29,6 +29,15 @@ export default function PreviewAcoes({
   onEdit,
   onDelete,
 }: PreviewAcoesProps) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const getFullImageUrl = (path?: string) => {
+    if (!path) return "/placeholder.svg";
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    // normaliza barras e garante concatenação correta
+    const normalized = path.replace(/\\/g, "/");
+    return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
@@ -77,7 +86,7 @@ export default function PreviewAcoes({
               {/* IMAGEM + TAG */}
               <div className="relative w-full h-auto">
                 <img
-                  src={acao.imagemUrl}
+                  src={getFullImageUrl(acao.imagemUrl)}
                   alt={acao.titulo}
                   className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
                 />

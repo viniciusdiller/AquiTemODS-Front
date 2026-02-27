@@ -10,7 +10,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { registerSustentAiCardClick } from "@/lib/api";
+import {
+  registerSustentAiCardClick,
+  getAcoesSustentai,
+  getHeaderSustentai,
+  getPessoasSustentai,
+} from "@/lib/api";
 import {
   Pagination,
   PaginationContent,
@@ -34,26 +39,47 @@ export default function SustentAiPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  // Usa o mesmo fallback do lib/api para conveniência local
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
   useEffect(() => {
-    fetch(`${API_URL}/api/sustentai`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCards(data);
-        } else {
-          console.error("Resposta da API inválida:", data);
-          setCards([]);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar dados SustentAí:", err);
+    let mounted = true;
+
+    const carregarConteudo = async () => {
+      setLoading(true);
+      try {
+        // Busca separada para evitar falha em cascata
+        const acoes = await getAcoesSustentai().catch((err) => {
+          console.error("Erro ao buscar ações SustentAí:", err);
+          return [] as any[];
+        });
+
+        // Se por acaso a API pública central retornar outro shape, tentamos mapear
+        const mapped = Array.isArray(acoes)
+          ? acoes.map((a: any) => ({
+              id: a.id,
+              titulo: a.titulo || a.title || "",
+              linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
+              imagemUrl: a.imagemUrl || a.imagem || a.imagem_url || "",
+            }))
+          : [];
+
+        if (!mounted) return;
+        setCards(mapped);
+      } catch (err) {
+        console.error("Erro inesperado ao carregar SustentAí:", err);
         setCards([]);
-        setLoading(false);
-      });
-  }, [API_URL]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    carregarConteudo();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const getFullImageUrl = (path: string) => {
     if (!path) return "/placeholder-image.png";
