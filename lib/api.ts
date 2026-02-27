@@ -442,3 +442,19 @@ export const adminUpdateHeader = (data: any, token: string) =>
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),
   });
+
+// PÚBLICO/ADMIN: Buscar os blocos de conteúdo específicos de uma ação
+export const getAcaoConteudo = (id: string | number) =>
+  fetchApi(`/api/sustentai/acoes/${id}/conteudo`);
+
+// ADMIN: Salvar os blocos de conteúdo da ação (Precisa do Token)
+export const adminUpdateAcaoConteudo = (
+  id: string | number,
+  blocos: any,
+  token: string,
+) =>
+  fetchApi(`/api/admin/sustentai/acoes/${id}/conteudo`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ blocos }),
+  });

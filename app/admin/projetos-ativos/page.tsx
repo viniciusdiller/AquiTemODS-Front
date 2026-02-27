@@ -28,7 +28,7 @@ import {
 } from "@ant-design/icons";
 import {
   getAllActiveProjetos,
-  adminUpdateProjeto, // Esta função não está sendo usada neste arquivo, mas mantida
+  adminUpdateProjeto,
   adminDeleteProjeto,
   adminExportProjetos,
 } from "@/lib/api";
@@ -94,7 +94,7 @@ const ProjetosAtivosPage: React.FC = () => {
         p.nomeProjeto.toLowerCase().includes(lowerCaseValue) ||
         p.prefeitura.toLowerCase().includes(lowerCaseValue) ||
         p.secretaria.toLowerCase().includes(lowerCaseValue) ||
-        String(p.projetoId).includes(lowerCaseValue)
+        String(p.projetoId).includes(lowerCaseValue),
     );
     setFilteredProjetos(filtered);
     setCurrentPage(1);
@@ -169,14 +169,17 @@ const ProjetosAtivosPage: React.FC = () => {
   };
 
   // Agrupa os projetos por ODS (para as abas de categoria)
-  const groupedProjetos = filteredProjetos.reduce((acc, projeto) => {
-    const ods = projeto.ods || "Sem Categoria";
-    if (!acc[ods]) {
-      acc[ods] = [];
-    }
-    acc[ods].push(projeto);
-    return acc;
-  }, {} as { [key: string]: Projeto[] });
+  const groupedProjetos = filteredProjetos.reduce(
+    (acc, projeto) => {
+      const ods = projeto.ods || "Sem Categoria";
+      if (!acc[ods]) {
+        acc[ods] = [];
+      }
+      acc[ods].push(projeto);
+      return acc;
+    },
+    {} as { [key: string]: Projeto[] },
+  );
 
   // Ordena as categorias
   const sortedCategories = Object.keys(groupedProjetos).sort((a, b) => {
@@ -191,7 +194,7 @@ const ProjetosAtivosPage: React.FC = () => {
   const totalTodos = filteredProjetos.length;
   const paginatedTodos = filteredProjetos.slice(
     (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    currentPage * PAGE_SIZE,
   );
 
   return (
@@ -330,7 +333,7 @@ const ProjetosAtivosPage: React.FC = () => {
               const totalCount = allProjetosForOds.length;
               const projetosToShow = allProjetosForOds.slice(
                 (currentPage - 1) * PAGE_SIZE,
-                currentPage * PAGE_SIZE
+                currentPage * PAGE_SIZE,
               );
 
               return (

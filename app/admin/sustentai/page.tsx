@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Edit, Newspaper, LayoutDashboard, Loader2 } from "lucide-react";
+import {
+  Edit,
+  Newspaper,
+  LayoutDashboard,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
 import PreviewAcoes from "@/components/admin/sustentai/PreviewAcoes";
 import PreviewPessoas from "@/components/admin/sustentai/PreviewPessoas";
 import ModalAcao from "@/components/admin/sustentai/ModalAcao";
@@ -190,21 +196,32 @@ export default function AdminSustentaiPage() {
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* HEADER DO ADMIN */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-          <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <LayoutDashboard className="w-4 h-4" />{" "}
-              <span>Admin / SustentAí</span>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+          <div className="flex items-center gap-5">
+            <Link
+              href="/admin/dashboard"
+              className="p-3.5 bg-gray-50 text-gray-500 hover:text-[#D7386E] hover:bg-pink-50 border border-gray-100 hover:border-pink-100 rounded-2xl transition-all duration-300 group shadow-sm flex-shrink-0"
+              title="Voltar para o Dashboard"
+            >
+              <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+            </Link>
+
+            <div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-1 font-medium">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Admin / SustentAí</span>
+              </div>
+              <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
+                Gerenciar Página
+              </h1>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Gerenciar Página SustentAí
-            </h1>
           </div>
+
           <Link
             href="/admin/sustentai/newsletter"
-            className="bg-[#3C6AB2] hover:bg-[#2e528a] text-white px-5 py-3 rounded-xl font-medium flex items-center gap-2 shadow-sm"
+            className="w-full md:w-auto bg-gradient-to-r from-[#3C6AB2] to-[#2e528a] hover:opacity-90 text-white px-6 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md transition-all duration-300 transform hover:scale-[1.02]"
           >
-            <Newspaper className="w-5 h-5" /> Gerenciar Newsletters em PDF
+            <Newspaper className="w-5 h-5" /> Gerenciar Newsletters
           </Link>
         </div>
 
@@ -242,9 +259,9 @@ export default function AdminSustentaiPage() {
             />
             <PreviewPessoas
               pessoas={pessoas}
-              onAdd={() => alert("Modal Pendente")}
-              onEdit={() => alert("Modal Pendente")}
-              onDelete={() => alert("API Pendente")}
+              onAdd={handleAbrirCriarPessoa}
+              onEdit={handleAbrirEditarPessoa}
+              onDelete={handleDeletePessoa}
             />
           </div>
         </section>

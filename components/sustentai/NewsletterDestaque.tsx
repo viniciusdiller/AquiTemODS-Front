@@ -286,6 +286,15 @@ export default function NewsletterDestaque() {
                 </div>
               ))}
             </div>
+            <div className="mt-12 flex justify-center w-full">
+              <Link
+                href="/sustentai/gente-que-constroi"
+                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white border-2 border-pink-100 text-[#D7386E] font-bold text-lg hover:bg-[#D7386E] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
+              >
+                Ver histórico completo
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </FadeInScroll>
       </div>
