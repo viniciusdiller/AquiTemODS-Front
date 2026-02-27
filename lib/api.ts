@@ -368,3 +368,77 @@ export const adminResendConfirmation = (id: number, token: string) =>
       Authorization: `Bearer ${token}`,
     },
   });
+
+// ==========================================
+// AÇÕES SUSTENTAÍ (Público e Admin)
+// ==========================================
+
+// PÚBLICO: Buscar todas as ações (Não precisa de token)
+export const getAcoesSustentai = () => fetchApi("/api/sustentai/acoes");
+
+// PÚBLICO: Buscar uma ação específica por ID/Slug para a página interna
+export const getAcaoSustentaiById = (id: string | number) =>
+  fetchApi(`/api/sustentai/acoes/${id}`);
+
+// ADMIN: Criar nova ação (Precisa do Token de Admin)
+export const adminCreateAcao = (data: any, token: string) =>
+  fetchApi("/api/admin/sustentai/acoes", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+// ADMIN: Atualizar ação existente (Precisa do Token de Admin)
+export const adminUpdateAcao = (id: number, data: any, token: string) =>
+  fetchApi(`/api/admin/sustentai/acoes/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+// ADMIN: Deletar ação (Precisa do Token de Admin)
+export const adminDeleteAcao = (id: number, token: string) =>
+  fetchApi(`/api/admin/sustentai/acoes/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+// ==========================================
+// GENTE QUE CONSTRÓI (Pessoas - Público e Admin)
+// ==========================================
+
+// PÚBLICO: Buscar todas as pessoas
+export const getPessoasSustentai = () => fetchApi("/api/sustentai/pessoas");
+
+// ADMIN: Criar nova pessoa
+export const adminCreatePessoa = (data: any, token: string) =>
+  fetchApi("/api/admin/sustentai/pessoas", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+// ADMIN: Atualizar pessoa
+export const adminUpdatePessoa = (id: number, data: any, token: string) =>
+  fetchApi(`/api/admin/sustentai/pessoas/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+// ADMIN: Deletar pessoa
+export const adminDeletePessoa = (id: number, token: string) =>
+  fetchApi(`/api/admin/sustentai/pessoas/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const getHeaderSustentai = () => fetchApi("/api/sustentai/header");
+
+// ADMIN: Atualizar o cabeçalho (Precisa do Token)
+export const adminUpdateHeader = (data: any, token: string) =>
+  fetchApi("/api/admin/sustentai/header", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });

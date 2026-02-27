@@ -8,6 +8,7 @@ import {
   Palette,
   LayoutTemplate,
   Tag,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -203,7 +204,7 @@ export default function ModalAcao({
           <div>
             {acaoAtual ? (
               <Link
-                href={`/admin/sustentai/secao/${acaoAtual.id}`}
+                href={`/admin/sustentai/acao/${acaoAtual.id}`}
                 className="px-4 py-2.5 rounded-xl bg-purple-100 text-purple-700 font-bold flex items-center gap-2 hover:bg-purple-200 transition-colors"
               >
                 <LayoutTemplate className="w-4 h-4" /> Editar Página Interna

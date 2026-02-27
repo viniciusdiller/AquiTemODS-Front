@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   HeartHandshake,
   ArrowRight,
   ChevronLeft,
   ChevronRight,
   Tag,
+  Loader2,
 } from "lucide-react";
 import { FadeInScroll } from "./Animationcards";
 import {
@@ -15,166 +16,63 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 import Link from "next/link";
-
-// ==========================================
-// LISTA DE DADOS FICTÍCIOS (Mock Data)
-// ==========================================
-const header = {
-  titulo: "SustentAí",
-  subtitulo: "Segunda Edição",
-  data: "Abril de 2025",
-};
-
-const acoesSustentai = [
-  {
-    id: 1,
-    titulo: "Sala do Empreendedor",
-    descricao:
-      "Serviços para abrir, regularizar ou expandir sua empresa com apoio técnico.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Saiba mais sobre a Sala",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#D7386E]",
-    corFundo: "bg-pink-50/30",
-    corBorda: "border-pink-100",
-    tag: "Empreendedorismo",
-  },
-  {
-    id: 2,
-    titulo: "Emprega Saquá",
-    descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal de talentos.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&h=800&auto=format&fit=crop&q=60",
-    linkTexto: "Acessar portal",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-  {
-    id: 3,
-    titulo: "Apoio ao Artesão",
-    descricao:
-      "Valorizando nossos talentos locais que movimentam a economia criativa.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=600&h=300&auto=format&fit=crop&q=60",
-    linkTexto: "Conheça mais",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#D7386E]",
-    corFundo: "bg-pink-50/30",
-    corBorda: "border-pink-100",
-  },
-  {
-    id: 4,
-    titulo: "Emprega Saquá 2",
-    descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
-    imagemUrl: "/Cursos/vivi.png",
-    linkTexto: "Acessar portal de vagas",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-  {
-    id: 5,
-    titulo: "Cursos Sebrae",
-    descricao:
-      "Ferramentas e estratégias gratuitas para empreender com sucesso.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Ver cursos",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#D7386E]",
-    corFundo: "bg-pink-50/30",
-    corBorda: "border-pink-100",
-  },
-  {
-    id: 4,
-    titulo: "Emprega Saquá 2",
-    descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
-    imagemUrl: "/Cursos/vivi.png",
-    linkTexto: "Acessar portal de vagas",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-  {
-    id: 6,
-    titulo: "Inovação",
-    descricao: "Entenda mais sobre economia criativa e inovação.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Saiba mais",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-  {
-    id: 6,
-    titulo: "Inovação",
-    descricao: "Entenda mais sobre economia criativa e inovação.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-    linkTexto: "Saiba mais",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-  {
-    id: 4,
-    titulo: "Emprega Saquá 2",
-    descricao:
-      "Buscando emprego ou procurando funcionários? Acesse nosso portal e tenha acesso a oportunidades.",
-    imagemUrl: "/Cursos/vivi.png",
-    linkTexto: "Acessar portal de vagas",
-    linkDestino: "https://www.flamengo.com.br/",
-    corDestaque: "text-[#3C6AB2]",
-    corFundo: "bg-blue-50/30",
-    corBorda: "border-blue-100",
-  },
-];
-
-const genteQueConstroi = [
-  {
-    id: 1,
-    nome: "Carolina Guilhon",
-    cargo: "Sala do Empreendedor",
-    descricao:
-      "Exemplo de dedicação e proatividade na construção de um ambiente de trabalho positivo.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 2,
-    nome: "Telma Cavalcante",
-    cargo: "Diretora de Cultura",
-    descricao:
-      "Referência na valorização do artesanato, idealizadora da ExpoArte Saquarema.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 3,
-    nome: "Leticia Majosene",
-    cargo: "Projetos Estratégicos",
-    descricao:
-      "Idealizadora do Emprega Saquá. Seu compromisso garantiu o sucesso do projeto.",
-    imagemUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&auto=format&fit=crop&q=60",
-  },
-];
+import {
+  getAcoesSustentai,
+  getPessoasSustentai,
+  getHeaderSustentai,
+} from "@/lib/api";
 
 export default function NewsletterDestaque() {
+  const [header, setHeader] = useState({ titulo: "", subtitulo: "", data: "" });
+
+  // 1. COMEÇA VAZIO!
+  const [acoesSustentai, setAcoesSustentai] = useState<any[]>([]);
+  const [genteQueConstroi, setGenteQueConstroi] = useState<any[]>([]);
+
+  // 2. ESTADO DO LOADER (Começa ativado)
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
+  // 3. O EFEITO MÁGICO (Roda sozinho ao abrir a página)
+  useEffect(() => {
+    const buscarDadosDoBackend = async () => {
+      try {
+        // Promise.all faz as duas buscas ao mesmo tempo na API!
+        const [acoes, pessoas, header] = await Promise.all([
+          getAcoesSustentai(),
+          getPessoasSustentai(),
+          getHeaderSustentai(),
+        ]);
+
+        // Quando os dados chegam, salvamos nos estados
+        setAcoesSustentai(acoes);
+        setGenteQueConstroi(pessoas);
+        setHeader(header);
+      } catch (error) {
+        console.error("Erro ao carregar os dados:", error);
+      } finally {
+        // Independente de dar certo ou errado, desliga a animação de carregamento
+        setIsLoading(false);
+      }
+    };
+
+    buscarDadosDoBackend();
+  }, []);
+
+  // 4. A TELA DE CARREGAMENTO (Enquanto isLoading for true, o código para aqui)
+  if (isLoading) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center bg-gray-50/50 rounded-3xl mb-16 gap-4">
+        <Loader2 className="w-10 h-10 text-[#D7386E] animate-spin" />
+        <p className="text-gray-500 font-medium animate-pulse">
+          Carregando novidades...
+        </p>
+      </div>
+    );
+  }
   const totalPages = Math.ceil(acoesSustentai.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
