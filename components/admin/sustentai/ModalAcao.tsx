@@ -36,6 +36,15 @@ export default function ModalAcao({
   // Somente envio por arquivo: armazena o arquivo selecionado e uma URL de preview
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const getFullImageUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    const normalized = path.replace(/\\/g, "/");
+    return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
+  };
+
   const [corDestaque, setCorDestaque] = useState("text-[#D7386E]");
   const [corFundo, setCorFundo] = useState("bg-pink-50/30");
   const [corBorda, setCorBorda] = useState("border-pink-100");
@@ -75,7 +84,11 @@ export default function ModalAcao({
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
     return () => {
-      URL.revokeObjectURL(url);
+      try {
+        if (url && url.startsWith("blob:")) URL.revokeObjectURL(url);
+      } catch (e) {
+        // ignore
+      }
     };
   }, [selectedFile]);
 
@@ -284,7 +297,7 @@ export default function ModalAcao({
 
                 <div className="flex-1">
                   {previewUrl ? (
-                    <img src={previewUrl} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
+                    <img src={getFullImageUrl(previewUrl) || undefined} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
                   ) : (
                     <div className="h-24 w-full flex items-center justify-center rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
                       Nenhuma imagem selecionada

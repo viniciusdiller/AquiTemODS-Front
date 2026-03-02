@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { Toaster as RadixToaster } from "@/components/ui/toaster";
 import { ConditionalFooter } from "@/components/ConditionalFooter";
 import AccessibilityStyles from "@/components/AccessibilityStyles";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
@@ -101,7 +102,10 @@ export default function RootLayout({
             <ConditionalNavbar />
             <main className="flex-grow">{children}</main>
             <ConditionalFooter />
-            <Toaster richColors />
+            {/* Toaster do sonner (existente) */}
+            <SonnerToaster richColors />
+            {/* Toaster do sistema interno (Radix) para use-toast hook */}
+            <RadixToaster />
             <ConditionalAccessibility />
           </AuthProvider>
         </ConfigProvider>

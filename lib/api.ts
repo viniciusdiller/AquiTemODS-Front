@@ -465,7 +465,7 @@ export const adminDeleteAcao = (id: number, token: string) =>
   });
 
 // ADMIN: Atualizar conteúdo da página interna da ação (Precisa do Token de Admin)
-export const adminUpdateAcaoConteudo = (id: number, data: any, token: string) =>
+export const adminUpdateAcaoConteudoAdmin = (id: number, data: any, token: string) =>
   fetchApi(`/api/admin/sustentai/acoes/${id}/conteudo`, {
     method: "PUT",
     headers: {
@@ -523,4 +523,152 @@ export const adminUpdateHeader = (data: any, token: string) =>
     method: "PUT",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),
+  });
+
+// PÚBLICO/ADMIN: Buscar os blocos de conteúdo específicos de uma ação
+export const getAcaoConteudo = (id: string | number) =>
+  fetchApi(`/api/sustentai/acoes/${id}/conteudo`);
+
+// ADMIN: Salvar os blocos de conteúdo da ação (Precisa do Token)
+export const adminUpdateAcaoConteudo = async (id: string, blocos: any, token: string) => {
+  const payload = { blocos };
+  // Tenta várias variações de caminho que o backend pode expor
+  const pathsToTry = [
+    `/api/admin/sustentai/acoes/${id}/conteudo`,
+    `/admin/sustentai/acoes/${id}/conteudo`,
+    `/api/sustentai/acoes/${id}/conteudo`,
+    `/sustentai/acoes/${id}/conteudo`,
+  ];
+
+  const attemptedFullUrls: string[] = [];
+
+  for (const path of pathsToTry) {
+    const fullUrl = `${API_URL}${path}`;
+    attemptedFullUrls.push(fullUrl);
+    try {
+      // Log para ajudar debug
+      // eslint-disable-next-line no-console
+      console.debug(`adminUpdateAcaoConteudo: tentando ${fullUrl}`);
+
+      return await fetchApi(path, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err: any) {
+      // Se o erro for 404 ou resposta HTML com 'Cannot PUT', tenta próximo path
+      const is404 = err && (err.status === 404 || (typeof err.data === 'string' && /Cannot PUT/i.test(err.data)));
+      if (!is404) {
+        // erro diferente — loga mais contexto e propaga
+        // eslint-disable-next-line no-console
+        console.error(`adminUpdateAcaoConteudo: erro ao tentar ${fullUrl}`, err);
+        throw err;
+      }
+      // senão, continua e tenta o próximo caminho
+    }
+  }
+
+  // Se chegou aqui, todos os caminhos falharam com 404 — lança erro genérico
+  const finalErr: any = new Error(
+    `Endpoint de adminUpdateAcaoConteudo não encontrado. URLs tentadas: ${attemptedFullUrls.join(", ")}`,
+  );
+  finalErr.status = 404;
+  finalErr.attempted = attemptedFullUrls;
+  // eslint-disable-next-line no-console
+  console.error("adminUpdateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:", attemptedFullUrls);
+  throw finalErr;
+};
+
+// ADMIN: Criar os blocos de conteúdo da ação (POST) — útil quando a rota do backend espera POST para criação
+export const adminCreateAcaoConteudo = async (id: string, blocos: any, token: string) => {
+  const payload = { blocos };
+  const pathsToTry = [
+    `/api/admin/sustentai/acoes/${id}/conteudo`,
+    `/admin/sustentai/acoes/${id}/conteudo`,
+    `/api/sustentai/acoes/${id}/conteudo`,
+    `/sustentai/acoes/${id}/conteudo`,
+  ];
+
+  const attemptedFullUrls: string[] = [];
+
+  for (const path of pathsToTry) {
+    const fullUrl = `${API_URL}${path}`;
+    attemptedFullUrls.push(fullUrl);
+    try {
+      // eslint-disable-next-line no-console
+      console.debug(`adminCreateAcaoConteudo: tentando ${fullUrl}`);
+
+      return await fetchApi(path, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err: any) {
+      const is404 = err && (err.status === 404 || (typeof err.data === 'string' && /Cannot POST|Cannot PUT|Not Found/i.test(err.data)));
+      if (!is404) {
+        // eslint-disable-next-line no-console
+        console.error(`adminCreateAcaoConteudo: erro ao tentar ${fullUrl}`, err);
+        throw err;
+      }
+      // tenta próxima
+    }
+  }
+
+  const finalErr: any = new Error(
+    `Endpoint de adminCreateAcaoConteudo não encontrado. URLs tentadas: ${attemptedFullUrls.join(", ")}`,
+  );
+  finalErr.status = 404;
+  finalErr.attempted = attemptedFullUrls;
+  // eslint-disable-next-line no-console
+  console.error("adminCreateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:", attemptedFullUrls);
+  throw finalErr;
+};
+
+// ==========================================
+// CARDS (Admin endpoints fornecidos pelo backend)
+// Rotas no backend (admin):
+// GET  /sustentai/cards
+// POST /sustentai/cards  (upload.single('imagem'))
+// PUT  /sustentai/cards/:id (upload.single('imagem'))
+// DELETE /sustentai/cards/:id
+// ==========================================
+
+export const adminGetCards = (token: string) =>
+  fetchApi(`/api/admin/sustentai/cards`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const adminCreateCard = (data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi('/api/admin/sustentai/cards', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
+  });
+};
+
+export const adminUpdateCard = (id: number | string, data: any, token: string) => {
+  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  return fetchApi(`/api/admin/sustentai/cards/${id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    },
+    body: isForm ? data : JSON.stringify(data),
+  });
+};
+
+export const adminDeleteCard = (id: number | string, token: string) =>
+  fetchApi(`/api/admin/sustentai/cards/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
   });

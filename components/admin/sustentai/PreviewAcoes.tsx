@@ -55,16 +55,20 @@ export default function PreviewAcoes({
       {/* ========================================== */}
       {/* BOTÃO ADICIONAR (Agora isolado acima de tudo) */}
       {/* ========================================== */}
-      <div
-        onClick={onAdd}
+      {/* Botão que abre o modal de criação (chama onAdd) */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          if (typeof onAdd === "function") onAdd();
+        }}
+        aria-label="Adicionar Novo Card"
         className="w-full mb-16 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:text-[#D7386E] hover:border-[#D7386E] hover:bg-pink-50 cursor-pointer transition-all py-10 shadow-sm"
       >
         <Plus className="w-10 h-10 mb-2" />
-        <span className="font-bold text-lg">Adicionar Nova Ação</span>
-        <p className="text-sm font-normal opacity-80 mt-1">
-          Crie um novo card para a vitrine
-        </p>
-      </div>
+        <span className="font-bold text-lg">Adicionar Novo Card</span>
+        <p className="text-sm font-normal opacity-80 mt-1">Crie um novo card para a vitrine</p>
+      </button>
 
       <div id="newsletter-acoes">
         <div className="text-center mb-10">
@@ -106,11 +110,16 @@ export default function PreviewAcoes({
                 <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
                   {acao.descricao}
                 </p>
-                <span
+                {/* No admin, permite visualizar o artigo público */}
+                {/* monta o href público usando slug quando disponível, senão usa id */}
+                <Link
+                  href={`/sustentai/${acao.slug || acao.slugUrl || acao.slug_url || acao.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
                 >
                   Ler artigo <ArrowRight className="w-4 h-4" />
-                </span>
+                </Link>
               </div>
 
               {/* OVERLAY DE ADMIN (Editar/Excluir) */}
