@@ -89,11 +89,33 @@ export default function PreviewAcoes({
             >
               {/* IMAGEM + TAG */}
               <div className="relative w-full h-auto">
-                <img
-                  src={getFullImageUrl(acao.imagemUrl)}
-                  alt={acao.titulo}
-                  className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
-                />
+                {(() => {
+                  const raw = acao.imagemUrl || "";
+                  const src = getFullImageUrl(raw);
+                  const lower = (raw || "").toLowerCase();
+                  const isDataPdf = lower.startsWith("data:application/pdf");
+                  const isPdfExt = src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                  const isPdf = isDataPdf || isPdfExt || (src && src.includes("application/pdf"));
+
+                  if (isPdf) {
+                    return (
+                      <div className="w-full h-56 md:h-72 rounded-t-2xl overflow-hidden bg-gray-100 border-b border-white/50">
+                        <object data={src} type="application/pdf" className="w-full h-full">
+                          <iframe src={src} className="w-full h-full" title={acao.titulo} />
+                        </object>
+                      </div>
+                    );
+                  }
+
+                  // fallback: renderizar imagem (suporta data:image, blob:, http...)
+                  return (
+                    <img
+                      src={src}
+                      alt={acao.titulo}
+                      className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
+                    />
+                  );
+                })()}
                 {acao.tag && (
                   <div
                     className={`absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}

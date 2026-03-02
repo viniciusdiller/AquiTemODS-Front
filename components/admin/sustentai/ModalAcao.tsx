@@ -40,7 +40,8 @@ export default function ModalAcao({
 
   const getFullImageUrl = (path?: string | null) => {
     if (!path) return null;
-    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    // Aceita data: (base64), blob: e http(s) como URLs válidas
+    if (path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")) return path;
     const normalized = path.replace(/\\/g, "/");
     return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
   };
@@ -285,7 +286,8 @@ export default function ModalAcao({
                     <span className="text-sm">Selecionar imagem</span>
                     <input
                       type="file"
-                      accept="image/*"
+                      // permite imagens e PDFs
+                      accept="image/*,application/pdf"
                       onChange={(e) => {
                         const f = e.target.files?.[0] ?? null;
                         setSelectedFile(f);
@@ -297,7 +299,28 @@ export default function ModalAcao({
 
                 <div className="flex-1">
                   {previewUrl ? (
-                    <img src={getFullImageUrl(previewUrl) || undefined} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
+                    (() => {
+                      const src = getFullImageUrl(previewUrl) || previewUrl;
+                      const lower = (previewUrl || "").toLowerCase();
+                      const isDataPdf = lower.startsWith("data:application/pdf");
+                      const isPdfExt = src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                      const isPdfByType = selectedFile?.type === "application/pdf";
+                      const isPdf = isDataPdf || isPdfExt || isPdfByType;
+
+                      if (isPdf) {
+                        return (
+                          <div className="w-full h-40 md:h-56 rounded-xl overflow-hidden bg-gray-100 border">
+                            <object data={src} type="application/pdf" className="w-full h-full">
+                              <iframe src={src} className="w-full h-full" title="Preview PDF" />
+                            </object>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <img src={src} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
+                      );
+                    })()
                   ) : (
                     <div className="h-24 w-full flex items-center justify-center rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
                       Nenhuma imagem selecionada

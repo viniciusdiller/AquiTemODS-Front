@@ -427,6 +427,9 @@ export const adminResendConfirmation = (id: number, token: string) =>
 // PÚBLICO: Buscar todas as ações (Não precisa de token)
 export const getAcoesSustentai = () => fetchApi("/api/sustentai/acoes");
 
+// Novo: buscar newsletters (rota criada no backend: GET /api/sustentai/newsletter)
+export const getNewsletters = () => fetchApi("/api/sustentai/newsletter");
+
 // PÚBLICO: Buscar uma ação específica por ID/Slug para a página interna
 export const getAcaoSustentaiById = (id: string | number) =>
   fetchApi(`/api/sustentai/acoes/${id}`);

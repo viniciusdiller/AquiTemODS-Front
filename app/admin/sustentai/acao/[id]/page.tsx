@@ -92,6 +92,21 @@ export default function AdminConstrutorAcaoPage() {
   const updateBlock = (id: string, field: keyof Block, value: any) =>
     setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
 
+  // Lida com seleção de arquivo para blocos do tipo 'image'. Converte em data URL para preview e envio.
+  const handleSelectFileForBlock = (id: string, file: File | null) => {
+    if (!file) return updateBlock(id, 'content', '');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // salva data: URL (ou URL direto) no conteúdo do bloco
+      updateBlock(id, 'content', result);
+      // opcional: armazena nome do arquivo para feedback
+      updateBlock(id, 'bgColor', 'file:' + (file.name || ''));
+    };
+    // Para imagens e PDFs usamos readAsDataURL
+    reader.readAsDataURL(file);
+  };
+
   const removeBlock = (id: string) => setBlocks((prev) => prev.filter((b) => b.id !== id));
 
   const handleSalvar = async () => {
@@ -246,18 +261,55 @@ export default function AdminConstrutorAcaoPage() {
                 />
               ) : (
                 <div className="space-y-3 mt-2">
-                  <input
-                    type="text"
-                    value={block.content}
-                    onChange={(e) => updateBlock(block.id, "content", e.target.value)}
-                    placeholder="URL da imagem (ex: https://... ou /Cursos/foto.png)"
-                    className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#3C6AB2]/50 focus:outline-none"
-                  />
-                  {block.content && (
-                    <div className="w-full h-48 md:h-64 rounded-xl overflow-hidden border border-gray-100 relative bg-gray-50">
-                      <img src={block.content} alt="Preview" className="w-full h-full object-contain" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                    <div>
+                      <label className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-4 py-2 rounded-xl font-medium cursor-pointer shadow-md hover:opacity-90">
+                        <span className="text-sm">Selecionar arquivo</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0] ?? null;
+                            handleSelectFileForBlock(block.id, f);
+                          }}
+                          className="sr-only"
+                        />
+                      </label>
+                      <div className="text-xs text-gray-500 mt-2">Aceita imagens e PDFs. Será convertido em preview.</div>
                     </div>
-                  )}
+
+                    <div className="md:col-span-2">
+                      <input
+                        type="text"
+                        value={block.content}
+                        onChange={(e) => updateBlock(block.id, "content", e.target.value)}
+                        placeholder="Ou cole a URL da imagem/PDF (ex: https://... ou /Cursos/foto.png)"
+                        className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#3C6AB2]/50 focus:outline-none"
+                      />
+
+                      {block.content && (
+                        <div className="w-full h-48 md:h-64 rounded-xl overflow-hidden border border-gray-100 relative bg-gray-50 mt-3">
+                          {(() => {
+                            const src = block.content;
+                            const lower = (src || "").toLowerCase();
+                            const isDataPdf = lower.startsWith("data:application/pdf");
+                            const isPdfExt = src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                            const isPdf = isDataPdf || isPdfExt || (src && src.includes("application/pdf"));
+
+                            if (isPdf) {
+                              return (
+                                <object data={src} type="application/pdf" className="w-full h-full">
+                                  <iframe src={src} className="w-full h-full" title="Preview PDF" />
+                                </object>
+                              );
+                            }
+
+                            return <img src={src} alt="Preview" className="w-full h-full object-contain" />;
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

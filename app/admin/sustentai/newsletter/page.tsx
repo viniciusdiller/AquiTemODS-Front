@@ -61,21 +61,125 @@ const AdminSustentAi = () => {
   const router = useRouter();
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // Helpers resilientes para endpoints /sustentai (tenta variações comuns)
+  const pathsToTryBase = [
+    `/api/sustentai`,
+    `/sustentai`,
+    `/api/admin/sustentai`,
+    `/admin/sustentai`,
+    // algumas instalações expõem o recurso de newsletter num sub-path
+    `/api/sustentai/newsletter`,
+    `/sustentai/newsletter`,
+    `/api/admin/sustentai/newsletter`,
+    `/admin/sustentai/newsletter`,
+  ];
+
+  async function tryFetchSustentaiList() {
+    const attempted: string[] = [];
+    for (const base of pathsToTryBase) {
+      const full = `${API_URL}${base}`;
+      attempted.push(full);
+      try {
+        // eslint-disable-next-line no-console
+        console.debug(`tryFetchSustentaiList: tentando ${full}`);
+        const res = await fetch(full);
+        if (!res.ok) {
+          // eslint-disable-next-line no-console
+          console.debug(`tryFetchSustentaiList: ${full} respondeu ${res.status}`);
+          continue;
+        }
+        return await res.json();
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.debug(`tryFetchSustentaiList: erro em ${full}`, e);
+      }
+    }
+    const err: any = new Error(`Nenhum endpoint /sustentai respondeu corretamente. URLs tentadas: ${attempted.join(", ")}`);
+    err.attempted = attempted;
+    throw err;
+  }
+
+  async function trySubmitSustentai(formData: FormData, token: string, editingId?: number | null) {
+    const attempted: string[] = [];
+    const method = editingId ? "PUT" : "POST";
+    for (const base of pathsToTryBase) {
+      const full = editingId ? `${API_URL}${base}/${editingId}` : `${API_URL}${base}`;
+      attempted.push(full);
+      try {
+        // eslint-disable-next-line no-console
+        console.debug(`trySubmitSustentai: tentando ${method} ${full}`);
+        const res = await fetch(full, {
+          method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        if (!res.ok) {
+          try {
+            const txt = await res.text();
+            // eslint-disable-next-line no-console
+            console.debug(`trySubmitSustentai: ${full} respondeu ${res.status}`, txt);
+          } catch (e) {}
+          continue;
+        }
+        return await res.json();
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.debug(`trySubmitSustentai: erro ao tentar ${full}`, e);
+      }
+    }
+    const err: any = new Error(`Falha ao salvar /sustentai. URLs tentadas: ${attempted.join(", ")}`);
+    err.attempted = attempted;
+    throw err;
+  }
+
+  async function tryDeleteSustentai(titulo: string, token: string) {
+    const attempted: string[] = [];
+    for (const base of pathsToTryBase) {
+      const full = `${API_URL}${base}/${encodeURIComponent(titulo)}`;
+      attempted.push(full);
+      try {
+        // eslint-disable-next-line no-console
+        console.debug(`tryDeleteSustentai: tentando DELETE ${full}`);
+        const res = await fetch(full, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          // eslint-disable-next-line no-console
+          console.debug(`tryDeleteSustentai: ${full} respondeu ${res.status}`);
+          continue;
+        }
+        return true;
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.debug(`tryDeleteSustentai: erro ao tentar ${full}`, e);
+      }
+    }
+    const err: any = new Error(`Falha ao excluir /sustentai. URLs tentadas: ${attempted.join(", ")}`);
+    err.attempted = attempted;
+    throw err;
+  }
+
   const getFullImageUrl = (path: string) => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
     return `${API_URL}${path}`;
   };
 
+  // Substitui o fetchCards para usar o helper resiliente
   const fetchCards = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/sustentai`);
-      if (!res.ok) throw new Error("Erro ao buscar dados");
-      const data = await res.json();
+      const data = await tryFetchSustentaiList();
       setCards(data);
     } catch (error) {
-      message.error("Erro ao carregar boxes.");
+      message.error("Erro ao carregar boxes. Veja console para detalhes.");
+      // eslint-disable-next-line no-console
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -142,26 +246,7 @@ const AdminSustentAi = () => {
 
     setSubmitting(true);
     try {
-      let url = `${API_URL}/api/sustentai`;
-      let method = "POST";
-
-      if (editingId) {
-        url = `${API_URL}/api/sustentai/${editingId}`;
-        method = "PUT";
-      }
-
-      const res = await fetch(url, {
-        method: method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Erro ao salvar");
-      }
+      await trySubmitSustentai(formData, token, editingId);
 
       message.success(
         editingId ? "Box atualizada com sucesso!" : "Nova Box criada!",
@@ -169,7 +254,9 @@ const AdminSustentAi = () => {
       cancelEdit();
       fetchCards();
     } catch (error: any) {
-      message.error(error.message);
+      message.error(error?.message || "Erro ao salvar. Veja console para detalhes.");
+      // eslint-disable-next-line no-console
+      console.error("trySubmitSustentai erro:", error);
     } finally {
       setSubmitting(false);
     }
@@ -178,22 +265,13 @@ const AdminSustentAi = () => {
   const handleDelete = async (tituloParaDeletar: string) => {
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch(
-        `${API_URL}/api/sustentai/${encodeURIComponent(tituloParaDeletar)}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!res.ok) throw new Error("Erro ao deletar");
-
+      await tryDeleteSustentai(tituloParaDeletar, token || "");
       message.success("Box removida.");
       fetchCards();
     } catch (error) {
-      message.error("Erro ao excluir box.");
+      message.error("Erro ao excluir box. Veja console para detalhes.");
+      // eslint-disable-next-line no-console
+      console.error(error);
     }
   };
 

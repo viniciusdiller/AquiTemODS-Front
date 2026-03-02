@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import {
   registerSustentAiCardClick,
-  getAcoesSustentai,
+  getNewsletters,
   getHeaderSustentai,
   getPessoasSustentai,
 } from "@/lib/api";
@@ -49,8 +49,9 @@ export default function SustentAiPage() {
       setLoading(true);
       try {
         // Busca separada para evitar falha em cascata
-        const acoes = await getAcoesSustentai().catch((err) => {
-          console.error("Erro ao buscar ações SustentAí:", err);
+        // Agora usamos a rota de newsletters criada no backend
+        const acoes = await getNewsletters().catch((err) => {
+          console.error("Erro ao buscar newsletters SustentAí:", err);
           return [] as any[];
         });
 

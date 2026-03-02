@@ -17,7 +17,8 @@ export default function PaginaAcaoInterna() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const getFullImageUrl = (path: string) => {
     if (!path) return "/enigmas_do_futuro.png";
-    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    // aceitamos data: (base64), blob: e http(s) como URLs válidas
+    if (path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")) return path;
     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
   };
 
