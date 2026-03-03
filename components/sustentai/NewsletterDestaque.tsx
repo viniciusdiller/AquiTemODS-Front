@@ -36,7 +36,7 @@ export default function NewsletterDestaque() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const getFullImageUrl = (path: string) => {
     if (!path) return "/placeholder-image.png";

@@ -24,6 +24,8 @@ interface SustentAiCard {
   titulo: string;
   linkDestino: string;
   imagemUrl: string;
+  tag?: string | null;
+  corDestaque?: string | null; // pode ser uma classe tailwind (ex.: 'bg-[#D7386E]') ou um hex
 }
 
 export default function SustentAiPage() {
@@ -53,6 +55,8 @@ export default function SustentAiPage() {
               titulo: a.titulo || a.title || "",
               linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
               imagemUrl: a.imagemUrl || a.imagem || a.imagem_url || "",
+              tag: a.tag || a.label || a.tagText || null,
+              corDestaque: a.corDestaque || a.tagClass || a.tagColor || null,
             }))
           : [];
 
@@ -162,6 +166,24 @@ export default function SustentAiPage() {
                     onClick={() => registerSustentAiCardClick(card.id)}
                   >
                     <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3]">
+                      {/* Badge no canto superior direito, se existir */}
+                      {card.tag && (
+                        // Se corDestaque for um valor hex (#...), usa style inline. Senão aplica como classe (tailwind).
+                        (card.corDestaque && card.corDestaque.startsWith("#")) ? (
+                          <div
+                            className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm"
+                            style={{ backgroundColor: card.corDestaque }}
+                          >
+                            {card.tag}
+                          </div>
+                        ) : (
+                          <div
+                            className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-gray-800 bg-white/90 ${card.corDestaque || ""}`}
+                          >
+                            {card.tag}
+                          </div>
+                        )
+                      )}
                       <Image
                         src={getFullImageUrl(card.imagemUrl)}
                         alt={card.titulo}
