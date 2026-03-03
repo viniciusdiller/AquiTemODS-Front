@@ -11,8 +11,6 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
-
-// Adiciona hooks e funções de API para integrar com admin SustentAi
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,18 +27,16 @@ export default function ModalAcao({
   acaoAtual,
   onSave,
 }: ModalAcaoProps) {
-  // Estados do formulário
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tag, setTag] = useState("");
-  // Somente envio por arquivo: armazena o arquivo selecionado e uma URL de preview
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const getFullImageUrl = (path?: string | null) => {
     if (!path) return null;
-    // Aceita data: (base64), blob: e http(s) como URLs válidas
     if (
       path.startsWith("http") ||
       path.startsWith("blob:") ||
@@ -55,19 +51,16 @@ export default function ModalAcao({
   const [corFundo, setCorFundo] = useState("bg-pink-50/30");
   const [corBorda, setCorBorda] = useState("border-pink-100");
 
-  // Novo estado para submissão
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const submittedRef = useRef(false);
 
-  // Preenche o formulário se for edição, ou limpa se for criação
   useEffect(() => {
     if (acaoAtual) {
       setTitulo(acaoAtual.titulo || "");
       setDescricao(acaoAtual.descricao || "");
       setTag(acaoAtual.tag || "");
-      // mostra preview da imagem já salva (quando existir)
       setPreviewUrl(acaoAtual.imagemUrl || null);
       setCorDestaque(acaoAtual.corDestaque || "text-[#D7386E]");
       setCorFundo(acaoAtual.corFundo || "bg-pink-50/30");
@@ -84,7 +77,7 @@ export default function ModalAcao({
     }
   }, [acaoAtual, isOpen]);
 
-  // libera objectURL quando trocar de arquivo para evitar memory leaks
+  // Libera objectURL para evitar memory leaks
   useEffect(() => {
     if (!selectedFile) return;
     const url = URL.createObjectURL(selectedFile);
@@ -92,56 +85,43 @@ export default function ModalAcao({
     return () => {
       try {
         if (url && url.startsWith("blob:")) URL.revokeObjectURL(url);
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     };
   }, [selectedFile]);
 
   const handleClose = () => {
-    // Reseta o flag para permitir novas submissões quando o modal for fechado
     submittedRef.current = false;
     onClose();
   };
 
-  // Handler para criar/atualizar ação usando API de admin
   async function handleSave() {
-    // Proteção contra submissões duplicadas rápidas
-    if (submittedRef.current) {
-      console.log(
-        "ModalAcao: submissão já em andamento ou já enviada — ignorando",
-      );
-      return;
-    }
+    if (submittedRef.current || isSubmitting) return;
 
     submittedRef.current = true;
-    // evita múltiplos cliques
-    if (isSubmitting) return;
     setIsSubmitting(true);
 
-    // VALIDAÇÃO CLIENT-SIDE: evita enviar payload vazio que o servidor rejeita
     if (!titulo || !descricao) {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha o título e a descrição antes de salvar.",
+        className: "bg-gray-100 border-gray-300 text-gray-800",
       });
       setIsSubmitting(false);
       submittedRef.current = false;
       return;
     }
 
-    // Agora o fluxo exige um arquivo — validação
-    if (!selectedFile) {
+    if (!selectedFile && !acaoAtual) {
       toast({
         title: "Arquivo obrigatório",
         description: "Selecione uma imagem para enviar.",
+        className: "bg-gray-100 border-gray-300 text-gray-800",
       });
       setIsSubmitting(false);
       submittedRef.current = false;
       return;
     }
 
-    // Helper: gera um slug simples a partir do título (compatível com a maioria dos backends)
     const generateSlug = (text: string) =>
       text
         .toLowerCase()
@@ -162,61 +142,63 @@ export default function ModalAcao({
       ordem: acaoAtual?.ordem ?? 0,
     };
 
-    // Prepara FormData com o arquivo e os campos
     const form = new FormData();
-    form.append("imagem", selectedFile, selectedFile.name);
+    if (selectedFile) {
+      form.append("imagem", selectedFile, selectedFile.name);
+    }
     Object.entries(payload).forEach(([key, value]) => {
       if (value !== undefined && value !== null)
         form.append(key, String(value));
     });
-    const bodyToSend = form;
 
-    // feedback inicial (opcional) para indicar que a requisição começou
     try {
       toast({
         title: "Enviando",
         description: "Enviando dados para o servidor...",
+        className: "bg-gray-100 border-gray-300 text-gray-800",
       });
-    } catch (e) {
-      // ignore se o toast falhar
-    }
 
-    try {
-      if (acaoAtual && acaoAtual.id) {
-        // inclui o id em um campo textual apenas para acompanhar (o backend usa a rota com id)
+      if (acaoAtual?.id) {
         form.append("id", String(acaoAtual.id));
       }
 
       if (onSave) {
-        const maybePromise = onSave(bodyToSend);
-        // Use an explicit null/undefined check to satisfy TypeScript strict null checks
+        const maybePromise = onSave(form);
         if (
           maybePromise != null &&
           typeof (maybePromise as any).then === "function"
         ) {
-          await maybePromise; // aguarda conclusão para dar feedback mais consistente
+          await maybePromise;
         }
       }
 
-      // Fecha o modal; o handleClose resetará submittedRef
+      // Feedback de sucesso em verde
+      toast({
+        title: "Sucesso!",
+        description: "Ação salva com êxito.",
+        className: "bg-green-600 border-green-700 text-white",
+      });
+
       handleClose();
     } catch (error: any) {
       console.error("Erro ao salvar ação:", error);
       const message = error?.message || "Ocorreu um erro ao salvar a ação.";
       const details = error?.data || error?.response?.data;
-      console.warn("Detalhes do erro da API:", details);
 
-      // Permite nova tentativa se houve erro
       submittedRef.current = false;
 
       const description =
         details && typeof details === "object"
           ? JSON.stringify(details)
           : String(details || message);
-      toast({ title: "Erro", description: description });
+
+      toast({
+        title: "Erro",
+        description: description,
+        className: "bg-gray-100 border-red-300 text-red-600",
+      });
     } finally {
       setIsSubmitting(false);
-      // NOTA: não resetar submittedRef aqui em caso de sucesso — handleClose fará isso.
     }
   }
 
@@ -225,7 +207,6 @@ export default function ModalAcao({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Header do Modal */}
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
           <h2 className="text-xl font-bold text-gray-800">
             {acaoAtual ? "Editar Ação" : "Adicionar Nova Ação"}
@@ -238,9 +219,7 @@ export default function ModalAcao({
           </button>
         </div>
 
-        {/* Corpo do Modal (Formulário) */}
         <div className="p-6 overflow-y-auto flex-grow space-y-6">
-          {/* Textos Principais */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-[#D7386E] font-semibold mb-2">
               <Type className="w-5 h-5" /> Textos Principais
@@ -260,7 +239,6 @@ export default function ModalAcao({
                 />
               </div>
               <div>
-                {/* NOVO CAMPO: TAG */}
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
                   <Tag className="w-4 h-4 text-gray-400" /> Tag
                 </label>
@@ -290,7 +268,6 @@ export default function ModalAcao({
 
           <hr className="border-gray-100" />
 
-          {/* Mídia */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-[#3C6AB2] font-semibold mb-2">
               <ImageIcon className="w-5 h-5" /> Mídia
@@ -306,7 +283,6 @@ export default function ModalAcao({
                     <span className="text-sm">Selecionar imagem</span>
                     <input
                       type="file"
-                      // permite imagens e PDFs
                       accept="image/*,application/pdf"
                       onChange={(e) => {
                         const f = e.target.files?.[0] ?? null;
@@ -374,7 +350,6 @@ export default function ModalAcao({
 
           <hr className="border-gray-100" />
 
-          {/* Estilização */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-purple-600 font-semibold mb-2">
               <Palette className="w-5 h-5" /> Estilo Visual
@@ -423,7 +398,6 @@ export default function ModalAcao({
           </div>
         </div>
 
-        {/* Footer do Modal */}
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
             {acaoAtual ? (

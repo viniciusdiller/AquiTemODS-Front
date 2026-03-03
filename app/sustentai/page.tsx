@@ -17,7 +17,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
-import NewsletterDestaque from "@/components/sustentai/NewsletterDestaque";
+import NewsletterDestaque from "@/components/sustentai/Blog";
 
 interface SustentAiCard {
   id: number;
@@ -167,9 +167,10 @@ export default function SustentAiPage() {
                   >
                     <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3]">
                       {/* Badge no canto superior direito, se existir */}
-                      {card.tag && (
+                      {card.tag &&
                         // Se corDestaque for um valor hex (#...), usa style inline. Senão aplica como classe (tailwind).
-                        (card.corDestaque && card.corDestaque.startsWith("#")) ? (
+                        (card.corDestaque &&
+                        card.corDestaque.startsWith("#") ? (
                           <div
                             className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm"
                             style={{ backgroundColor: card.corDestaque }}
@@ -182,8 +183,7 @@ export default function SustentAiPage() {
                           >
                             {card.tag}
                           </div>
-                        )
-                      )}
+                        ))}
                       <Image
                         src={getFullImageUrl(card.imagemUrl)}
                         alt={card.titulo}

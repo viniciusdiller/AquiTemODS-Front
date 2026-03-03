@@ -3,9 +3,8 @@ import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Definição do tipo de dado que vem do backend
 interface Curso {
   id: number;
   titulo: string;
@@ -15,30 +14,30 @@ interface Curso {
 
 export default function SobrePage() {
   const jaContabilizou = useRef(false);
-  
-  // Estados para gerenciar os dados dinâmicos
+
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Estados para a paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   useEffect(() => {
-    // 1. Lógica do Contador de Visualizações da Página (Mantida)
+    // Contabiliza visualização da página Espaço ODS
     if (!jaContabilizou.current) {
       jaContabilizou.current = true;
       fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/ESPACO_ODS`,
-        {
-          method: "POST",
-        }
+        { method: "POST" },
       ).catch((err) => console.error("Erro contador Espaço ODS:", err));
     }
 
-    // 2. Busca os cursos do Backend
+    // Busca os cursos ativos no backend
     const fetchCursos = async () => {
       try {
-        // --- CORREÇÃO IMPORTANTE AQUI ---
-        // Alinhado com o Backend que espera ?status=ativo
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos?status=ativo`);
-        
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/cursos?status=ativo`,
+        );
         if (res.ok) {
           const data = await res.json();
           setCursos(data);
@@ -55,18 +54,15 @@ export default function SobrePage() {
     fetchCursos();
   }, []);
 
-  // Função auxiliar para resolver a URL da imagem
   const getFullImageUrl = (path: string) => {
-    if (!path) return "/placeholder.svg"; // Imagem padrão caso venha vazio
-    if (path.startsWith("http")) return path; // Se já for link externo
-    return `${process.env.NEXT_PUBLIC_API_URL}${path}`; // Concatena com a URL da API
+    if (!path) return "/placeholder.svg";
+    if (path.startsWith("http")) return path;
+    return `${process.env.NEXT_PUBLIC_API_URL}${path}`;
   };
 
-  // --- NOVA LÓGICA: Função para registrar o clique no curso ---
+  // Registra o clique no curso de forma assíncrona sem travar a navegação
   const handleCursoClick = async (id: number) => {
     try {
-      // Chama a rota PATCH criada no backend. 
-      // Não precisamos de 'await' aqui pois não queremos travar a abertura do link.
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos/${id}/click`, {
         method: "PATCH",
       });
@@ -75,10 +71,15 @@ export default function SobrePage() {
     }
   };
 
+  // Lógica matemática da paginação
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCursos = cursos.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(cursos.length / itemsPerPage);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
-        {/* --- SEÇÃO INICIAL --- */}
         <section className="mb-8">
           <div className="md:flex md:items-start md:gap-8 lg:gap-12">
             <div className="md:w-2/3">
@@ -95,7 +96,7 @@ export default function SobrePage() {
               </h1>
               <p className="text-gray-700 leading-relaxed text-lg">
                 Os{" "}
-                <strong>Objetivos de Desenvolvimento Sustentável(ODS)</strong>{" "}
+                <strong>Objetivos de Desenvolvimento Sustentável (ODS)</strong>{" "}
                 são um conjunto de{" "}
                 <strong>
                   metas globais estabelecidas pela Organização das Nações Unidas
@@ -106,10 +107,6 @@ export default function SobrePage() {
                   erradicar a pobreza, proteger o planeta e promover
                   prosperidade e paz para todas as pessoas até 2030.
                 </strong>
-              </p>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                erradicar a pobreza, proteger o planeta e promover prosperidade
-                e paz para todas as pessoas até 2030.
               </p>
               <p className="text-gray-700 leading-relaxed text-lg mt-4">
                 A Agenda 2030 é o pacto internacional que reúne esses objetivos
@@ -136,7 +133,6 @@ export default function SobrePage() {
           </div>
         </section>
 
-        {/* --- CONTEÚDO PRINCIPAL --- */}
         <section className="mt-8 border-t pt-6">
           <h2 className="text-3xl font-semibold text-left mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
@@ -184,7 +180,7 @@ export default function SobrePage() {
           <ul className=" mt-3 list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
             <li>
               <strong>Integra políticas públicas</strong> (educação, saúde, meio
-              ambiente, mobilidade, economia) sob uma mesma visão de futuro;{" "}
+              ambiente, mobilidade, economia) sob uma mesma visão de futuro;
             </li>
             <li>
               <strong>Monitora resultados e indicadores locais</strong>,
@@ -232,7 +228,6 @@ export default function SobrePage() {
           </p>
         </section>
 
-        {/* --- SEÇÃO DE CURSOS (DINÂMICA) --- */}
         <section className="mt-12 border-t pt-6">
           <h2 className="text-3xl font-semibold text-center mb-10">
             <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
@@ -250,14 +245,14 @@ export default function SobrePage() {
                 Nenhuma capacitação encontrada no momento.
               </div>
             ) : (
-              cursos.map((curso) => (
+              currentCursos.map((curso) => (
                 <Link
                   key={curso.id}
                   href={curso.linkDestino}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block text-center"
-                  onClick={() => handleCursoClick(curso.id)} // <--- CLIQUE REGISTRADO AQUI
+                  onClick={() => handleCursoClick(curso.id)}
                 >
                   <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3] bg-gray-50">
                     <Image
@@ -274,9 +269,46 @@ export default function SobrePage() {
               ))
             )}
           </div>
+
+          {/* Novos Controles de Paginação (Mais modernos) */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 sm:gap-6 mt-14">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="group flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold shadow-sm disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#D7386E] hover:text-[#D7386E] transition-all duration-300"
+              >
+                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                <span className="hidden sm:inline">Anterior</span>
+              </button>
+
+              <div className="flex items-center gap-3">
+                <span className="text-gray-500 font-medium text-sm hidden sm:inline">
+                  Página
+                </span>
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold shadow-md">
+                  {currentPage}
+                </span>
+                <span className="text-gray-500 font-medium text-sm">
+                  de {totalPages}
+                </span>
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="group flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold shadow-sm disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#3C6AB2] hover:text-[#3C6AB2] transition-all duration-300"
+              >
+                <span className="hidden sm:inline">Próxima</span>
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          )}
         </section>
 
-        <section className="mt-8 border-t pt-6">
+        <section className="mt-12 border-t pt-6">
           <p className="text-gray-700 leading-relaxed text-lg mt-4">
             Os ODS e a Agenda 2030 representam{" "}
             <strong>um compromisso coletivo pelo futuro</strong>. E os

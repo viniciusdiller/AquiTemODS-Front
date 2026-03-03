@@ -219,6 +219,29 @@ export default function PaginaAcaoInterna() {
     };
     return oldMap[bg] || bg;
   };
+  const formatarData = (dataString: string) => {
+    if (!dataString) return "Publicado recentemente";
+    try {
+      const data = new Date(dataString);
+
+      if (isNaN(data.getTime())) return dataString;
+
+      const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(data);
+
+      return dataFormatada.replace(
+        / de ([a-z])/g,
+        (match, primeiraLetraMes) => {
+          return ` de ${primeiraLetraMes.toUpperCase()}`;
+        },
+      );
+    } catch (error) {
+      return dataString;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
@@ -248,7 +271,9 @@ export default function PaginaAcaoInterna() {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
                 <Calendar className="w-4 h-4 text-[#3C6AB2]" />{" "}
-                {acao.data || "Publicado recentemente"}
+                <span className="capitalize-first">
+                  {formatarData(acao.data)}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
                 Por{" "}
