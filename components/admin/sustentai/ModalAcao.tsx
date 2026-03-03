@@ -41,7 +41,12 @@ export default function ModalAcao({
   const getFullImageUrl = (path?: string | null) => {
     if (!path) return null;
     // Aceita data: (base64), blob: e http(s) como URLs válidas
-    if (path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")) return path;
+    if (
+      path.startsWith("http") ||
+      path.startsWith("blob:") ||
+      path.startsWith("data:")
+    )
+      return path;
     const normalized = path.replace(/\\/g, "/");
     return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
   };
@@ -103,7 +108,9 @@ export default function ModalAcao({
   async function handleSave() {
     // Proteção contra submissões duplicadas rápidas
     if (submittedRef.current) {
-      console.log("ModalAcao: submissão já em andamento ou já enviada — ignorando");
+      console.log(
+        "ModalAcao: submissão já em andamento ou já enviada — ignorando",
+      );
       return;
     }
 
@@ -125,7 +132,10 @@ export default function ModalAcao({
 
     // Agora o fluxo exige um arquivo — validação
     if (!selectedFile) {
-      toast({ title: "Arquivo obrigatório", description: "Selecione uma imagem para enviar." });
+      toast({
+        title: "Arquivo obrigatório",
+        description: "Selecione uma imagem para enviar.",
+      });
       setIsSubmitting(false);
       submittedRef.current = false;
       return;
@@ -156,13 +166,17 @@ export default function ModalAcao({
     const form = new FormData();
     form.append("imagem", selectedFile, selectedFile.name);
     Object.entries(payload).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) form.append(key, String(value));
+      if (value !== undefined && value !== null)
+        form.append(key, String(value));
     });
     const bodyToSend = form;
 
     // feedback inicial (opcional) para indicar que a requisição começou
     try {
-      toast({ title: "Enviando", description: "Enviando dados para o servidor..." });
+      toast({
+        title: "Enviando",
+        description: "Enviando dados para o servidor...",
+      });
     } catch (e) {
       // ignore se o toast falhar
     }
@@ -176,7 +190,10 @@ export default function ModalAcao({
       if (onSave) {
         const maybePromise = onSave(bodyToSend);
         // Use an explicit null/undefined check to satisfy TypeScript strict null checks
-        if (maybePromise != null && typeof (maybePromise as any).then === "function") {
+        if (
+          maybePromise != null &&
+          typeof (maybePromise as any).then === "function"
+        ) {
           await maybePromise; // aguarda conclusão para dar feedback mais consistente
         }
       }
@@ -192,7 +209,10 @@ export default function ModalAcao({
       // Permite nova tentativa se houve erro
       submittedRef.current = false;
 
-      const description = details && typeof details === "object" ? JSON.stringify(details) : String(details || message);
+      const description =
+        details && typeof details === "object"
+          ? JSON.stringify(details)
+          : String(details || message);
       toast({ title: "Erro", description: description });
     } finally {
       setIsSubmitting(false);
@@ -302,23 +322,39 @@ export default function ModalAcao({
                     (() => {
                       const src = getFullImageUrl(previewUrl) || previewUrl;
                       const lower = (previewUrl || "").toLowerCase();
-                      const isDataPdf = lower.startsWith("data:application/pdf");
-                      const isPdfExt = src && src.toLowerCase().split("?")[0].endsWith(".pdf");
-                      const isPdfByType = selectedFile?.type === "application/pdf";
+                      const isDataPdf = lower.startsWith(
+                        "data:application/pdf",
+                      );
+                      const isPdfExt =
+                        src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                      const isPdfByType =
+                        selectedFile?.type === "application/pdf";
                       const isPdf = isDataPdf || isPdfExt || isPdfByType;
 
                       if (isPdf) {
                         return (
                           <div className="w-full h-40 md:h-56 rounded-xl overflow-hidden bg-gray-100 border">
-                            <object data={src} type="application/pdf" className="w-full h-full">
-                              <iframe src={src} className="w-full h-full" title="Preview PDF" />
+                            <object
+                              data={src}
+                              type="application/pdf"
+                              className="w-full h-full"
+                            >
+                              <iframe
+                                src={src}
+                                className="w-full h-full"
+                                title="Preview PDF"
+                              />
                             </object>
                           </div>
                         );
                       }
 
                       return (
-                        <img src={src} alt="Preview" className="max-h-40 rounded-xl object-contain border" />
+                        <img
+                          src={src}
+                          alt="Preview"
+                          className="max-h-40 rounded-xl object-contain border"
+                        />
                       );
                     })()
                   ) : (
@@ -327,11 +363,12 @@ export default function ModalAcao({
                     </div>
                   )}
                   {selectedFile && (
-                    <p className="text-xs text-gray-500 mt-2">Arquivo selecionado: {selectedFile.name}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Arquivo selecionado: {selectedFile.name}
+                    </p>
                   )}
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">* Envie um arquivo de imagem. O backend deve gravar a imagem e retornar a URL.</p>
             </div>
           </div>
 
@@ -414,7 +451,7 @@ export default function ModalAcao({
               onClick={handleSave}
               disabled={isSubmitting}
               aria-busy={isSubmitting}
-              className={`px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}
+              className={`px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto ${isSubmitting ? "opacity-60 pointer-events-none" : ""}`}
             >
               {isSubmitting ? (
                 <>
@@ -423,7 +460,8 @@ export default function ModalAcao({
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4" /> {acaoAtual ? "Salvar" : "Criar Ação"}
+                  <Save className="w-4 h-4" />{" "}
+                  {acaoAtual ? "Salvar" : "Criar Ação"}
                 </>
               )}
             </button>

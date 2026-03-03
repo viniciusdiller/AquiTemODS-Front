@@ -43,7 +43,8 @@
 
 .leaflet-popup-content-wrapper {
   border-radius: 0.5rem !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -173,4 +174,18 @@
 
     --primary: 339 65% 53%;
   }
+}
+
+.ql-snow .ql-color-picker .ql-picker-item[data-value=""]::before,
+.ql-snow .ql-bg-picker .ql-picker-item[data-value=""]::before {
+  content: "X" !important;
+  color: #000000 !important; /* Cor vermelha */
+  font-weight: 900 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: none !important; /* Remove a linha vermelha nativa */
 }

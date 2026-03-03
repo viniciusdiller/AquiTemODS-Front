@@ -10,12 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import {
-  registerSustentAiCardClick,
-  getNewsletters,
-  getHeaderSustentai,
-  getPessoasSustentai,
-} from "@/lib/api";
+import { registerSustentAiCardClick, getNewsletters } from "@/lib/api";
 import {
   Pagination,
   PaginationContent,
@@ -39,8 +34,7 @@ export default function SustentAiPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // Usa o mesmo fallback do lib/api para conveniência local
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     let mounted = true;
@@ -48,14 +42,11 @@ export default function SustentAiPage() {
     const carregarConteudo = async () => {
       setLoading(true);
       try {
-        // Busca separada para evitar falha em cascata
-        // Agora usamos a rota de newsletters criada no backend
         const acoes = await getNewsletters().catch((err) => {
           console.error("Erro ao buscar newsletters SustentAí:", err);
           return [] as any[];
         });
 
-        // Se por acaso a API pública central retornar outro shape, tentamos mapear
         const mapped = Array.isArray(acoes)
           ? acoes.map((a: any) => ({
               id: a.id,
@@ -104,7 +95,7 @@ export default function SustentAiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#D7386E] to-[#3C6AB2] py-20 px-6 sm:px-12">
+    <div className="min-h-screen py-20 px-6 sm:px-12">
       <div className="max-w-screen-fullhd mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
         {/* Cabeçalho */}
         <section className="mb-12">
@@ -190,7 +181,6 @@ export default function SustentAiPage() {
                 <div className="flex justify-center mt-10">
                   <Pagination>
                     <PaginationContent className="gap-2 sm:gap-4">
-                      {/* Botão Anterior Customizado */}
                       <PaginationItem>
                         <PaginationLink
                           href="#"
@@ -211,7 +201,6 @@ export default function SustentAiPage() {
                         </PaginationLink>
                       </PaginationItem>
 
-                      {/* Números das Páginas */}
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                         (page) => (
                           <PaginationItem key={page}>
@@ -237,7 +226,6 @@ export default function SustentAiPage() {
                         ),
                       )}
 
-                      {/* Botão Próximo Customizado */}
                       <PaginationItem>
                         <PaginationLink
                           href="#"

@@ -26,7 +26,6 @@ import {
   adminUpdateHeader,
 } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { Modal } from "antd";
 
 export default function AdminSustentaiPage() {
@@ -48,14 +47,14 @@ export default function AdminSustentaiPage() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  // Detecta visualização mobile (pequenas larguras). Usamos matchMedia para ser preciso no client.
-  const isMobile = typeof window !== "undefined" ? window.matchMedia("(max-width: 640px)").matches : false;
+  const isMobile =
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 640px)").matches
+      : false;
 
-  // 1. CARREGAR DADOS INICIAIS
   useEffect(() => {
     const carregarPainel = async () => {
       try {
-        // Faz chamadas individualmente para lidar melhor com 404/erros de servidor
         try {
           const dadosHeader = await getHeaderSustentai();
           setHeader(dadosHeader);
@@ -69,7 +68,6 @@ export default function AdminSustentaiPage() {
           });
         }
 
-        // Busca as AÇÕES (conteúdo das páginas) para o construtor
         try {
           const dadosAcoes = await getAcoesSustentai();
           const mappedAcoes = Array.isArray(dadosAcoes)
@@ -83,7 +81,8 @@ export default function AdminSustentaiPage() {
           console.warn("Falha ao buscar ações (conteúdo) do SustentAí:", err);
           toast({
             title: "Backend não respondeu (ações)",
-            description: "Não foi possível carregar as ações (conteúdo). Verifique o backend.",
+            description:
+              "Não foi possível carregar as ações (conteúdo). Verifique o backend.",
             variant: "destructive",
           });
         }
@@ -101,7 +100,8 @@ export default function AdminSustentaiPage() {
           console.warn("Falha ao buscar pessoas SustentAí:", err);
           toast({
             title: "Backend não respondeu (pessoas)",
-            description: "Não foi possível carregar as pessoas. Verifique o backend.",
+            description:
+              "Não foi possível carregar as pessoas. Verifique o backend.",
             variant: "destructive",
           });
         }
@@ -114,17 +114,16 @@ export default function AdminSustentaiPage() {
     carregarPainel();
   }, []);
 
-  // 2. FUNÇÃO: SALVAR OU EDITAR AÇÃO
   const savingRef = useRef(false);
 
   const handleSalvarAcao = async (dadosDaAcao: any) => {
     if (savingRef.current) {
-      console.warn("handleSalvarAcao: já existe uma solicitação em andamento — ignorando");
+      console.warn(
+        "handleSalvarAcao: já existe uma solicitação em andamento — ignorando",
+      );
       return null;
     }
     savingRef.current = true;
-    // Se o Modal já realizou a requisição e nos passou o objeto criado/atualizado,
-    // ele virá com um `id` — então apenas atualizamos o estado local sem chamar a API.
     try {
       if (!dadosDaAcao) return;
 
@@ -140,10 +139,12 @@ export default function AdminSustentaiPage() {
         return resultado;
       }
 
-      // Caso o Modal apenas nos envie os dados (payload) e não tenha feito a chamada,
-      // seguimos com o fluxo antigo: chamamos a API aqui.
       if (!token) {
-        toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+        toast({
+          title: "Sessão expirada",
+          description: "Faça login novamente.",
+          variant: "destructive",
+        });
         savingRef.current = false;
         return null;
       }
@@ -164,30 +165,39 @@ export default function AdminSustentaiPage() {
         setAcoes([...acoes, novaAcao]);
         resultado = novaAcao;
       }
-      setIsModalAcaoOpen(false); // Fecha o modal
+      setIsModalAcaoOpen(false);
       savingRef.current = false;
       return resultado;
     } catch (error) {
-      console.error('Erro ao salvar a ação:', error);
-      toast({ title: "Erro", description: "Erro ao salvar a ação no servidor.", variant: "destructive" });
+      console.error("Erro ao salvar a ação:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar a ação no servidor.",
+        variant: "destructive",
+      });
       savingRef.current = false;
       return null;
     }
   };
 
-  // 3. FUNÇÃO: EXCLUIR AÇÃO
   const handleDeleteAcao = async (id: number) => {
     if (!token) {
-      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      toast({
+        title: "Sessão expirada",
+        description: "Faça login novamente.",
+        variant: "destructive",
+      });
       return;
     }
     if (isMobile) {
-      // Em mobile mostramos confirmação por toast (toque mais fácil)
       const t = toast({
         title: "Confirmar exclusão",
         description: (
           <div>
-            <div>Tem certeza que deseja excluir esta ação do banco de dados? Esta ação é irreversível.</div>
+            <div>
+              Tem certeza que deseja excluir esta ação do banco de dados? Esta
+              ação é irreversível.
+            </div>
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={async (e) => {
@@ -195,11 +205,22 @@ export default function AdminSustentaiPage() {
                   try {
                     await adminDeleteAcao(id, token);
                     setAcoes((prev) => prev.filter((a) => a.id !== id));
-                    try { t.dismiss(); } catch (err) {}
-                    toast({ title: "Removido", description: "Ação excluída com sucesso." });
+                    try {
+                      t.dismiss();
+                    } catch (err) {}
+                    toast({
+                      title: "Removido",
+                      description: "Ação excluída com sucesso.",
+                    });
                   } catch (error) {
-                    try { t.dismiss(); } catch (err) {}
-                    toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
+                    try {
+                      t.dismiss();
+                    } catch (err) {}
+                    toast({
+                      title: "Erro",
+                      description: "Erro ao excluir.",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 className="px-3 py-1 rounded bg-red-600 text-white text-sm"
@@ -207,7 +228,12 @@ export default function AdminSustentaiPage() {
                 Excluir
               </button>
               <button
-                onClick={(e) => { e.preventDefault(); try { t.dismiss(); } catch (err) {} }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    t.dismiss();
+                  } catch (err) {}
+                }}
                 className="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm"
               >
                 Cancelar
@@ -219,10 +245,10 @@ export default function AdminSustentaiPage() {
       return;
     }
 
-    // Em desktop, usar modal padrão (mais visível em telas grandes)
     Modal.confirm({
       title: "Confirmar exclusão",
-      content: "Tem certeza que deseja excluir esta ação do banco de dados? Esta ação é irreversível.",
+      content:
+        "Tem certeza que deseja excluir esta ação do banco de dados? Esta ação é irreversível.",
       okText: "Excluir",
       okType: "danger",
       cancelText: "Cancelar",
@@ -230,9 +256,16 @@ export default function AdminSustentaiPage() {
         try {
           await adminDeleteAcao(id, token);
           setAcoes((prev) => prev.filter((a) => a.id !== id));
-          toast({ title: "Removido", description: "Ação excluída com sucesso." });
+          toast({
+            title: "Removido",
+            description: "Ação excluída com sucesso.",
+          });
         } catch (error) {
-          toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
+          toast({
+            title: "Erro",
+            description: "Erro ao excluir.",
+            variant: "destructive",
+          });
         }
       },
     });
@@ -240,12 +273,15 @@ export default function AdminSustentaiPage() {
 
   const handleSalvarPessoa = async (dados: any) => {
     if (!token) {
-      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      toast({
+        title: "Sessão expirada",
+        description: "Faça login novamente.",
+        variant: "destructive",
+      });
       return;
     }
     try {
       if (pessoaSendoEditada) {
-        // EDIÇÃO (PUT)
         const pessoaAtualizada = await adminUpdatePessoa(
           pessoaSendoEditada.id,
           dados,
@@ -257,19 +293,26 @@ export default function AdminSustentaiPage() {
           ),
         );
       } else {
-        // CRIAÇÃO (POST)
         const novaPessoa = await adminCreatePessoa(dados, token);
         setPessoas([...pessoas, novaPessoa]);
       }
       setIsModalPessoaOpen(false);
     } catch (error) {
-      toast({ title: "Erro", description: "Erro ao salvar pessoa.", variant: "destructive" });
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar pessoa.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDeletePessoa = async (id: number) => {
     if (!token) {
-      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      toast({
+        title: "Sessão expirada",
+        description: "Faça login novamente.",
+        variant: "destructive",
+      });
       return;
     }
     if (isMobile) {
@@ -277,7 +320,9 @@ export default function AdminSustentaiPage() {
         title: "Confirmar exclusão",
         description: (
           <div>
-            <div>Deseja excluir este membro da equipe? Esta ação é irreversível.</div>
+            <div>
+              Deseja excluir este membro da equipe? Esta ação é irreversível.
+            </div>
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={async (e) => {
@@ -285,11 +330,22 @@ export default function AdminSustentaiPage() {
                   try {
                     await adminDeletePessoa(id, token);
                     setPessoas((prev) => prev.filter((p) => p.id !== id));
-                    try { t.dismiss(); } catch (err) {}
-                    toast({ title: "Removido", description: "Membro excluído com sucesso." });
+                    try {
+                      t.dismiss();
+                    } catch (err) {}
+                    toast({
+                      title: "Removido",
+                      description: "Membro excluído com sucesso.",
+                    });
                   } catch (error) {
-                    try { t.dismiss(); } catch (err) {}
-                    toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
+                    try {
+                      t.dismiss();
+                    } catch (err) {}
+                    toast({
+                      title: "Erro",
+                      description: "Erro ao excluir.",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 className="px-3 py-1 rounded bg-red-600 text-white text-sm"
@@ -297,7 +353,12 @@ export default function AdminSustentaiPage() {
                 Excluir
               </button>
               <button
-                onClick={(e) => { e.preventDefault(); try { t.dismiss(); } catch (err) {} }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    t.dismiss();
+                  } catch (err) {}
+                }}
                 className="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm"
               >
                 Cancelar
@@ -311,7 +372,8 @@ export default function AdminSustentaiPage() {
 
     Modal.confirm({
       title: "Confirmar exclusão",
-      content: "Deseja excluir este membro da equipe? Esta ação é irreversível.",
+      content:
+        "Deseja excluir este membro da equipe? Esta ação é irreversível.",
       okText: "Excluir",
       okType: "danger",
       cancelText: "Cancelar",
@@ -319,9 +381,16 @@ export default function AdminSustentaiPage() {
         try {
           await adminDeletePessoa(id, token);
           setPessoas((prev) => prev.filter((p) => p.id !== id));
-          toast({ title: "Removido", description: "Membro excluído com sucesso." });
+          toast({
+            title: "Removido",
+            description: "Membro excluído com sucesso.",
+          });
         } catch (error) {
-          toast({ title: "Erro", description: "Erro ao excluir.", variant: "destructive" });
+          toast({
+            title: "Erro",
+            description: "Erro ao excluir.",
+            variant: "destructive",
+          });
         }
       },
     });
@@ -329,7 +398,11 @@ export default function AdminSustentaiPage() {
 
   const handleSalvarHeader = async (dados: any) => {
     if (!token) {
-      toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+      toast({
+        title: "Sessão expirada",
+        description: "Faça login novamente.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -339,7 +412,11 @@ export default function AdminSustentaiPage() {
       setHeader(headerAtualizado);
       setIsModalHeaderOpen(false);
     } catch (error) {
-      toast({ title: "Erro", description: "Erro ao atualizar o cabeçalho. Tente novamente.", variant: "destructive" });
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar o cabeçalho. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -406,17 +483,16 @@ export default function AdminSustentaiPage() {
 
         {/* ÁREA DE PREVIEW */}
         <section className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
-          {/* Cabeçalho da Newsletter */}
           <div className="relative group">
             <div className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] p-8 text-white text-center transition-opacity duration-300 group-hover:opacity-90">
               <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
                 Prefeitura de Saquarema
               </p>
               <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-                {header.titulo}
+                {header?.titulo}
               </h2>
               <p className="text-lg opacity-90">
-                {header.subtitulo} - {header.data}
+                {header?.subtitulo} - {header?.data}
               </p>
             </div>
             <div className="absolute top-4 right-4">
