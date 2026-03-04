@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import FormattedDescription from "@/components/FormattedDescription";
 // Assumindo que StarRating está sendo exportado de 'page.tsx'
-import { StarRating } from "@/app/categoria/[slug]/[nome]/page";
+import { StarRating } from "@/components/ui/StarRating";
 
 // Tipos
 type User = {

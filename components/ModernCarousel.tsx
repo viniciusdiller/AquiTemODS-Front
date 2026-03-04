@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { categories } from "@/app/page";
+import { categories } from "@/constants/categories";
 
 // A interface para os slides agora usa a estrutura das suas categorias
 interface Slide {
@@ -29,7 +29,7 @@ export default function ModernCarousel({
 
   useEffect(() => {
     const otherCategories = categories.filter(
-      (cat) => cat.id !== currentCategoryId
+      (cat) => cat.id !== currentCategoryId,
     );
 
     const shuffled = [...otherCategories].sort(() => 0.5 - Math.random());
@@ -47,7 +47,7 @@ export default function ModernCarousel({
     resetTimeout();
     timeoutRef.current = setTimeout(() => {
       setCurrent((prevIndex) =>
-        prevIndex === displaySlides.length - 1 ? 0 : prevIndex + 1
+        prevIndex === displaySlides.length - 1 ? 0 : prevIndex + 1,
       );
     }, interval);
 
