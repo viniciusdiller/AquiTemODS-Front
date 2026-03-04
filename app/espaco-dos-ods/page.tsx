@@ -8,6 +8,7 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 interface Curso {
   id: number;
   titulo: string;
+  tag: string;
   linkDestino: string;
   imagemUrl: string;
 }
@@ -255,6 +256,11 @@ export default function SobrePage() {
                   onClick={() => handleCursoClick(curso.id)}
                 >
                   <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3] bg-gray-50">
+                    {curso.tag && (
+                      <div className="absolute top-2 right-2 z-10 bg-slate-50 text-black text-[10px] uppercase font-bold px-2 py-1 rounded-full shadow-md">
+                        {curso.tag}
+                      </div>
+                    )}
                     <Image
                       src={getFullImageUrl(curso.imagemUrl)}
                       alt={curso.titulo}

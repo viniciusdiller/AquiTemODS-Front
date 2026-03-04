@@ -16,6 +16,7 @@ export const odsColors: { [key: string]: string } = {
   "15": "#56C02B",
   "16": "#00689D",
   "17": "#19486A",
+  "18": "#6c321a",
 };
 
 // Função auxiliar para obter a cor (retorna uma cor padrão se não encontrar)

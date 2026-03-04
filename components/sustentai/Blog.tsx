@@ -202,7 +202,7 @@ export default function NewsletterDestaque() {
                     {/* TAG AQUI */}
                     {acao.tag && (
                       <div
-                        className={`absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase 
+                        className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase 
                         tracking-wider shadow-sm ${acao.corDestaque}`}
                       >
                         {acao.tag}
