@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Share2, Loader2, Tag } from "lucide-react";
 import { useParams } from "next/navigation";
 import { getAcaoSustentaiById, getAcaoConteudo } from "@/lib/api";
 import DOMPurify from "dompurify";
+import { toast } from "@/components/ui/use-toast";
 
 export default function PaginaAcaoInterna() {
   const params = useParams() as { slug?: string };
@@ -15,7 +16,7 @@ export default function PaginaAcaoInterna() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const getFullImageUrl = (path: string) => {
     if (!path) return "/enigmas_do_futuro.png";
     if (
@@ -171,14 +172,40 @@ export default function PaginaAcaoInterna() {
   }, [slug]);
 
   const handleCompartilhar = () => {
+    if (typeof window === "undefined" || typeof navigator === "undefined")
+      return;
+
+    const url = window.location.href;
+
     if (navigator.share) {
-      navigator.share({
-        title: acao?.titulo || "Prefeitura de Saquarema",
-        url: window.location.href,
-      });
+      navigator
+        .share({
+          title: acao?.titulo || "Prefeitura de Saquarema",
+          url: url,
+        })
+        .catch((err) => {
+          console.log("Compartilhamento cancelado ou falhou:", err);
+        });
+    } else if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          toast({
+            title: "Link copiado!",
+            description: "O link foi copiado para a área de transferência.",
+          });
+        })
+        .catch((err) => {
+          console.error("Erro ao copiar link:", err);
+          toast({
+            title: "Erro",
+            description:
+              "Erro ao copiar o link. Por favor, copie a URL do navegador.",
+            className: "bg-gray-100 border-red-300 text-red-600",
+          });
+        });
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copiado para a área de transferência!");
+      alert(`Copie este link para compartilhar:\n\n${url}`);
     }
   };
 
@@ -245,9 +272,9 @@ export default function PaginaAcaoInterna() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
-      <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-lg border border-gray-100 overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-lg  overflow-hidden">
         {/* HEADER DO ARTIGO */}
-        <div className="p-8 md:p-12 lg:p-16 border-b border-gray-100 bg-white relative">
+        <div className="p-8 md:p-12 lg:p-16  bg-white relative">
           <Link
             href="/sustentai"
             className="inline-flex items-center gap-2 text-[#D7386E] font-semibold mb-8 hover:bg-pink-50 px-4 py-2 rounded-full transition-colors -ml-4"
@@ -267,9 +294,9 @@ export default function PaginaAcaoInterna() {
             {acao.titulo}
           </h1>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-6 mt-6">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-y border-gray-100 py-6 mt-6">
+            <div className="flex items-center gap-6 ">
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm ">
                 <Calendar className="w-4 h-4 text-[#3C6AB2]" />{" "}
                 <span className="capitalize-first">
                   {formatarData(acao.data)}
@@ -294,7 +321,7 @@ export default function PaginaAcaoInterna() {
         </div>
 
         {/* CONTEÚDO */}
-        <div className="p-8 md:p-12 lg:p-16 space-y-8 md:space-y-10 bg-gray-50/30">
+        <div className="p-8 md:p-12 md:space-y-10 lg:p-16 space-y-8 bg-gray-50/30">
           {blocos.length > 0 ? (
             blocos.map((bloco: any, idx: number) => {
               if (bloco.type === "image") {

@@ -67,7 +67,9 @@ export default function PreviewAcoes({
       >
         <Plus className="w-10 h-10 mb-2" />
         <span className="font-bold text-lg">Adicionar Novo Card</span>
-        <p className="text-sm font-normal opacity-80 mt-1">Crie um novo card para a vitrine</p>
+        <p className="text-sm font-normal opacity-80 mt-1">
+          Crie um novo card para a vitrine
+        </p>
       </button>
 
       <div id="newsletter-acoes">
@@ -94,14 +96,26 @@ export default function PreviewAcoes({
                   const src = getFullImageUrl(raw);
                   const lower = (raw || "").toLowerCase();
                   const isDataPdf = lower.startsWith("data:application/pdf");
-                  const isPdfExt = src && src.toLowerCase().split("?")[0].endsWith(".pdf");
-                  const isPdf = isDataPdf || isPdfExt || (src && src.includes("application/pdf"));
+                  const isPdfExt =
+                    src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                  const isPdf =
+                    isDataPdf ||
+                    isPdfExt ||
+                    (src && src.includes("application/pdf"));
 
                   if (isPdf) {
                     return (
                       <div className="w-full h-56 md:h-72 rounded-t-2xl overflow-hidden bg-gray-100 border-b border-white/50">
-                        <object data={src} type="application/pdf" className="w-full h-full">
-                          <iframe src={src} className="w-full h-full" title={acao.titulo} />
+                        <object
+                          data={src}
+                          type="application/pdf"
+                          className="w-full h-full"
+                        >
+                          <iframe
+                            src={src}
+                            className="w-full h-full"
+                            title={acao.titulo}
+                          />
                         </object>
                       </div>
                     );
@@ -125,11 +139,13 @@ export default function PreviewAcoes({
                 )}
               </div>
 
-              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
-                <h4 className="font-bold text-gray-800 text-lg mb-3">
+              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95 ">
+                <h4 className={`font-bold ${acao.corTexto} text-lg mb-3`}>
                   {acao.titulo}
                 </h4>
-                <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                <p
+                  className={`text-gray-600 mb-6 flex-grow leading-relaxed ${acao.corTexto}`}
+                >
                   {acao.descricao}
                 </p>
                 {/* No admin, permite visualizar o artigo público */}

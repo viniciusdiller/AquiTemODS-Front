@@ -47,9 +47,11 @@ export default function ModalAcao({
     return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
   };
 
+  // Estados das cores
   const [corDestaque, setCorDestaque] = useState("text-[#D7386E]");
   const [corFundo, setCorFundo] = useState("bg-pink-50/30");
   const [corBorda, setCorBorda] = useState("border-pink-100");
+  const [corTexto, setCorTexto] = useState("text-gray-800"); // NOVO ESTADO
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isLoading } = useAuth();
@@ -65,6 +67,7 @@ export default function ModalAcao({
       setCorDestaque(acaoAtual.corDestaque || "text-[#D7386E]");
       setCorFundo(acaoAtual.corFundo || "bg-pink-50/30");
       setCorBorda(acaoAtual.corBorda || "border-pink-100");
+      setCorTexto(acaoAtual.corTexto || "text-gray-800");
     } else {
       setTitulo("");
       setDescricao("");
@@ -74,6 +77,7 @@ export default function ModalAcao({
       setCorDestaque("text-[#D7386E]");
       setCorFundo("bg-pink-50/30");
       setCorBorda("border-pink-100");
+      setCorTexto("text-gray-800"); 
     }
   }, [acaoAtual, isOpen]);
 
@@ -137,6 +141,7 @@ export default function ModalAcao({
       corDestaque,
       corFundo,
       corBorda,
+      corTexto, // ENVIANDO A NOVA PROPRIEDADE
       slug: acaoAtual?.slug || generateSlug(titulo),
       publicado: true,
       ordem: acaoAtual?.ordem ?? 0,
@@ -172,7 +177,6 @@ export default function ModalAcao({
         }
       }
 
-      // Feedback de sucesso em verde
       toast({
         title: "Sucesso!",
         description: "Ação salva com êxito.",
@@ -206,7 +210,7 @@ export default function ModalAcao({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
           <h2 className="text-xl font-bold text-gray-800">
             {acaoAtual ? "Editar Ação" : "Adicionar Nova Ação"}
@@ -354,10 +358,31 @@ export default function ModalAcao({
             <div className="flex items-center gap-2 text-purple-600 font-semibold mb-2">
               <Palette className="w-5 h-5" /> Estilo Visual
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* NOVO GRID DE 4 COLUNAS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cor do Destaque
+                <label className="block text-sm font-medium text-gray-700 mb-1 truncate">
+                  Cor do Texto
+                </label>
+                <select
+                  value={corTexto}
+                  onChange={(e) => setCorTexto(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-purple-500/50 bg-white"
+                >
+                  <option value="text-gray-800">Cinza Escuro (Padrão)</option>
+                  <option value="text-[#D7386E]">Rosa (SustentAí)</option>
+                  <option value="text-[#3C6AB2]">Azul (SustentAí)</option>
+                  <option value="text-slate-900">Preto</option>
+                  <option value="text-white">Branco</option>
+                  <option value="text-gray-500">Cinza Médio</option>
+                  <option value="text-emerald-700">Verde Escuro</option>
+                  <option value="text-purple-700">Roxo Escuro</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 truncate">
+                  Cor do Destaque (Tag/Ícone)
                 </label>
                 <select
                   value={corDestaque}
@@ -366,10 +391,18 @@ export default function ModalAcao({
                 >
                   <option value="text-[#D7386E]">Rosa (SustentAí)</option>
                   <option value="text-[#3C6AB2]">Azul (SustentAí)</option>
+                  <option value="text-emerald-600">Verde</option>
+                  <option value="text-amber-600">Amarelo</option>
+                  <option value="text-orange-500">Laranja</option>
+                  <option value="text-purple-600">Roxo</option>
+                  <option value="text-red-600">Vermelho</option>
+                  <option value="text-slate-900">Preto / Escuro</option>
+                  <option value="text-white">Branco</option>
                 </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 truncate">
                   Cor de Fundo
                 </label>
                 <select
@@ -379,10 +412,19 @@ export default function ModalAcao({
                 >
                   <option value="bg-pink-50/30">Fundo Rosa Claro</option>
                   <option value="bg-blue-50/30">Fundo Azul Claro</option>
+                  <option value="bg-emerald-50/30">Fundo Verde Claro</option>
+                  <option value="bg-amber-50/30">Fundo Amarelo Claro</option>
+                  <option value="bg-orange-50/30">Fundo Laranja Claro</option>
+                  <option value="bg-purple-50/30">Fundo Roxo Claro</option>
+                  <option value="bg-red-50/30">Fundo Vermelho Claro</option>
+                  <option value="bg-slate-400/30">Fundo Cinza Claro</option>
+                  <option value="bg-white">Fundo Branco</option>
+                  <option value="bg-slate-900">Fundo Escuro (Preto)</option>
                 </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 truncate">
                   Cor da Borda
                 </label>
                 <select
@@ -392,6 +434,13 @@ export default function ModalAcao({
                 >
                   <option value="border-pink-100">Borda Rosa</option>
                   <option value="border-blue-100">Borda Azul</option>
+                  <option value="border-emerald-100">Borda Verde</option>
+                  <option value="border-amber-100">Borda Amarelo</option>
+                  <option value="border-orange-100">Borda Laranja</option>
+                  <option value="border-purple-100">Borda Roxo</option>
+                  <option value="border-red-100">Borda Vermelha</option>
+                  <option value="border-slate-200">Borda Escura (Cinza)</option>
+                  <option value="border-gray-100">Borda Branca / Sutil</option>
                 </select>
               </div>
             </div>

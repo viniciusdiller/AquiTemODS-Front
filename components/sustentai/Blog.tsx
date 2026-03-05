@@ -125,7 +125,7 @@ export default function NewsletterDestaque() {
           <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
             Prefeitura de Saquarema
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 ">
             {header.titulo}
           </h2>
           <p className="text-lg md:text-xl opacity-90">
@@ -177,10 +177,12 @@ export default function NewsletterDestaque() {
                   </div>
 
                   <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
-                    <h4 className="font-bold text-gray-800 text-lg mb-3">
+                    <h4 className={`font-bold ${acao.corTexto} text-lg mb-3`}>
                       {acao.titulo}
                     </h4>
-                    <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                    <p
+                      className={`text-gray-600 mb-6 flex-grow leading-relaxed ${acao.corTexto}`}
+                    >
                       {acao.descricao}
                     </p>
 
@@ -188,7 +190,7 @@ export default function NewsletterDestaque() {
                       href={`/sustentai/${acao.id}`}
                       className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
                     >
-                      Ler artigo <ArrowRight className="w-4 h-4" />
+                      Ver Mais <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
