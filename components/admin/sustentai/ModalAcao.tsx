@@ -77,7 +77,7 @@ export default function ModalAcao({
       setCorDestaque("text-[#D7386E]");
       setCorFundo("bg-pink-50/30");
       setCorBorda("border-pink-100");
-      setCorTexto("text-gray-800"); 
+      setCorTexto("text-gray-800");
     }
   }, [acaoAtual, isOpen]);
 
@@ -377,6 +377,7 @@ export default function ModalAcao({
                   <option value="text-gray-500">Cinza Médio</option>
                   <option value="text-emerald-700">Verde Escuro</option>
                   <option value="text-purple-700">Roxo Escuro</option>
+                  <option value="text-red-700">Vermelho Escuro</option>
                 </select>
               </div>
 

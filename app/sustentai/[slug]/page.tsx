@@ -1,7 +1,15 @@
+// app/sustentai/[slug]/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Share2, Loader2, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Share2,
+  Loader2,
+  Tag,
+  ChevronRight,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import { getAcaoSustentaiById, getAcaoConteudo } from "@/lib/api";
 import DOMPurify from "dompurify";
@@ -37,13 +45,12 @@ export default function PaginaAcaoInterna() {
 
       try {
         if (!slug) throw new Error("ID da ação não informado");
-
         const dados = await getAcaoSustentaiById(slug);
-
         if (!dados) throw new Error("Ação não encontrada");
 
         let localBlocos: any[] = [];
 
+        // Extração dos blocos...
         if (Array.isArray(dados.conteudo)) {
           localBlocos = dados.conteudo;
         } else if (Array.isArray(dados.blocos)) {
@@ -85,19 +92,20 @@ export default function PaginaAcaoInterna() {
           }
         }
 
+        // Fallback da API separada...
         if (localBlocos.length === 0) {
           try {
             const conteudoFallback: any = await getAcaoConteudo(slug).catch(
               () => null,
             );
             if (conteudoFallback) {
-              if (Array.isArray(conteudoFallback.blocos)) {
+              if (Array.isArray(conteudoFallback.blocos))
                 localBlocos = conteudoFallback.blocos;
-              } else if (Array.isArray(conteudoFallback.conteudo)) {
+              else if (Array.isArray(conteudoFallback.conteudo))
                 localBlocos = conteudoFallback.conteudo;
-              } else if (Array.isArray(conteudoFallback)) {
+              else if (Array.isArray(conteudoFallback))
                 localBlocos = conteudoFallback;
-              } else if (
+              else if (
                 typeof conteudoFallback === "string" &&
                 conteudoFallback.trim()
               ) {
@@ -138,6 +146,7 @@ export default function PaginaAcaoInterna() {
           ];
         }
 
+        // Normalização dos Blocos (AGORA SUPORTA ARRAY DE IMAGENS)
         const normalized = {
           titulo: dados.titulo || dados.title || "",
           data: dados.data || dados.createdAt || "",
@@ -146,8 +155,21 @@ export default function PaginaAcaoInterna() {
           corDestaque: dados.corDestaque,
           blocos: localBlocos.map((b: any) => {
             if (b && b.type === "image") {
-              const raw = b.content || b.url || b.imagemUrl || b.imagem || "";
-              return { ...b, content: getFullImageUrl(raw) };
+              const rawSingle =
+                b.content || b.url || b.imagemUrl || b.imagem || "";
+
+              // Se tiver array de images (novo padrão do admin)
+              if (b.images && Array.isArray(b.images) && b.images.length > 0) {
+                b.images = b.images.map((img: any) => ({
+                  ...img,
+                  url: getFullImageUrl(img.url),
+                }));
+              } else {
+                // Retrocompatibilidade para ações antigas
+                b.images = rawSingle
+                  ? [{ url: getFullImageUrl(rawSingle), link: b.link || "" }]
+                  : [];
+              }
             }
             return b;
           }),
@@ -174,18 +196,11 @@ export default function PaginaAcaoInterna() {
   const handleCompartilhar = () => {
     if (typeof window === "undefined" || typeof navigator === "undefined")
       return;
-
     const url = window.location.href;
-
     if (navigator.share) {
       navigator
-        .share({
-          title: acao?.titulo || "Prefeitura de Saquarema",
-          url: url,
-        })
-        .catch((err) => {
-          console.log("Compartilhamento cancelado ou falhou:", err);
-        });
+        .share({ title: acao?.titulo || "Prefeitura de Saquarema", url })
+        .catch(() => {});
     } else if (navigator.clipboard) {
       navigator.clipboard
         .writeText(url)
@@ -195,13 +210,11 @@ export default function PaginaAcaoInterna() {
             description: "O link foi copiado para a área de transferência.",
           });
         })
-        .catch((err) => {
-          console.error("Erro ao copiar link:", err);
+        .catch(() => {
           toast({
             title: "Erro",
-            description:
-              "Erro ao copiar o link. Por favor, copie a URL do navegador.",
-            className: "bg-gray-100 border-red-300 text-red-600",
+            description: "Erro ao copiar o link.",
+            variant: "destructive",
           });
         });
     } else {
@@ -235,7 +248,6 @@ export default function PaginaAcaoInterna() {
     );
   }
 
-  // Função auxiliar para lidar com cores antigas do tailwind
   const getBgColor = (bg: string) => {
     if (!bg) return "#ffffff";
     const oldMap: Record<string, string> = {
@@ -246,35 +258,79 @@ export default function PaginaAcaoInterna() {
     };
     return oldMap[bg] || bg;
   };
+
   const formatarData = (dataString: string) => {
     if (!dataString) return "Publicado recentemente";
     try {
       const data = new Date(dataString);
-
       if (isNaN(data.getTime())) return dataString;
-
       const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
         day: "numeric",
         month: "long",
         year: "numeric",
       }).format(data);
-
       return dataFormatada.replace(
         / de ([a-z])/g,
-        (match, primeiraLetraMes) => {
-          return ` de ${primeiraLetraMes.toUpperCase()}`;
-        },
+        (m, l) => ` de ${l.toUpperCase()}`,
       );
-    } catch (error) {
+    } catch {
       return dataString;
     }
   };
 
+  // Subcomponente de renderização da mídia (Agora trata se é Carrossel ou Imagem Única)
+  const MediaViewer = ({
+    img,
+    idx,
+    isCarousel = false,
+  }: {
+    img: any;
+    idx: number;
+    isCarousel?: boolean;
+  }) => {
+    if (!img.url) return null;
+    const isPdf =
+      img.url.toLowerCase().includes("application/pdf") ||
+      img.url.split("?")[0].endsWith(".pdf");
+
+    const content = isPdf ? (
+      <iframe
+        src={img.url}
+        className={`w-full border border-gray-100 ${isCarousel ? "h-full absolute inset-0" : "h-[400px] md:h-[600px] rounded-2xl shadow-md"}`}
+        title={`PDF ${idx + 1}`}
+      />
+    ) : (
+      <img
+        src={img.url}
+        alt={`Mídia ${idx + 1}`}
+        className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] ${
+          isCarousel
+            ? "h-full absolute inset-0" // Preenche toda a caixa do carrossel rigorosamente
+            : "h-auto max-h-[600px] rounded-2xl shadow-md" // Comportamento normal para imagem única
+        }`}
+      />
+    );
+
+    if (img.link) {
+      return (
+        <a
+          href={img.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`block w-full ${isCarousel ? "h-full" : ""}`}
+        >
+          {content}
+        </a>
+      );
+    }
+    return content;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
-      <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-lg  overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-lg overflow-hidden">
         {/* HEADER DO ARTIGO */}
-        <div className="p-8 md:p-12 lg:p-16  bg-white relative">
+        <div className="p-8 md:p-12 lg:p-16 bg-white relative">
           <Link
             href="/sustentai"
             className="inline-flex items-center gap-2 text-[#D7386E] font-semibold mb-8 hover:bg-pink-50 px-4 py-2 rounded-full transition-colors -ml-4"
@@ -295,8 +351,8 @@ export default function PaginaAcaoInterna() {
           </h1>
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-y border-gray-100 py-6 mt-6">
-            <div className="flex items-center gap-6 ">
-              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm ">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
                 <Calendar className="w-4 h-4 text-[#3C6AB2]" />{" "}
                 <span className="capitalize-first">
                   {formatarData(acao.data)}
@@ -309,7 +365,6 @@ export default function PaginaAcaoInterna() {
                 </span>
               </div>
             </div>
-
             <button
               onClick={handleCompartilhar}
               className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
@@ -325,25 +380,56 @@ export default function PaginaAcaoInterna() {
           {blocos.length > 0 ? (
             blocos.map((bloco: any, idx: number) => {
               if (bloco.type === "image") {
+                const images = bloco.images || [];
+                if (images.length === 0) return null;
+
+                // Múltiplas imagens = CARROSSEL
+                if (images.length > 1) {
+                  return (
+                    <div
+                      key={bloco.id || idx}
+                      className="w-full my-10 relative"
+                    >
+                      <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 custom-scrollbar items-center">
+                        {images.map((img: any, i: number) => (
+                          <div
+                            key={i}
+                            // Largura de 85% a 70% permite ver a borda da próxima foto (ajuda a saber que dá pra deslizar)
+                            // O aspect-[4/3] (celular) e aspect-video (PC) forçam uma altura limite perfeita.
+                            className="w-[85%] sm:w-[75%] md:w-[70%] flex-shrink-0 snap-center relative group aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden shadow-sm bg-gray-100 border border-gray-200"
+                          >
+                            <MediaViewer img={img} idx={i} isCarousel={true} />
+
+                            <div className="absolute top-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-10 pointer-events-none">
+                              {i + 1} / {images.length}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-gray-400 text-sm mt-0 font-medium opacity-80">
+                        Deslize para ver mais{" "}
+                        <ChevronRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                // IMAGEM ÚNICA (Sem alteração do antigo)
                 return (
                   <div
                     key={bloco.id || idx}
-                    className="w-full rounded-2xl overflow-hidden shadow-md my-10 group"
+                    className="w-full my-10 group relative flex justify-center"
                   >
-                    <img
-                      src={bloco.content}
-                      alt={acao.titulo}
-                      className="w-full h-auto max-h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                    <MediaViewer img={images[0]} idx={0} isCarousel={false} />
                   </div>
                 );
               }
 
+              // BLOCO DE TEXTO
               if (bloco.type === "text") {
                 const hexColor = getBgColor(bloco.bgColor);
                 const isColoredBox =
                   hexColor !== "#ffffff" && hexColor !== "bg-white";
-
                 const sanitizedHtml = DOMPurify.sanitize(bloco.content || "");
 
                 return (

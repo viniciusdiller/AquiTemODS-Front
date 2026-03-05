@@ -23,13 +23,20 @@ import ImageBlock from "@/components/admin/sustentai/construtor/ImageBlock";
 
 type BlockType = "text" | "image";
 
-interface Block {
+// Nova interface para suportar múltiplas imagens
+export interface BlockImage {
+  url: string;
+  link?: string;
+}
+
+export interface Block {
   id: string;
   type: BlockType;
   content: string;
   bgColor: string;
   isBold: boolean;
   link?: string;
+  images?: BlockImage[];
 }
 
 export default function AdminConstrutorAcaoPage() {
@@ -47,13 +54,21 @@ export default function AdminConstrutorAcaoPage() {
       setIsLoading(true);
       try {
         if (!idAcao) return;
-        const dados = await getAcaoConteudo(idAcao).catch((e) => {
-          console.warn("getAcaoConteudo falhou:", e);
-          return null;
-        });
+        const dados = await getAcaoConteudo(idAcao).catch(() => null);
 
         if (dados && Array.isArray(dados.blocos) && dados.blocos.length > 0) {
-          setBlocks(dados.blocos);
+          const blocosMigrados = dados.blocos.map((b: any) => {
+            if (b.type === "image" && !b.images) {
+              return {
+                ...b,
+                images: b.content
+                  ? [{ url: b.content, link: b.link || "" }]
+                  : [],
+              };
+            }
+            return b;
+          });
+          setBlocks(blocosMigrados);
         } else {
           setBlocks([
             {
@@ -66,7 +81,6 @@ export default function AdminConstrutorAcaoPage() {
           ]);
         }
       } catch (error) {
-        console.error("Erro ao buscar o conteúdo da ação:", error);
         setBlocks([
           {
             id: Date.now().toString(),
@@ -80,7 +94,6 @@ export default function AdminConstrutorAcaoPage() {
         setIsLoading(false);
       }
     };
-
     carregarConteudo();
   }, [idAcao]);
 
@@ -105,7 +118,7 @@ export default function AdminConstrutorAcaoPage() {
         content: "",
         bgColor: "#ffffff",
         isBold: false,
-        link: "",
+        images: [],
       },
     ]);
 
@@ -114,31 +127,39 @@ export default function AdminConstrutorAcaoPage() {
       prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
     );
 
-  const handleSelectFileForBlock = (id: string, file: File | null) => {
-    if (!file) return updateBlock(id, "content", "");
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      updateBlock(id, "content", result);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const removeBlock = (id: string) =>
     setBlocks((prev) => prev.filter((b) => b.id !== id));
+
+  // Funções de Reordenação
+  const moveBlockUp = (index: number) => {
+    if (index === 0) return;
+    setBlocks((prev) => {
+      const newBlocks = [...prev];
+      [newBlocks[index - 1], newBlocks[index]] = [
+        newBlocks[index],
+        newBlocks[index - 1],
+      ];
+      return newBlocks;
+    });
+  };
+
+  const moveBlockDown = (index: number) => {
+    if (index === blocks.length - 1) return;
+    setBlocks((prev) => {
+      const newBlocks = [...prev];
+      [newBlocks[index + 1], newBlocks[index]] = [
+        newBlocks[index],
+        newBlocks[index + 1],
+      ];
+      return newBlocks;
+    });
+  };
 
   const handleSalvar = async () => {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (!token) {
-      toast({
-        title: "Sessão expirada",
-        description: "Faça login novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    if (!token)
+      return toast({ title: "Sessão expirada", variant: "destructive" });
     if (!idAcao) return;
 
     setIsSaving(true);
@@ -147,31 +168,18 @@ export default function AdminConstrutorAcaoPage() {
       if (idAcao === "novo") {
         const created = await adminCreateAcao(
           { titulo: "Nova Ação", descricao: "" },
-          token as string,
+          token,
         );
         targetId =
           (created && (created.id || created._id || created.data?.id)) || null;
-        if (!targetId)
-          throw new Error(
-            "Falha ao criar nova ação antes de salvar o conteúdo.",
-          );
-
-        await adminCreateAcaoConteudo(
-          targetId as string,
-          blocks,
-          token as string,
-        );
+        if (!targetId) throw new Error("Falha ao criar nova ação");
+        await adminCreateAcaoConteudo(targetId as string, blocks, token);
         router.replace(`/admin/sustentai/acao/${targetId}`);
       } else {
-        await adminUpdateAcaoConteudo(
-          targetId as string,
-          blocks,
-          token as string,
-        );
+        await adminUpdateAcaoConteudo(targetId as string, blocks, token);
       }
-
       toast({ title: "Salvo", description: "Conteúdo salvo com sucesso." });
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Erro",
         description: "Erro ao salvar",
@@ -235,13 +243,17 @@ export default function AdminConstrutorAcaoPage() {
 
         {/* Editor de Blocos */}
         <div className="space-y-4">
-          {blocks.map((block) =>
+          {blocks.map((block, index) =>
             block.type === "text" ? (
               <TextBlock
                 key={block.id}
                 block={block}
                 updateBlock={updateBlock}
                 removeBlock={removeBlock}
+                moveUp={() => moveBlockUp(index)}
+                moveDown={() => moveBlockDown(index)}
+                isFirst={index === 0}
+                isLast={index === blocks.length - 1}
               />
             ) : (
               <ImageBlock
@@ -249,24 +261,27 @@ export default function AdminConstrutorAcaoPage() {
                 block={block}
                 updateBlock={updateBlock}
                 removeBlock={removeBlock}
-                handleSelectFileForBlock={handleSelectFileForBlock}
+                moveUp={() => moveBlockUp(index)}
+                moveDown={() => moveBlockDown(index)}
+                isFirst={index === 0}
+                isLast={index === blocks.length - 1}
               />
             ),
           )}
         </div>
 
-        {/* Botões para Adicionar Novos Blocos */}
+        {/* Botões Adicionar Blocos */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 py-8 border-t border-dashed border-gray-300">
           <button
             onClick={addTextBlock}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50 transition-all"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium hover:border-[#D7386E] hover:text-[#D7386E] transition-all"
           >
             <Plus className="w-5 h-5" /> <Type className="w-5 h-5" /> Adicionar
             Texto
           </button>
           <button
             onClick={addImageBlock}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium hover:border-[#3C6AB2] hover:text-[#3C6AB2] hover:bg-blue-50 transition-all"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium hover:border-[#3C6AB2] hover:text-[#3C6AB2] transition-all"
           >
             <Plus className="w-5 h-5" /> <ImageIcon className="w-5 h-5" />{" "}
             Adicionar Imagem

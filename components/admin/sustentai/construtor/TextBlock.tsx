@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Type, Trash2, X } from "lucide-react";
+import { Type, Trash2, X, ArrowUp, ArrowDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 
@@ -67,7 +67,15 @@ const getAlphaFromColor = (color: string) => {
   return 1;
 };
 
-export default function TextBlock({ block, updateBlock, removeBlock }: any) {
+export default function TextBlock({
+  block,
+  updateBlock,
+  removeBlock,
+  moveUp,
+  moveDown,
+  isFirst,
+  isLast,
+}: any) {
   const getBgStyle = (bg: string) => {
     if (!bg || bg === "transparent") return "transparent";
     const oldMap: Record<string, string> = {
@@ -174,13 +182,34 @@ export default function TextBlock({ block, updateBlock, removeBlock }: any) {
           </button>
         </div>
 
-        <button
-          onClick={() => removeBlock(block.id)}
-          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 shadow-sm transition-colors"
-          title="Excluir Bloco Inteiro"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1 bg-white/90 p-1.5 rounded-lg shadow-sm border border-gray-200 backdrop-blur-sm">
+          <button
+            onClick={moveUp}
+            disabled={isFirst}
+            className="p-1 text-gray-500 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-gray-100"
+            title="Mover para cima"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </button>
+          <button
+            onClick={moveDown}
+            disabled={isLast}
+            className="p-1 text-gray-500 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-gray-100"
+            title="Mover para baixo"
+          >
+            <ArrowDown className="w-4 h-4" />
+          </button>
+
+          <div className="w-px h-4 bg-gray-300 mx-1"></div>
+
+          <button
+            onClick={() => removeBlock(block.id)}
+            className="p-1 text-red-500 hover:text-red-700 rounded hover:bg-red-50"
+            title="Excluir Bloco"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-600 uppercase tracking-widest mt-8 md:mt-0">
