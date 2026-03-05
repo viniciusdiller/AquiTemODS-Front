@@ -36,10 +36,10 @@ const Footer = () => {
               <li className="flex items-center justify-center gap-3 hover:text-[#D7386E] transition-colors">
                 <Mail size={16} />
                 <a
-                  href="mailto:aquitemods@gmail.com"
+                  href="mailto:sac-lab.isa@saquarema.rj.gov.br"
                   className="hover:underline hover:text-[#D7386E] transition-colors"
                 >
-                  aquitemods@gmail.com
+                  sac-lab.isa@saquarema.rj.gov.br
                 </a>
               </li>
               <li className="flex items-center justify-center gap-3 hover:text-[#D7386E] transition-colors">
