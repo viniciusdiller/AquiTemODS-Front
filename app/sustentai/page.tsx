@@ -163,7 +163,39 @@ export default function SustentAiPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group text-center h-full flex flex-col"
-                    onClick={() => registerSustentAiCardClick(card.id)}
+                    onClick={async (e) => {
+                      try {
+                        // log para diagnosticar no console do browser
+                        console.debug("SustentAí: enviando clique", card.id);
+                        await registerSustentAiCardClick(card.id);
+                        console.debug(
+                          "SustentAí: clique registrado via registerSustentAiCardClick",
+                          card.id
+                        );
+                      } catch (err) {
+                        console.error(
+                          "SustentAí: falha ao registrar clique via registerSustentAiCardClick",
+                          err
+                        );
+                        // fallback para rota alternativa esperada pelo admin
+                        try {
+                          const fallback = `${API_URL}/api/sustentai/acoes/${card.id}/click`;
+                          console.debug("SustentAí: tentando fallback", fallback);
+                          const res = await fetch(fallback, { method: "POST" });
+                          if (res.ok) {
+                            console.debug("SustentAí: fallback ok", await res.text());
+                          } else {
+                            console.error(
+                              "SustentAí: fallback respondeu",
+                              res.status,
+                              await res.text()
+                            );
+                          }
+                        } catch (e) {
+                          console.error("SustentAí: fallback falhou", e);
+                        }
+                      }
+                    }}
                   >
                     <div className="overflow-hidden rounded-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-300 relative aspect-[4/3]">
                       {/* Badge no canto superior direito, se existir */}

@@ -14,6 +14,8 @@ import {
   getAcoesSustentai,
   getPessoasSustentai,
   getHeaderSustentai,
+  registerSustentAiCardClick,
+  registerSustentaiActionClick,
 } from "@/lib/api";
 import GenteQueConstroiCarousel from "./GenteQueConstroiCarousel";
 
@@ -65,6 +67,7 @@ export default function NewsletterDestaque() {
               a.imagemUrl || a.imagem || a.imagem_url || "",
             ),
             linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
+            cliques: typeof a.cliques === 'number' ? a.cliques : a.views || a.accesses || 0,
           }))
         : [];
 
@@ -189,6 +192,18 @@ export default function NewsletterDestaque() {
                     <Link
                       href={`/sustentai/${acao.id}`}
                       className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
+                      onClick={async () => {
+                        try {
+                          await registerSustentAiCardClick(acao.id);
+                        } catch (err) {
+                          // fallback para rota alternativa esperada pelo admin
+                          try {
+                            await registerSustentaiActionClick(acao.id);
+                          } catch (e) {
+                            console.debug('Falha ao registrar clique (fallback):', e);
+                          }
+                        }
+                      }}
                     >
                       Ver Mais <ArrowRight className="w-4 h-4" />
                     </Link>

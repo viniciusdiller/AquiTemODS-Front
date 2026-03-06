@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { getAcoesSustentai } from "@/lib/api";
 
 interface ModalAcaoProps {
   isOpen: boolean;
@@ -146,6 +147,35 @@ export default function ModalAcao({
       publicado: true,
       ordem: acaoAtual?.ordem ?? 0,
     };
+
+    // Verificação local prévia: evita criar duas ações com mesmo título
+    try {
+      const todas = await getAcoesSustentai().catch(() => []);
+      if (Array.isArray(todas) && todas.length > 0) {
+        const tituloNormalize = (titulo || "").trim().toLowerCase();
+        const conflitante = todas.find((a: any) => {
+          if (!a) return false;
+          const otherTitle = (a.titulo || a.title || a.name || "").trim().toLowerCase();
+          if (!otherTitle) return false;
+          // se estivermos editando, ignorar o próprio registro
+          if (acaoAtual && (acaoAtual.id || acaoAtual._id) && (a.id === acaoAtual.id || a.id === acaoAtual._id)) return false;
+          return otherTitle === tituloNormalize;
+        });
+        if (conflitante) {
+          toast({
+            title: "Título duplicado",
+            description: "Já existe uma ação com esse título. Escolha outro título ou edite a existente.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          submittedRef.current = false;
+          return;
+        }
+      }
+    } catch (e) {
+      // se falhar a verificação, continua e deixa o backend validar
+      console.debug("Verificação de títulos falhou, prosseguindo:", e);
+    }
 
     const form = new FormData();
     if (selectedFile) {

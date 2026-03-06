@@ -374,6 +374,10 @@ export const registerSustentAiNavClick = () =>
 export const registerSustentAiCardClick = (id: number) =>
   fetchApi(`/api/sustentai/click-card/${id}`, { method: "POST" });
 
+// Fallback para rota que o admin solicita: POST /api/sustentai/acoes/:id/click
+export const registerSustentaiActionClick = (id: number) =>
+  fetchApi(`/api/sustentai/acoes/${id}/click`, { method: "POST" });
+
 export const getAllUsers = (token: string) =>
   fetchApi("/api/admin/users", {
     method: "GET",

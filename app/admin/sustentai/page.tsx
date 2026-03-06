@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Loader2,
   ArrowLeft,
+  BarChart2,
 } from "lucide-react";
 import PreviewAcoes from "@/components/admin/sustentai/PreviewAcoes";
 import PreviewPessoas from "@/components/admin/sustentai/PreviewPessoas";
@@ -473,12 +474,21 @@ export default function AdminSustentaiPage() {
             </div>
           </div>
 
-          <Link
-            href="/admin/sustentai/newsletter"
-            className="w-full md:w-auto bg-gradient-to-r from-[#3C6AB2] to-[#2e528a] hover:opacity-90 text-white px-6 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md transition-all duration-300 transform hover:scale-[1.02]"
-          >
-            <Newspaper className="w-5 h-5" /> Gerenciar Newsletters
-          </Link>
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <Link
+              href="/admin/sustentai/newsletter"
+              className="w-full md:w-auto bg-gradient-to-r from-[#3C6AB2] to-[#2e528a] hover:opacity-90 text-white px-6 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md transition-all duration-300 transform hover:scale-[1.02]"
+            >
+              <Newspaper className="w-5 h-5" /> Gerenciar Newsletters
+            </Link>
+
+            <Link
+              href="/admin/sustentai/indicadores"
+              className="w-full md:w-auto bg-gradient-to-r from-[#1D6F42] to-[#15803d] hover:opacity-90 text-white px-6 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md transition-all duration-300 transform hover:scale-[1.02]"
+            >
+              <BarChart2 className="w-5 h-5" /> Indicadores SustentAí
+            </Link>
+          </div>
         </div>
 
         {/* ÁREA DE PREVIEW */}
