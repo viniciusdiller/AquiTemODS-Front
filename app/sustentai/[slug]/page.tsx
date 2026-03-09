@@ -330,7 +330,7 @@ export default function PaginaAcaoInterna() {
     <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
       <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-lg overflow-hidden">
         {/* HEADER DO ARTIGO */}
-        <div className="p-8 md:p-12 lg:p-16 bg-white relative">
+        <div className="pb-0 p-8 bg-white relative">
           <Link
             href="/sustentai"
             className="inline-flex items-center gap-2 text-[#D7386E] font-semibold mb-8 hover:bg-pink-50 px-4 py-2 rounded-full transition-colors -ml-4"
@@ -376,7 +376,7 @@ export default function PaginaAcaoInterna() {
         </div>
 
         {/* CONTEÚDO */}
-        <div className="p-8 md:p-12 md:space-y-10 lg:p-16 space-y-8 bg-gray-50/30">
+        <div className="p-8 md:p-8 md:space-y-10 lg:p-10 space-y-8 bg-gray-50/30">
           {blocos.length > 0 ? (
             blocos.map((bloco: any, idx: number) => {
               if (bloco.type === "image") {

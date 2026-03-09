@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { ImageIcon, Trash2, Plus, GripVertical } from "lucide-react";
 import { BlockImage } from "@/app/admin/sustentai/acao/[id]/page";
 import { useSortable } from "@dnd-kit/sortable";
@@ -15,6 +15,8 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
     isDragging,
   } = useSortable({ id: String(block.id) });
 
+  const [imageToDelete, setImageToDelete] = useState<number | null>(null);
+
   const dndStyle = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -28,10 +30,19 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
     updateBlock(block.id, "images", [...images, { url: "", link: "" }]);
   };
 
-  const handleRemoveImage = (index: number) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    updateBlock(block.id, "images", newImages);
+  // Abre modal interno
+  const confirmRemoveImage = (index: number) => {
+    setImageToDelete(index);
+  };
+
+  // Executa a remoção e fecha
+  const executeRemoveImage = () => {
+    if (imageToDelete !== null) {
+      const newImages = [...images];
+      newImages.splice(imageToDelete, 1);
+      updateBlock(block.id, "images", newImages);
+      setImageToDelete(null);
+    }
   };
 
   const handleUpdateImage = (
@@ -61,9 +72,34 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
     <div
       ref={setNodeRef}
       style={dndStyle}
-      className="flex items-stretch gap-5 group w-full"
+      className="flex items-stretch gap-2 group w-full"
     >
-      {/* Alça de Arrastar Oculta (Lado esquerdo, altura total) */}
+      {/* MODAL INTERNO PARA APAGAR IMAGEM INDIVIDUAL */}
+      {imageToDelete !== null && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-6">
+            <h3 className="text-lg font-bold text-gray-900">
+              Quer mesmo remover esta imagem?
+            </h3>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => setImageToDelete(null)}
+                className="px-4 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={executeRemoveImage}
+                className="px-4 py-2 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-sm"
+              >
+                Sim, remover
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Alça de Arrastar Oculta */}
       <div
         {...attributes}
         {...listeners}
@@ -73,7 +109,6 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
         <GripVertical className="w-6 h-6" />
       </div>
 
-      {/* Bloco Real de Conteúdo */}
       <div className="flex-1 bg-white p-5 rounded-2xl shadow-sm border border-gray-200 relative transition-all">
         <div className="absolute top-4 right-4 flex gap-2 opacity-100 md:opacity-50 md:group-hover:opacity-100 transition-opacity z-10 bg-white/80 p-1 rounded-lg shadow-sm backdrop-blur-sm">
           <button
@@ -89,45 +124,69 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
           <ImageIcon className="w-4 h-4" /> Bloco de Imagem
         </div>
 
-        {/* Lista de Edição das Imagens do Bloco */}
         <div className="space-y-4">
           {images.map((img, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-gray-100 bg-gray-50 rounded-xl relative"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 border border-gray-100 bg-gray-50 rounded-xl relative items-center"
             >
               <button
-                onClick={() => handleRemoveImage(index)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+                onClick={() => confirmRemoveImage(index)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors z-10"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
-              <div className="flex flex-col justify-center">
-                <label className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-4 py-2 rounded-xl font-medium cursor-pointer shadow-sm hover:opacity-90">
-                  <span className="text-sm">Selecionar arquivo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e, index)}
-                    className="sr-only"
-                  />
-                </label>
-                <div className="text-xs text-gray-500 mt-2 text-center">
-                  Apenas imagem
-                </div>
+              {/* ESQUERDA: Apenas a miniatura da imagem */}
+              <div className="flex justify-center md:justify-start">
+                {img.url ? (
+                  <div className="w-56 h-40 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-white shrink-0">
+                    <img
+                      src={img.url}
+                      alt={`Miniatura ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center bg-white shrink-0">
+                    <ImageIcon className="w-8 h-8 text-gray-300" />
+                  </div>
+                )}
               </div>
 
-              <div className="md:col-span-2 space-y-3">
-                <input
-                  type="text"
-                  value={img.url}
-                  onChange={(e) =>
-                    handleUpdateImage(index, "url", e.target.value)
-                  }
-                  placeholder="Ou cole a URL da imagem"
-                  className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#3C6AB2]/50 focus:outline-none text-sm"
-                />
+              {/* DIREITA: Input da URL e botão de upload abaixo */}
+              <div className="md:col-span-2 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">
+                    URL da Imagem
+                  </label>
+                  <input
+                    type="text"
+                    value={img.url}
+                    onChange={(e) =>
+                      handleUpdateImage(index, "url", e.target.value)
+                    }
+                    placeholder="Cole o link (URL) da imagem aqui"
+                    className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#3C6AB2]/50 focus:outline-none text-sm"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-5 py-2.5 rounded-xl font-medium cursor-pointer shadow-sm hover:opacity-90 transition-opacity">
+                    <span className="text-sm whitespace-nowrap">
+                      {img.url ? "Alterar arquivo" : "Selecionar arquivo"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileChange(e, index)}
+                      className="sr-only"
+                    />
+                  </label>
+                  <span className="text-xs text-gray-400 font-medium">
+                    Apenas formatos de imagem
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -141,7 +200,6 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
           </button>
         </div>
 
-        {/* Preview das imagens (Carrossel Nativo UI) */}
         {images.length > 0 && images.some((img) => img.url) && (
           <div className="mt-6 border-t pt-4">
             <label className="text-xs font-semibold text-gray-400 uppercase mb-2 block">
@@ -150,7 +208,6 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 custom-scrollbar">
               {images.map((img, idx) => {
                 if (!img.url) return null;
-
                 return (
                   <div
                     key={idx}
