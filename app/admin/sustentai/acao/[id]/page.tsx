@@ -1,4 +1,3 @@
-// app/admin/sustentai/acao/[id]/page.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -20,17 +19,31 @@ import {
 } from "@/lib/api";
 import TextBlock from "@/components/admin/sustentai/construtor/TextBlock";
 import ImageBlock from "@/components/admin/sustentai/construtor/ImageBlock";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 type BlockType = "text" | "image";
 
-// Nova interface para suportar múltiplas imagens
 export interface BlockImage {
   url: string;
   link?: string;
 }
 
 export interface Block {
-  id: string;
+  id: string | number; // Adaptado para suportar IDs numéricos que vêm da API
   type: BlockType;
   content: string;
   bgColor: string;
@@ -38,6 +51,10 @@ export interface Block {
   link?: string;
   images?: BlockImage[];
 }
+
+// Gera um ID sempre único na hora de criar novos blocos
+const generateUniqueId = () =>
+  Date.now().toString() + Math.random().toString(36).substring(2, 6);
 
 export default function AdminConstrutorAcaoPage() {
   const params = useParams();
@@ -48,6 +65,13 @@ export default function AdminConstrutorAcaoPage() {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   useEffect(() => {
     const carregarConteudo = async () => {
@@ -72,7 +96,7 @@ export default function AdminConstrutorAcaoPage() {
         } else {
           setBlocks([
             {
-              id: Date.now().toString(),
+              id: generateUniqueId(),
               type: "text",
               content: "",
               bgColor: "#ffffff",
@@ -83,7 +107,7 @@ export default function AdminConstrutorAcaoPage() {
       } catch (error) {
         setBlocks([
           {
-            id: Date.now().toString(),
+            id: generateUniqueId(),
             type: "text",
             content: "",
             bgColor: "#ffffff",
@@ -101,7 +125,7 @@ export default function AdminConstrutorAcaoPage() {
     setBlocks((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: generateUniqueId(),
         type: "text",
         content: "",
         bgColor: "#ffffff",
@@ -113,7 +137,7 @@ export default function AdminConstrutorAcaoPage() {
     setBlocks((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: generateUniqueId(),
         type: "image",
         content: "",
         bgColor: "#ffffff",
@@ -122,38 +146,15 @@ export default function AdminConstrutorAcaoPage() {
       },
     ]);
 
-  const updateBlock = (id: string, field: keyof Block, value: any) =>
+  const updateBlock = (id: string | number, field: keyof Block, value: any) =>
     setBlocks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
+      prev.map((b) =>
+        String(b.id) === String(id) ? { ...b, [field]: value } : b,
+      ),
     );
 
-  const removeBlock = (id: string) =>
-    setBlocks((prev) => prev.filter((b) => b.id !== id));
-
-  // Funções de Reordenação
-  const moveBlockUp = (index: number) => {
-    if (index === 0) return;
-    setBlocks((prev) => {
-      const newBlocks = [...prev];
-      [newBlocks[index - 1], newBlocks[index]] = [
-        newBlocks[index],
-        newBlocks[index - 1],
-      ];
-      return newBlocks;
-    });
-  };
-
-  const moveBlockDown = (index: number) => {
-    if (index === blocks.length - 1) return;
-    setBlocks((prev) => {
-      const newBlocks = [...prev];
-      [newBlocks[index + 1], newBlocks[index]] = [
-        newBlocks[index],
-        newBlocks[index + 1],
-      ];
-      return newBlocks;
-    });
-  };
+  const removeBlock = (id: string | number) =>
+    setBlocks((prev) => prev.filter((b) => String(b.id) !== String(id)));
 
   const handleSalvar = async () => {
     const token =
@@ -165,6 +166,11 @@ export default function AdminConstrutorAcaoPage() {
     setIsSaving(true);
     try {
       let targetId = idAcao;
+      const blocksParaSalvar = blocks.map((b, index) => ({
+        ...b,
+        ordem: index,
+      }));
+
       if (idAcao === "novo") {
         const created = await adminCreateAcao(
           { titulo: "Nova Ação", descricao: "" },
@@ -173,10 +179,19 @@ export default function AdminConstrutorAcaoPage() {
         targetId =
           (created && (created.id || created._id || created.data?.id)) || null;
         if (!targetId) throw new Error("Falha ao criar nova ação");
-        await adminCreateAcaoConteudo(targetId as string, blocks, token);
+
+        await adminCreateAcaoConteudo(
+          targetId as string,
+          blocksParaSalvar,
+          token,
+        );
         router.replace(`/admin/sustentai/acao/${targetId}`);
       } else {
-        await adminUpdateAcaoConteudo(targetId as string, blocks, token);
+        await adminUpdateAcaoConteudo(
+          targetId as string,
+          blocksParaSalvar,
+          token,
+        );
       }
       toast({ title: "Salvo", description: "Conteúdo salvo com sucesso." });
     } catch (err) {
@@ -188,6 +203,26 @@ export default function AdminConstrutorAcaoPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || String(active.id) === String(over.id)) return;
+
+    setBlocks((items) => {
+      const oldIndex = items.findIndex(
+        (item) => String(item.id) === String(active.id),
+      );
+      const newIndex = items.findIndex(
+        (item) => String(item.id) === String(over.id),
+      );
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        return arrayMove(items, oldIndex, newIndex);
+      }
+      return items;
+    });
   };
 
   if (isLoading) {
@@ -204,7 +239,6 @@ export default function AdminConstrutorAcaoPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Cabeçalho do Construtor */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-200 gap-4">
           <div className="flex items-center gap-4">
             <Link
@@ -241,36 +275,37 @@ export default function AdminConstrutorAcaoPage() {
           </button>
         </div>
 
-        {/* Editor de Blocos */}
         <div className="space-y-4">
-          {blocks.map((block, index) =>
-            block.type === "text" ? (
-              <TextBlock
-                key={block.id}
-                block={block}
-                updateBlock={updateBlock}
-                removeBlock={removeBlock}
-                moveUp={() => moveBlockUp(index)}
-                moveDown={() => moveBlockDown(index)}
-                isFirst={index === 0}
-                isLast={index === blocks.length - 1}
-              />
-            ) : (
-              <ImageBlock
-                key={block.id}
-                block={block}
-                updateBlock={updateBlock}
-                removeBlock={removeBlock}
-                moveUp={() => moveBlockUp(index)}
-                moveDown={() => moveBlockDown(index)}
-                isFirst={index === 0}
-                isLast={index === blocks.length - 1}
-              />
-            ),
-          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={blocks.map((b) => String(b.id))}
+              strategy={verticalListSortingStrategy}
+            >
+              {blocks.map((block) =>
+                block.type === "text" ? (
+                  <TextBlock
+                    key={block.id}
+                    block={block}
+                    updateBlock={updateBlock}
+                    removeBlock={removeBlock}
+                  />
+                ) : (
+                  <ImageBlock
+                    key={block.id}
+                    block={block}
+                    updateBlock={updateBlock}
+                    removeBlock={removeBlock}
+                  />
+                ),
+              )}
+            </SortableContext>
+          </DndContext>
         </div>
 
-        {/* Botões Adicionar Blocos */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 py-8 border-t border-dashed border-gray-300">
           <button
             onClick={addTextBlock}

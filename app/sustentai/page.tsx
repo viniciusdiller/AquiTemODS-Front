@@ -25,7 +25,7 @@ interface SustentAiCard {
   linkDestino: string;
   imagemUrl: string;
   tag?: string | null;
-  corDestaque?: string | null; // pode ser uma classe tailwind (ex.: 'bg-[#D7386E]') ou um hex
+  corDestaque?: string | null;
 }
 
 export default function SustentAiPage() {
@@ -170,25 +170,31 @@ export default function SustentAiPage() {
                         await registerSustentAiCardClick(card.id);
                         console.debug(
                           "SustentAí: clique registrado via registerSustentAiCardClick",
-                          card.id
+                          card.id,
                         );
                       } catch (err) {
                         console.error(
                           "SustentAí: falha ao registrar clique via registerSustentAiCardClick",
-                          err
+                          err,
                         );
                         // fallback para rota alternativa esperada pelo admin
                         try {
                           const fallback = `${API_URL}/api/sustentai/acoes/${card.id}/click`;
-                          console.debug("SustentAí: tentando fallback", fallback);
+                          console.debug(
+                            "SustentAí: tentando fallback",
+                            fallback,
+                          );
                           const res = await fetch(fallback, { method: "POST" });
                           if (res.ok) {
-                            console.debug("SustentAí: fallback ok", await res.text());
+                            console.debug(
+                              "SustentAí: fallback ok",
+                              await res.text(),
+                            );
                           } else {
                             console.error(
                               "SustentAí: fallback respondeu",
                               res.status,
-                              await res.text()
+                              await res.text(),
                             );
                           }
                         } catch (e) {

@@ -1,8 +1,10 @@
 "use client";
 import React from "react";
-import { Type, Trash2, X, ArrowUp, ArrowDown } from "lucide-react";
+import { Type, Trash2, X, GripVertical } from "lucide-react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -67,15 +69,23 @@ const getAlphaFromColor = (color: string) => {
   return 1;
 };
 
-export default function TextBlock({
-  block,
-  updateBlock,
-  removeBlock,
-  moveUp,
-  moveDown,
-  isFirst,
-  isLast,
-}: any) {
+export default function TextBlock({ block, updateBlock, removeBlock }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: String(block.id) });
+
+  const dndStyle = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
   const getBgStyle = (bg: string) => {
     if (!bg || bg === "transparent") return "transparent";
     const oldMap: Record<string, string> = {
@@ -103,128 +113,130 @@ export default function TextBlock({
 
   return (
     <div
-      className="p-5 rounded-2xl shadow-sm border border-gray-200 relative group transition-all"
-      style={{ backgroundColor: bgColor }}
+      ref={setNodeRef}
+      style={dndStyle}
+      className="flex items-stretch gap-5 group w-full"
     >
-      <div className="absolute top-4 right-4 flex gap-3 opacity-100 md:opacity-50 md:group-hover:opacity-100 transition-opacity z-10 items-center flex-wrap justify-end">
-        {/* Controle de Fundo com Transparência */}
-        <div className="flex items-center gap-2 bg-white/90 p-1.5 px-3 rounded-lg shadow-sm border border-gray-200 backdrop-blur-sm">
-          <label className="text-xs font-semibold text-gray-700">Fundo:</label>
+      <div
+        {...attributes}
+        {...listeners}
+        className="w-8 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-700"
+        title="Arraste para reordenar"
+      >
+        <GripVertical className="w-6 h-6" />
+      </div>
 
-          <select
-            value={selectValue}
-            onChange={(e) => {
-              if (e.target.value !== "custom") {
-                updateBlock(block.id, "bgColor", e.target.value);
-              }
-            }}
-            className="text-xs border border-gray-200 rounded cursor-pointer px-1 py-1 bg-gray-50 text-gray-700 focus:outline-none hover:border-gray-300"
-          >
-            <option value="bg-white">Branco</option>
-            <option value="bg-pink-50">Rosa Claro</option>
-            <option value="bg-blue-50">Azul Claro</option>
-            <option value="bg-gray-100">Cinza</option>
-            <option value="transparent">Transparente</option>
-            {!isPresetDropdown && (
-              <option value="custom">Personalizado...</option>
-            )}
-          </select>
+      {/* Bloco Real de Conteúdo */}
+      <div
+        className="flex-1 p-5 rounded-2xl shadow-sm border border-gray-200 relative transition-all"
+        style={{ backgroundColor: bgColor }}
+      >
+        <div className="absolute top-4 right-4 flex gap-3 opacity-100 md:opacity-50 md:group-hover:opacity-100 transition-opacity z-10 items-center flex-wrap justify-end">
+          <div className="flex items-center gap-2 bg-white/90 p-1.5 px-3 rounded-lg shadow-sm border border-gray-200 backdrop-blur-sm">
+            <label className="text-xs font-semibold text-gray-700">
+              Fundo:
+            </label>
 
-          <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-          {/* Seletor de Cor + Slider de Opacidade */}
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={pickerColor}
-              onChange={(e) =>
-                updateBlock(
-                  block.id,
-                  "bgColor",
-                  hexToRgba(e.target.value, currentAlpha || 1),
-                )
-              }
-              className="w-5 h-5 p-0 border-0 rounded cursor-pointer overflow-hidden"
-              title="Escolha a cor base"
-            />
-
-            <div
-              className="flex flex-col items-center gap-0.5"
-              title="Opacidade"
+            <select
+              value={selectValue}
+              onChange={(e) => {
+                if (e.target.value !== "custom") {
+                  updateBlock(block.id, "bgColor", e.target.value);
+                }
+              }}
+              className="text-xs border border-gray-200 rounded cursor-pointer px-1 py-1 bg-gray-50 text-gray-700 focus:outline-none hover:border-gray-300"
             >
+              <option value="bg-white">Branco</option>
+              <option value="bg-pink-50">Rosa Claro</option>
+              <option value="bg-blue-50">Azul Claro</option>
+              <option value="bg-gray-100">Cinza</option>
+              <option value="transparent">Transparente</option>
+              {!isPresetDropdown && (
+                <option value="custom">Personalizado...</option>
+              )}
+            </select>
+
+            <div className="w-px h-4 bg-gray-300 mx-1"></div>
+
+            {/* Seletor de Cor + Slider de Opacidade */}
+            <div className="flex items-center gap-2">
               <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={currentAlpha}
+                type="color"
+                value={pickerColor}
                 onChange={(e) =>
                   updateBlock(
                     block.id,
                     "bgColor",
-                    hexToRgba(pickerColor, parseFloat(e.target.value)),
+                    hexToRgba(e.target.value, currentAlpha || 1),
                   )
                 }
-                className="w-12 h-1.5 accent-pink-500 cursor-pointer"
+                className="w-5 h-5 p-0 border-0 rounded cursor-pointer overflow-hidden"
+                title="Escolha a cor base"
               />
-              <span className="text-[8px] font-bold text-gray-500">
-                {Math.round(currentAlpha * 100)}%
-              </span>
+
+              <div
+                className="flex flex-col items-center gap-0.5"
+                title="Opacidade"
+              >
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={currentAlpha}
+                  onChange={(e) =>
+                    updateBlock(
+                      block.id,
+                      "bgColor",
+                      hexToRgba(pickerColor, parseFloat(e.target.value)),
+                    )
+                  }
+                  className="w-12 h-1.5 accent-pink-500 cursor-pointer"
+                />
+                <span className="text-[8px] font-bold text-gray-500">
+                  {Math.round(currentAlpha * 100)}%
+                </span>
+              </div>
             </div>
+
+            <button
+              onClick={() => updateBlock(block.id, "bgColor", "transparent")}
+              className={`p-1 rounded transition-colors ${
+                block.bgColor === "transparent"
+                  ? "text-red-500 bg-red-50"
+                  : "text-gray-400 hover:text-red-500"
+              }`}
+              title="Remover cor de fundo"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <button
-            onClick={() => updateBlock(block.id, "bgColor", "transparent")}
-            className={`p-1 rounded transition-colors ${block.bgColor === "transparent" ? "text-red-500 bg-red-50" : "text-gray-400 hover:text-red-500"}`}
-            title="Remover cor de fundo"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-1 bg-white/90 p-1.5 rounded-lg shadow-sm border border-gray-200 backdrop-blur-sm">
+            <button
+              onClick={() => removeBlock(block.id)}
+              className="p-1 text-red-500 hover:text-red-700 rounded hover:bg-red-50"
+              title="Excluir Bloco"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-white/90 p-1.5 rounded-lg shadow-sm border border-gray-200 backdrop-blur-sm">
-          <button
-            onClick={moveUp}
-            disabled={isFirst}
-            className="p-1 text-gray-500 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-gray-100"
-            title="Mover para cima"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-          <button
-            onClick={moveDown}
-            disabled={isLast}
-            className="p-1 text-gray-500 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-gray-100"
-            title="Mover para baixo"
-          >
-            <ArrowDown className="w-4 h-4" />
-          </button>
-
-          <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-          <button
-            onClick={() => removeBlock(block.id)}
-            className="p-1 text-red-500 hover:text-red-700 rounded hover:bg-red-50"
-            title="Excluir Bloco"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+        <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-600 uppercase tracking-widest mt-8 md:mt-0">
+          <Type className="w-4 h-4" /> Bloco de Texto
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-600 uppercase tracking-widest mt-8 md:mt-0">
-        <Type className="w-4 h-4" /> Bloco de Texto
-      </div>
-
-      <div className="bg-white/80 rounded-xl overflow-hidden border border-gray-300">
-        <ReactQuill
-          theme="snow"
-          value={block.content}
-          onChange={(content) => updateBlock(block.id, "content", content)}
-          modules={modules}
-          className="min-h-[150px] bg-transparent"
-          placeholder="Escreva seu texto aqui..."
-        />
+        <div className="bg-white/80 rounded-xl overflow-hidden border border-gray-300">
+          <ReactQuill
+            theme="snow"
+            value={block.content}
+            onChange={(content) => updateBlock(block.id, "content", content)}
+            modules={modules}
+            className="min-h-[150px] bg-transparent"
+            placeholder="Escreva seu texto aqui..."
+          />
+        </div>
       </div>
     </div>
   );
