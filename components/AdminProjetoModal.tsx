@@ -1,4 +1,3 @@
-// app/admin/components/AdminProjetoModal.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -23,6 +22,8 @@ import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { adminUpdateProjeto } from "@/lib/api";
 import { Projeto, Imagens } from "@/types/Interface-Projeto";
 import { ApoioPlanejamento } from "@/constants/cadastroProjeto";
+import { cidadesRJ } from "@/constants/cidades"; // <--- LISTA DE CIDADES IMPORTADA
+import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo"; // <--- COMPONENTE IMPORTADO
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import "@/app/cadastro-projeto/quill-styles.css";
@@ -94,8 +95,11 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 }) => {
   const [isEditLoading, setIsEditLoading] = useState(false);
   const [editForm] = Form.useForm();
-  const [outrasAlteracoes, setOutrasAlteracoes] = useState<string | null>(null);
 
+  // Hook que observa as mudanças no input da prefeitura em tempo real
+  const prefeituraSelecionada = Form.useWatch("prefeitura", editForm);
+
+  const [outrasAlteracoes, setOutrasAlteracoes] = useState<string | null>(null);
   const [currentLogo, setCurrentLogo] = useState<string | null>(null);
 
   const [currentPortfolio, setCurrentPortfolio] = useState<Imagens[]>([]);
@@ -107,7 +111,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
       let dataToEdit: any = { ...projeto };
 
       setCurrentLogo(projeto.logoUrl || null);
-
       setCurrentPortfolio(projeto.projetoImg || []);
       setPortfolioToDelete([]);
       setLogoToDelete(false);
@@ -123,12 +126,8 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
         }
         if (projeto.dados_atualizacao.imagens) {
           const novasImagens = projeto.dados_atualizacao.imagens.map(
-            (url: string, index: number) => ({
-              id: `new-${index}`,
-              url: url,
-            }),
+            (url: string, index: number) => ({ id: `new-${index}`, url: url }),
           );
-
           setCurrentPortfolio(novasImagens);
         }
         delete dataToEdit.outrasAlteracoes;
@@ -166,26 +165,20 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 
   const handleSubmit = async (values: any) => {
     if (!projeto) return;
-
     setIsEditLoading(true);
 
     if (Array.isArray(values.odsRelacionadas)) {
       values.odsRelacionadas = values.odsRelacionadas.join(", ");
     }
-
     if (Array.isArray(values.apoio_planejamento)) {
       values.apoio_planejamento = values.apoio_planejamento.join(", ");
     }
 
     const finalValues = { ...values };
 
-    if (logoToDelete) {
-      finalValues.logoUrl = null;
-    }
-
-    if (portfolioToDelete.length > 0) {
+    if (logoToDelete) finalValues.logoUrl = null;
+    if (portfolioToDelete.length > 0)
       finalValues.urlsParaExcluir = portfolioToDelete;
-    }
 
     try {
       const token = localStorage.getItem("admin_token");
@@ -213,9 +206,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 
   const getFullImageUrl = (path: string): string => {
     if (!path) return "";
-    if (path.startsWith("http") || path.startsWith("blob:")) {
-      return path;
-    }
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
     const normalizedPath = path.replace(/\\/g, "/");
     const cleanPath = normalizedPath.startsWith("/")
       ? normalizedPath.substring(1)
@@ -244,7 +235,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
         <Button key="cancel" onClick={() => onClose(false)}>
           Cancelar
         </Button>,
-
         projeto && (
           <GerarCertificadoButton
             key="certificado"
@@ -316,15 +306,50 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
+
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="prefeitura"
                 label="Prefeitura"
-                rules={[{ required: true }]}
+                rules={[
+                  { required: true, message: "Insira o nome da Prefeitura!" },
+                ]}
               >
-                <Input />
+                <Select
+                  showSearch
+                  placeholder="Selecione a Prefeitura"
+                  optionFilterProp="label"
+                  options={cidadesRJ.map((cidade) => ({
+                    value: `Prefeitura Municipal de ${cidade}`,
+                    label: `Prefeitura Municipal de ${cidade}`,
+                  }))}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                />
               </Form.Item>
+              {prefeituraSelecionada && (
+                <div className="mb-4 flex items-center gap-3 p-3 border rounded-md bg-blue-50/50 mt-[-10px]">
+                  <div className="w-12 h-12 flex-shrink-0 bg-white rounded-full flex items-center justify-center border shadow-sm overflow-hidden">
+                    <PrefeituraLogo
+                      nomePrefeitura={prefeituraSelecionada}
+                      tipo="p"
+                      className="max-w-full max-h-full p-1.5"
+                    />
+                  </div>
+                  <div className="text-sm">
+                    <p className="font-semibold text-gray-700 m-0">
+                      Logótipo vinculado
+                    </p>
+                    <p className="text-gray-500 text-xs m-0">
+                      Gerado automaticamente
+                    </p>
+                  </div>
+                </div>
+              )}
             </Col>
             <Col span={12}>
               <Form.Item
@@ -336,6 +361,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
+
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -346,7 +372,6 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
                 <Input />
               </Form.Item>
             </Col>
-
             <Col span={12}>
               <Form.Item
                 name="oficio"
@@ -418,6 +443,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
           <Form.Item name="endereco" label="Endereço">
             <Input />
           </Form.Item>
+
           <Title level={5} className="mt-4">
             Detalhes
           </Title>
@@ -438,7 +464,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             <ReactQuill
               theme="snow"
               modules={quillModules}
-              placeholder="Descreva o projeto em detalhes, você pode usar negrito, itálico..."
+              placeholder="Descreva o projeto em detalhes..."
               style={{ minHeight: "10px" }}
             />
           </Form.Item>
@@ -468,16 +494,16 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               <Option value={false}>Não</Option>
             </Select>
           </Form.Item>
+
           <Form.Item
             name="apoio_planejamento"
-            label="De que forma você acredita que a plataforma Aqui tem ODS pode apoiar o planejamento, monitoramento e a integração das ações da sua secretaria ou setor?"
+            label="De que forma você acredita que a plataforma Aqui tem ODS pode apoiar o planejamento?"
           >
             <Select
               mode="multiple"
               placeholder="Selecione todas as opções que se aplicam."
               allowClear
             >
-              {/* Usamos a constante importada */}
               {ApoioPlanejamento.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -494,14 +520,13 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             <Rate count={10} />
           </Form.Item>
 
-          {/* --- SEÇÃO DE GERENCIAMENTO DE IMAGENS --- */}
           <Title level={5} className="mt-4">
             Gerenciamento de Imagens
           </Title>
           <Row gutter={16}>
             <Col span={12}>
               <Title level={5} style={{ fontSize: "16px" }}>
-                Logo
+                Logo (Upload Antigo)
               </Title>
               {currentLogo ? (
                 <div style={{ position: "relative", width: "fit-content" }}>
@@ -541,7 +566,11 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
                   </Popconfirm>
                 </div>
               ) : (
-                <p>{logoToDelete ? "Logo será removida." : "Nenhuma logo."}</p>
+                <p>
+                  {logoToDelete
+                    ? "Logo será removida."
+                    : "Nenhuma logo do usuário."}
+                </p>
               )}
             </Col>
             <Col span={12}>
