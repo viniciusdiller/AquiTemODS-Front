@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo";
 import {
   ArrowLeft,
   Loader2,
@@ -11,7 +12,6 @@ import {
   Share2,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, Suspense, useMemo } from "react";
-import { TiltImage } from "@/components/ui/TiltImage";
 import "leaflet/dist/leaflet.css";
 import Image from "next/image";
 import {
@@ -48,7 +48,7 @@ import OdsTag from "@/components/ui/OdsTag";
 import AvaliacaoModal from "@/components/Pop-up Coments";
 import { ReviewComment } from "@/components/ReviewComments";
 import DOMPurify from "dompurify";
-import { CustomStarIcon, StarRating } from "@/components/ui/StarRating";
+import { StarRating } from "@/components/ui/StarRating";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -432,12 +432,10 @@ function ProjetoPageContent() {
               </div>
               <div className="flex items-center justify-center md:col-span-1">
                 <div className="relative w-48 h-48 md:w-56 md:h-56 desktop:w-64 desktop:h-64 bg-white rounded-2xl flex items-center justify-center p-4 overflow-hidden">
-                  <TiltImage
-                    src="/logo2sq.png"
-                    alt={`Logo de ${projeto.nomeProjeto}`}
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-contain"
+                  <PrefeituraLogo
+                    nomePrefeitura={projeto.prefeitura}
+                    tipo="g"
+                    className="w-full h-full"
                   />
                 </div>
               </div>

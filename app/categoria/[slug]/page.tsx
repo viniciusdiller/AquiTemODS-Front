@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import { Spin, Empty, Button, Input, Pagination } from "antd";
 import ModernCarousel from "@/components/ModernCarousel";
+import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo";
 import { getProjetosByOds } from "@/lib/api";
 import { Projeto } from "@/types/Interface-Projeto";
 import { categories } from "@/constants/categories";
@@ -225,12 +226,10 @@ export default function CategoryPage() {
                         <div
                           className="absolute top-4 right-4 w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm z-10" // Posicionamento e estilo redondo
                         >
-                          <Image
-                            src="/logomobilesq.png"
-                            alt={`Logo ${projeto.nomeProjeto}`}
-                            fill
-                            sizes="48px"
-                            className="object-contain" // Ou object-cover se preferir preenchimento
+                          <PrefeituraLogo
+                            nomePrefeitura={projeto.prefeitura}
+                            tipo="p"
+                            className="w-full h-full p-2"
                           />
                         </div>
 

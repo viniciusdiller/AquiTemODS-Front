@@ -22,7 +22,7 @@ import {
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { adminUpdateProjeto } from "@/lib/api";
 import { Projeto, Imagens } from "@/types/Interface-Projeto";
-import { ApoioPlanejamento } from "@/app/cadastro-projeto/page";
+import { ApoioPlanejamento } from "@/constants/cadastroProjeto";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import "@/app/cadastro-projeto/quill-styles.css";
@@ -126,7 +126,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
             (url: string, index: number) => ({
               id: `new-${index}`,
               url: url,
-            })
+            }),
           );
 
           setCurrentPortfolio(novasImagens);
@@ -448,7 +448,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
               {categorias
                 .map((cat) => cat.split(" - ")[0])
                 .filter(
-                  (v, i, a) => a.indexOf(v) === i && !v.startsWith("ODS 18")
+                  (v, i, a) => a.indexOf(v) === i && !v.startsWith("ODS 18"),
                 )
                 .map((ods) => (
                   <Option key={ods} value={ods}>
@@ -579,7 +579,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
                         onConfirm={() => {
                           setPortfolioToDelete((prev) => [...prev, img.url]);
                           setCurrentPortfolio((prev) =>
-                            prev.filter((i) => i.url !== img.url)
+                            prev.filter((i) => i.url !== img.url),
                           );
                           message.info("Imagem marcada para remoção.");
                         }}
