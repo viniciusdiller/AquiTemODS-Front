@@ -30,7 +30,7 @@ export const PrefeituraLogo: React.FC<PrefeituraLogoProps> = ({
       attempts.push(`/LogoPrefeituras/${slug}.${ext}`);
     });
 
-    attempts.push("/logo2sq.png");
+    attempts.push("/logo_aquitemods.png");
 
     return attempts;
   };
