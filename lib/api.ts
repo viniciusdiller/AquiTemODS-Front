@@ -10,8 +10,13 @@ async function fetchApi(path: string, options: RequestInit = {}) {
     headers["Content-Type"] = "application/json";
   }
 
-  if (options.headers && (options.headers as Record<string, string>)["Authorization"]) {
-    headers["Authorization"] = (options.headers as Record<string, string>)["Authorization"];
+  if (
+    options.headers &&
+    (options.headers as Record<string, string>)["Authorization"]
+  ) {
+    headers["Authorization"] = (options.headers as Record<string, string>)[
+      "Authorization"
+    ];
   }
 
   const url = `${API_URL}${path}`;
@@ -25,7 +30,10 @@ async function fetchApi(path: string, options: RequestInit = {}) {
         : "[non-string body]"
       : undefined;
     // eslint-disable-next-line no-console
-    console.debug("fetchApi ->", (options.method || "GET").toUpperCase(), url, { headers, body: bodyPreview });
+    console.debug("fetchApi ->", (options.method || "GET").toUpperCase(), url, {
+      headers,
+      body: bodyPreview,
+    });
   } catch (e) {
     // ignore
   }
@@ -78,8 +86,8 @@ async function fetchApi(path: string, options: RequestInit = {}) {
       typeof data === "object" && data && (data.message || data.error)
         ? data.message || data.error
         : typeof data === "string" && data.trim()
-        ? data
-        : `API error: ${response.status} ${response.statusText}`;
+          ? data
+          : `API error: ${response.status} ${response.statusText}`;
 
     // Cria um Error enriquecido com os dados da resposta para facilitar debug no frontend
     const err: any = new Error(errorMessage);
@@ -87,7 +95,11 @@ async function fetchApi(path: string, options: RequestInit = {}) {
     err.statusText = response.statusText;
     err.data = data; // objeto ou texto retornado pela API
     // compatibilidade: anexa um response com os dados
-    err.response = { status: response.status, statusText: response.statusText, data };
+    err.response = {
+      status: response.status,
+      statusText: response.statusText,
+      data,
+    };
 
     throw err;
   }
@@ -259,6 +271,38 @@ export const getAllActiveProjetos = async (token: string) => {
   });
   if (!response.ok) {
     throw new Error("Falha ao buscar projetos ativos");
+  }
+  return response.json();
+};
+export const adminGetAllProjetosGeral = async (token: string) => {
+  const response = await fetch(`${API_URL}/api/admin/projetos-geral`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Falha ao buscar todos os projetos");
+  }
+  return response.json();
+};
+
+export const adminToggleProjetoStatus = async (
+  id: number,
+  ativo: boolean,
+  token: string,
+) => {
+  const response = await fetch(`${API_URL}/api/admin/projeto/${id}/status`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ ativo }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha ao alterar status do projeto");
   }
   return response.json();
 };
@@ -440,12 +484,12 @@ export const getAcaoSustentaiById = (id: string | number) =>
 
 // ADMIN: Criar nova ação (Precisa do Token de Admin)
 export const adminCreateAcao = (data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
-  return fetchApi('/api/admin/sustentai/acoes', {
-    method: 'POST',
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
+  return fetchApi("/api/admin/sustentai/acoes", {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
@@ -453,12 +497,12 @@ export const adminCreateAcao = (data: any, token: string) => {
 
 // ADMIN: Atualizar ação existente (Precisa do Token de Admin)
 export const adminUpdateAcao = (id: number, data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
   return fetchApi(`/api/admin/sustentai/acoes/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
@@ -472,7 +516,11 @@ export const adminDeleteAcao = (id: number, token: string) =>
   });
 
 // ADMIN: Atualizar conteúdo da página interna da ação (Precisa do Token de Admin)
-export const adminUpdateAcaoConteudoAdmin = (id: number, data: any, token: string) =>
+export const adminUpdateAcaoConteudoAdmin = (
+  id: number,
+  data: any,
+  token: string,
+) =>
   fetchApi(`/api/admin/sustentai/acoes/${id}/conteudo`, {
     method: "PUT",
     headers: {
@@ -491,12 +539,12 @@ export const getPessoasSustentai = () => fetchApi("/api/sustentai/pessoas");
 
 // ADMIN: Criar nova pessoa
 export const adminCreatePessoa = (data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
-  return fetchApi('/api/admin/sustentai/pessoas', {
-    method: 'POST',
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
+  return fetchApi("/api/admin/sustentai/pessoas", {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
@@ -504,12 +552,12 @@ export const adminCreatePessoa = (data: any, token: string) => {
 
 // ADMIN: Atualizar pessoa
 export const adminUpdatePessoa = (id: number, data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
   return fetchApi(`/api/admin/sustentai/pessoas/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
@@ -537,7 +585,11 @@ export const getAcaoConteudo = (id: string | number) =>
   fetchApi(`/api/sustentai/acoes/${id}/conteudo`);
 
 // ADMIN: Salvar os blocos de conteúdo da ação (Precisa do Token)
-export const adminUpdateAcaoConteudo = async (id: string, blocos: any, token: string) => {
+export const adminUpdateAcaoConteudo = async (
+  id: string,
+  blocos: any,
+  token: string,
+) => {
   const payload = { blocos };
   // Tenta várias variações de caminho que o backend pode expor
   const pathsToTry = [
@@ -566,11 +618,17 @@ export const adminUpdateAcaoConteudo = async (id: string, blocos: any, token: st
       });
     } catch (err: any) {
       // Se o erro for 404 ou resposta HTML com 'Cannot PUT', tenta próximo path
-      const is404 = err && (err.status === 404 || (typeof err.data === 'string' && /Cannot PUT/i.test(err.data)));
+      const is404 =
+        err &&
+        (err.status === 404 ||
+          (typeof err.data === "string" && /Cannot PUT/i.test(err.data)));
       if (!is404) {
         // erro diferente — loga mais contexto e propaga
         // eslint-disable-next-line no-console
-        console.error(`adminUpdateAcaoConteudo: erro ao tentar ${fullUrl}`, err);
+        console.error(
+          `adminUpdateAcaoConteudo: erro ao tentar ${fullUrl}`,
+          err,
+        );
         throw err;
       }
       // senão, continua e tenta o próximo caminho
@@ -584,12 +642,19 @@ export const adminUpdateAcaoConteudo = async (id: string, blocos: any, token: st
   finalErr.status = 404;
   finalErr.attempted = attemptedFullUrls;
   // eslint-disable-next-line no-console
-  console.error("adminUpdateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:", attemptedFullUrls);
+  console.error(
+    "adminUpdateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:",
+    attemptedFullUrls,
+  );
   throw finalErr;
 };
 
 // ADMIN: Criar os blocos de conteúdo da ação (POST) — útil quando a rota do backend espera POST para criação
-export const adminCreateAcaoConteudo = async (id: string, blocos: any, token: string) => {
+export const adminCreateAcaoConteudo = async (
+  id: string,
+  blocos: any,
+  token: string,
+) => {
   const payload = { blocos };
   const pathsToTry = [
     `/api/admin/sustentai/acoes/${id}/conteudo`,
@@ -615,10 +680,17 @@ export const adminCreateAcaoConteudo = async (id: string, blocos: any, token: st
         body: JSON.stringify(payload),
       });
     } catch (err: any) {
-      const is404 = err && (err.status === 404 || (typeof err.data === 'string' && /Cannot POST|Cannot PUT|Not Found/i.test(err.data)));
+      const is404 =
+        err &&
+        (err.status === 404 ||
+          (typeof err.data === "string" &&
+            /Cannot POST|Cannot PUT|Not Found/i.test(err.data)));
       if (!is404) {
         // eslint-disable-next-line no-console
-        console.error(`adminCreateAcaoConteudo: erro ao tentar ${fullUrl}`, err);
+        console.error(
+          `adminCreateAcaoConteudo: erro ao tentar ${fullUrl}`,
+          err,
+        );
         throw err;
       }
       // tenta próxima
@@ -631,18 +703,12 @@ export const adminCreateAcaoConteudo = async (id: string, blocos: any, token: st
   finalErr.status = 404;
   finalErr.attempted = attemptedFullUrls;
   // eslint-disable-next-line no-console
-  console.error("adminCreateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:", attemptedFullUrls);
+  console.error(
+    "adminCreateAcaoConteudo: nenhuma rota encontrada. URLs tentadas:",
+    attemptedFullUrls,
+  );
   throw finalErr;
 };
-
-// ==========================================
-// CARDS (Admin endpoints fornecidos pelo backend)
-// Rotas no backend (admin):
-// GET  /sustentai/cards
-// POST /sustentai/cards  (upload.single('imagem'))
-// PUT  /sustentai/cards/:id (upload.single('imagem'))
-// DELETE /sustentai/cards/:id
-// ==========================================
 
 export const adminGetCards = (token: string) =>
   fetchApi(`/api/admin/sustentai/cards`, {
@@ -651,24 +717,28 @@ export const adminGetCards = (token: string) =>
   });
 
 export const adminCreateCard = (data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
-  return fetchApi('/api/admin/sustentai/cards', {
-    method: 'POST',
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
+  return fetchApi("/api/admin/sustentai/cards", {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
 };
 
-export const adminUpdateCard = (id: number | string, data: any, token: string) => {
-  const isForm = typeof FormData !== 'undefined' && data instanceof FormData;
+export const adminUpdateCard = (
+  id: number | string,
+  data: any,
+  token: string,
+) => {
+  const isForm = typeof FormData !== "undefined" && data instanceof FormData;
   return fetchApi(`/api/admin/sustentai/cards/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
     },
     body: isForm ? data : JSON.stringify(data),
   });
@@ -676,6 +746,6 @@ export const adminUpdateCard = (id: number | string, data: any, token: string) =
 
 export const adminDeleteCard = (id: number | string, token: string) =>
   fetchApi(`/api/admin/sustentai/cards/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });

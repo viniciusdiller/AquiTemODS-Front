@@ -34,15 +34,6 @@ export default function CategoryPage() {
     [slug],
   );
 
-  const getImageUrl = (url?: string) => {
-    if (!url) {
-      return "/Logo_aquitemods.png";
-    }
-
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    return `${baseUrl}/${url.startsWith("/") ? url.substring(1) : url}`;
-  };
-
   useEffect(() => {
     if (slug) {
       const fetchProjetos = async () => {

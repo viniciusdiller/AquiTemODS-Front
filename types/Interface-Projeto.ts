@@ -10,6 +10,7 @@ export interface Projeto {
   projetoId: number;
   nomeProjeto: string;
   prefeitura: string;
+  secretaria?: string;
   responsavelProjeto?: string;
   logoUrl?: string;
   oficioUrl?: string;
@@ -19,5 +20,6 @@ export interface Projeto {
   venceuPspe: boolean;
   venda?: string;
   escala?: number;
+  ativos?: boolean;
   [key: string]: any;
 }

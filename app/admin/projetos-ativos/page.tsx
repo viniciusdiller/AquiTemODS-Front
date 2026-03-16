@@ -9,7 +9,6 @@ import {
   Card,
   Row,
   Col,
-  Avatar,
   Button,
   Tabs,
   Input,
@@ -25,32 +24,25 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   BarChartOutlined,
+  StopOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import {
-  getAllActiveProjetos,
-  adminUpdateProjeto,
+  adminGetAllProjetosGeral,
+  adminToggleProjetoStatus,
   adminDeleteProjeto,
   adminExportProjetos,
 } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
 import { Projeto } from "@/types/Interface-Projeto";
+import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo"; // <--- Importação adicionada
 
 const { Title, Text } = Typography;
 const { Search } = Input;
 const { TabPane } = Tabs;
 const { useBreakpoint } = Grid;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const PAGE_SIZE = 6;
-
-const getFullImageUrl = (path: string): string => {
-  if (!path) return "";
-  const normalizedPath = path.replace(/\\/g, "/");
-  const cleanPath = normalizedPath.startsWith("/")
-    ? normalizedPath.substring(1)
-    : normalizedPath;
-  return `${API_URL}/${cleanPath}`;
-};
 
 const ProjetosAtivosPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -72,7 +64,7 @@ const ProjetosAtivosPage: React.FC = () => {
       return;
     }
     try {
-      const data = await getAllActiveProjetos(token);
+      const data = await adminGetAllProjetosGeral(token);
       setProjetos(data);
       setFilteredProjetos(data);
     } catch (error: any) {
@@ -86,14 +78,13 @@ const ProjetosAtivosPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  // --- ALTERAÇÃO 1: ATUALIZADO handleSearch PARA INCLUIR ID ---
   const handleSearch = (value: string) => {
     const lowerCaseValue = value.toLowerCase();
     const filtered = projetos.filter(
       (p) =>
         p.nomeProjeto.toLowerCase().includes(lowerCaseValue) ||
-        p.prefeitura.toLowerCase().includes(lowerCaseValue) ||
-        p.secretaria.toLowerCase().includes(lowerCaseValue) ||
+        (p.prefeitura || "").toLowerCase().includes(lowerCaseValue) ||
+        (p.secretaria || "").toLowerCase().includes(lowerCaseValue) ||
         String(p.projetoId).includes(lowerCaseValue),
     );
     setFilteredProjetos(filtered);
@@ -108,22 +99,35 @@ const ProjetosAtivosPage: React.FC = () => {
   const handleModalClose = (shouldRefresh: boolean) => {
     setIsEditModalVisible(false);
     setSelectedItem(null);
-    if (shouldRefresh) {
-      fetchData();
-    }
+    if (shouldRefresh) fetchData();
   };
 
-  const handleDelete = async (projetoId: number) => {
+  const handleToggleStatus = async (projeto: Projeto) => {
     const token = localStorage.getItem("admin_token");
     if (!token) {
       message.error("Autenticação expirada.");
       return;
     }
+    setLoading(true);
+    try {
+      await adminToggleProjetoStatus(projeto.projetoId, !projeto.ativo, token);
+      message.success(
+        `Projeto ${projeto.ativo ? "desativado" : "reativado"} com sucesso!`,
+      );
+      fetchData();
+    } catch (error: any) {
+      message.error(error.message || "Falha ao alterar o status do projeto.");
+      setLoading(false);
+    }
+  };
 
+  const handleDeleteDefinitivo = async (projetoId: number) => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) return;
     setLoading(true);
     try {
       await adminDeleteProjeto(projetoId, token);
-      message.success("Projeto excluído com sucesso!");
+      message.success("Projeto excluído permanentemente do banco de dados!");
       fetchData();
     } catch (error: any) {
       message.error(error.message || "Falha ao excluir o projeto.");
@@ -131,33 +135,22 @@ const ProjetosAtivosPage: React.FC = () => {
     }
   };
 
-  // --- NOVA FUNÇÃO: EXPORTAR PROJETOS ---
   const handleExport = async () => {
     const token = localStorage.getItem("admin_token");
-    if (!token) {
-      message.error("Sessão expirada.");
-      return;
-    }
-
+    if (!token) return;
     setExporting(true);
     try {
       const blob = await adminExportProjetos(token);
-
-      // Cria um link temporário para forçar o download
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `projetos_AquiTemODS${
-        new Date().toISOString().split("T")[0]
-      }.csv`; // Nome do arquivo com data
+      a.download = `projetos_AquiTemODS_${new Date().toISOString().split("T")[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-
       message.success("Relatório gerado com sucesso!");
     } catch (error: any) {
-      console.error(error);
       message.error("Erro ao gerar relatório. Tente novamente.");
     } finally {
       setExporting(false);
@@ -168,20 +161,19 @@ const ProjetosAtivosPage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // Agrupa os projetos por ODS (para as abas de categoria)
+  const ativos = filteredProjetos.filter((p) => p.ativo);
+  const inativos = filteredProjetos.filter((p) => !p.ativo);
+
   const groupedProjetos = filteredProjetos.reduce(
     (acc, projeto) => {
       const ods = projeto.ods || "Sem Categoria";
-      if (!acc[ods]) {
-        acc[ods] = [];
-      }
+      if (!acc[ods]) acc[ods] = [];
       acc[ods].push(projeto);
       return acc;
     },
     {} as { [key: string]: Projeto[] },
   );
 
-  // Ordena as categorias
   const sortedCategories = Object.keys(groupedProjetos).sort((a, b) => {
     const aNum = parseInt(a.split(" ")[1]);
     const bNum = parseInt(b.split(" ")[1]);
@@ -191,11 +183,152 @@ const ProjetosAtivosPage: React.FC = () => {
 
   const tabPosition = screens.md ? "left" : "top";
 
-  const totalTodos = filteredProjetos.length;
-  const paginatedTodos = filteredProjetos.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  const renderProjetosGrid = (lista: Projeto[]) => {
+    const totalCount = lista.length;
+    const projetosToShow = lista.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE,
+    );
+
+    if (totalCount === 0) {
+      return <Empty description="Nenhum projeto encontrado nesta aba." />;
+    }
+
+    return (
+      <>
+        <Row gutter={[16, 16]}>
+          {projetosToShow.map((projeto) => (
+            <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
+              <Card
+                hoverable
+                className={
+                  !projeto.ativo
+                    ? "grayscale opacity-80 bg-gray-50 border-gray-300"
+                    : ""
+                }
+                actions={[
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => openEditModal(projeto)}
+                    className="hover:!bg-blue-500 hover:!text-white text-blue-500"
+                  >
+                    Editar
+                  </Button>,
+                  <Popconfirm
+                    key="toggle"
+                    title={
+                      projeto.ativo ? "Desativar Projeto" : "Reativar Projeto"
+                    }
+                    description={
+                      projeto.ativo
+                        ? "Ocultar este projeto do site público?"
+                        : "Voltar a exibir este projeto no site público?"
+                    }
+                    onConfirm={() => handleToggleStatus(projeto)}
+                    okText="Sim"
+                    cancelText="Não"
+                  >
+                    <Button
+                      type="text"
+                      icon={
+                        projeto.ativo ? (
+                          <StopOutlined />
+                        ) : (
+                          <CheckCircleOutlined />
+                        )
+                      }
+                      className={
+                        projeto.ativo
+                          ? "hover:!bg-orange-500 hover:!text-white text-orange-500"
+                          : "hover:!bg-green-500 hover:!text-white text-green-600"
+                      }
+                    >
+                      {projeto.ativo ? "Desativar" : "Reativar"}
+                    </Button>
+                  </Popconfirm>,
+                  <Popconfirm
+                    key="delete"
+                    title="Excluir do Banco de Dados"
+                    description="ATENÇÃO: Deseja apagar definitivamente? Isso não pode ser desfeito."
+                    onConfirm={() => handleDeleteDefinitivo(projeto.projetoId)}
+                    okText="Sim, Apagar BD"
+                    cancelText="Não"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <Button
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      className="hover:!bg-red-500 hover:!text-white"
+                    >
+                      Excluir BD
+                    </Button>
+                  </Popconfirm>,
+                ]}
+              >
+                <Card.Meta
+                  // --- AQUI ESTÁ A INTEGRAÇÃO COM O PrefeituraLogo ---
+                  avatar={
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 overflow-hidden shrink-0">
+                      <PrefeituraLogo
+                        nomePrefeitura={projeto.prefeitura || ""}
+                        tipo="p"
+                        className="w-full h-full object-contain p-1"
+                      />
+                    </div>
+                  }
+                  title={
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={
+                          !projeto.ativo ? "line-through text-gray-500" : ""
+                        }
+                      >
+                        {projeto.nomeProjeto}
+                      </span>
+                      {!projeto.ativo && (
+                        <span className="text-red-500 text-xs font-normal border border-red-500 rounded px-1">
+                          Inativo
+                        </span>
+                      )}
+                    </span>
+                  }
+                  description={
+                    <>
+                      <Text>
+                        <strong>ID do Projeto:</strong> {projeto.projetoId}
+                      </Text>
+                      <br />
+                      <Text>
+                        <strong>Prefeitura:</strong> {projeto.prefeitura}
+                      </Text>
+                      <br />
+                      <Text>
+                        <strong>Secretaria:</strong> {projeto.secretaria}
+                      </Text>
+                    </>
+                  }
+                />
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {totalCount > PAGE_SIZE && (
+          <div className="mt-6 text-center">
+            <Pagination
+              current={currentPage}
+              pageSize={PAGE_SIZE}
+              total={totalCount}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+            />
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -224,13 +357,13 @@ const ProjetosAtivosPage: React.FC = () => {
             loading={exporting}
             className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
           >
-            Exportar Projetos Ativos (CSV)
+            Exportar CSV
           </Button>
         </div>
       </div>
 
       <Title level={2} className="mb-6">
-        Gerenciar Projetos Ativos ({projetos.length})
+        Gerenciar Projetos ({filteredProjetos.length})
       </Title>
 
       <Search
@@ -244,177 +377,51 @@ const ProjetosAtivosPage: React.FC = () => {
 
       <Spin spinning={loading}>
         {filteredProjetos.length === 0 && !loading ? (
-          <Empty description="Nenhum projeto ativo encontrado." />
+          <Empty description="Nenhum projeto encontrado com este filtro." />
         ) : (
           <Tabs
-            defaultActiveKey="todos"
+            defaultActiveKey="geral"
             tabPosition={tabPosition}
             onChange={handleTabChange}
           >
-            <TabPane tab={`Todos os Projetos (${totalTodos})`} key="todos">
-              <Row gutter={[16, 16]}>
-                {paginatedTodos.map((projeto) => (
-                  <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
-                    <Card
-                      hoverable
-                      actions={[
-                        <Button
-                          type="text"
-                          icon={<EditOutlined />}
-                          onClick={() => openEditModal(projeto)}
-                          className="hover:!bg-blue-500 hover:!text-white"
-                        >
-                          Editar
-                        </Button>,
-                        <Popconfirm
-                          key="delete"
-                          title="Excluir Projeto"
-                          description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
-                          onConfirm={() => handleDelete(projeto.projetoId)}
-                          okText="Sim, Excluir"
-                          cancelText="Não"
-                          okButtonProps={{ danger: true }}
-                        >
-                          <Button
-                            type="text"
-                            danger
-                            icon={<DeleteOutlined />}
-                            className="hover:!bg-red-500 hover:!text-white"
-                          >
-                            Excluir
-                          </Button>
-                        </Popconfirm>,
-                      ]}
-                    >
-                      <Card.Meta
-                        avatar={
-                          <Avatar
-                            src={getFullImageUrl(projeto.logoUrl || "")}
-                          />
-                        }
-                        title={projeto.nomeProjeto}
-                        description={
-                          <>
-                            <Text>
-                              <strong>ID do Projeto:</strong>{" "}
-                              {projeto.projetoId}
-                            </Text>
-                            <br />
-                            <Text>
-                              <strong>Prefeitura:</strong> {projeto.prefeitura}
-                            </Text>
-                            <br />
-                            <Text>
-                              <strong>Secretaria:</strong> {projeto.secretaria}
-                            </Text>
-                          </>
-                        }
-                      />
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
+            <TabPane
+              tab={
+                <span className="font-semibold text-gray-700">
+                  Geral ({filteredProjetos.length})
+                </span>
+              }
+              key="geral"
+            >
+              {renderProjetosGrid(filteredProjetos)}
+            </TabPane>
 
-              {totalTodos > PAGE_SIZE && (
-                <div className="mt-6 text-center">
-                  <Pagination
-                    current={currentPage}
-                    pageSize={PAGE_SIZE}
-                    total={totalTodos}
-                    onChange={(page) => setCurrentPage(page)}
-                    showSizeChanger={false}
-                  />
-                </div>
-              )}
+            <TabPane
+              tab={
+                <span className="font-semibold text-green-600">
+                  Ativos ({ativos.length})
+                </span>
+              }
+              key="ativos"
+            >
+              {renderProjetosGrid(ativos)}
+            </TabPane>
+
+            <TabPane
+              tab={
+                <span className="font-semibold text-red-500">
+                  Inativos ({inativos.length})
+                </span>
+              }
+              key="inativos"
+            >
+              {renderProjetosGrid(inativos)}
             </TabPane>
 
             {sortedCategories.map((ods) => {
-              const allProjetosForOds = groupedProjetos[ods];
-              const totalCount = allProjetosForOds.length;
-              const projetosToShow = allProjetosForOds.slice(
-                (currentPage - 1) * PAGE_SIZE,
-                currentPage * PAGE_SIZE,
-              );
-
+              const odsList = groupedProjetos[ods];
               return (
-                <TabPane tab={`${ods} (${allProjetosForOds.length})`} key={ods}>
-                  <Row gutter={[16, 16]}>
-                    {projetosToShow.map((projeto) => (
-                      <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
-                        <Card
-                          hoverable
-                          actions={[
-                            <Button
-                              type="text"
-                              icon={<EditOutlined />}
-                              onClick={() => openEditModal(projeto)}
-                              className="hover:!bg-blue-500 hover:!text-white"
-                            >
-                              Editar
-                            </Button>,
-                            <Popconfirm
-                              key="delete"
-                              title="Excluir Projeto"
-                              description="Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita."
-                              onConfirm={() => handleDelete(projeto.projetoId)}
-                              okText="Sim, Excluir"
-                              cancelText="Não"
-                              okButtonProps={{ danger: true }}
-                            >
-                              <Button
-                                type="text"
-                                danger
-                                icon={<DeleteOutlined />}
-                                className="hover:!bg-red-500 hover:!text-white"
-                              >
-                                Excluir
-                              </Button>
-                            </Popconfirm>,
-                          ]}
-                        >
-                          <Card.Meta
-                            avatar={
-                              <Avatar
-                                src={getFullImageUrl(projeto.logoUrl || "")}
-                              />
-                            }
-                            title={projeto.nomeProjeto}
-                            description={
-                              <>
-                                <Text>
-                                  <strong>ID do Projeto:</strong>{" "}
-                                  {projeto.projetoId}
-                                </Text>
-                                <br />
-                                <Text>
-                                  <strong>Prefeitura:</strong>{" "}
-                                  {projeto.prefeitura}
-                                </Text>
-                                <br />
-                                <Text>
-                                  <strong>Secretaria:</strong>{" "}
-                                  {projeto.secretaria}
-                                </Text>
-                              </>
-                            }
-                          />
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
-
-                  {/* Paginação para as abas de Categoria */}
-                  {totalCount > PAGE_SIZE && (
-                    <div className="mt-6 text-center">
-                      <Pagination
-                        current={currentPage}
-                        pageSize={PAGE_SIZE}
-                        total={totalCount}
-                        onChange={(page) => setCurrentPage(page)}
-                        showSizeChanger={false}
-                      />
-                    </div>
-                  )}
+                <TabPane tab={`${ods} (${odsList.length})`} key={ods}>
+                  {renderProjetosGrid(odsList)}
                 </TabPane>
               );
             })}
