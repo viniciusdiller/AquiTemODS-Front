@@ -104,12 +104,9 @@ export default function SustentAiPage() {
         {/* Cabeçalho */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <Newspaper className="text-[#D7386E] w-8 h-8 sm:w-10 sm:h-10" />
-
-            <h1 className="text-4xl font-extrabold inline-block pb-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
-              <span className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] bg-clip-text text-transparent">
-                SustentAí
-              </span>
+            <Newspaper className="text-black w-8 h-8 sm:w-10 sm:h-10" />
+            <h1 className="text-4xl font-extrabold inline-block pb-2 bg-gradient-to-r from-gray-400 to-black bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
+              <span className="text-black">SustentAí</span>
             </h1>
           </div>
 

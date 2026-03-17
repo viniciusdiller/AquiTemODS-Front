@@ -67,7 +67,10 @@ export default function NewsletterDestaque() {
               a.imagemUrl || a.imagem || a.imagem_url || "",
             ),
             linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
-            cliques: typeof a.cliques === 'number' ? a.cliques : a.views || a.accesses || 0,
+            cliques:
+              typeof a.cliques === "number"
+                ? a.cliques
+                : a.views || a.accesses || 0,
           }))
         : [];
 
@@ -124,16 +127,14 @@ export default function NewsletterDestaque() {
     <section className="mb-16 bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
       {/* Cabeçalho */}
       <FadeInScroll>
-        <div className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] p-8 md:p-12 text-white text-center">
-          <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
-            Prefeitura de Saquarema
-          </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 ">
-            {header.titulo}
-          </h2>
-          <p className="text-lg md:text-xl opacity-90">
-            {header.subtitulo} - {header.data}
-          </p>
+        <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[200px]">
+          <div className="absolute inset-0">
+            <img
+              src="/Sustentai.png"
+              alt="Logo_Sustentai"
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       </FadeInScroll>
 
@@ -200,7 +201,10 @@ export default function NewsletterDestaque() {
                           try {
                             await registerSustentaiActionClick(acao.id);
                           } catch (e) {
-                            console.debug('Falha ao registrar clique (fallback):', e);
+                            console.debug(
+                              "Falha ao registrar clique (fallback):",
+                              e,
+                            );
                           }
                         }
                       }}

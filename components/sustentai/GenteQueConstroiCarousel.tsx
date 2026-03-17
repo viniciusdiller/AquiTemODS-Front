@@ -72,10 +72,10 @@ export default function GenteQueConstroiCarousel({
 
                 {/* Textos Embaixo da Imagem */}
                 <div className="flex flex-col flex-grow text-left">
-                  <h4 className="font-bold text-[#3C6AB2] text-xl sm:text-2xl md:text-xl">
+                  <h4 className="font-bold text-[#4f4f4f] text-xl sm:text-2xl md:text-xl">
                     {pessoa.nome}
                   </h4>
-                  <p className="text-sm sm:text-base md:text-sm text-[#D7386E] font-bold mt-1 mb-3">
+                  <p className="text-sm sm:text-base md:text-sm text-black font-bold mt-1 mb-3">
                     {pessoa.cargo}
                   </p>
                   <p className="text-sm sm:text-base md:text-sm text-gray-600 leading-relaxed">
