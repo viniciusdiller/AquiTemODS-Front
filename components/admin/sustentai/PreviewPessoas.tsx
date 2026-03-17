@@ -50,6 +50,8 @@ export default function PreviewPessoas({
       pessoa.nome.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
+  const LIMITE_DESCRICAO = 120;
+
   return (
     <div className="w-full">
       {/* BOTÃO ADICIONAR PESSOA */}
@@ -140,7 +142,6 @@ export default function PreviewPessoas({
                         <Edit className="w-4 h-4 ml-0.5" />
                       </button>
                       <button
-                        // Agora isto vai ativar o Modal da página principal!
                         onClick={() => onDelete(pessoa.id)}
                         className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-red-500 hover:bg-red-500 hover:text-white rounded-full shadow-sm border border-gray-200 transition-all"
                         title="Excluir Perfil"

@@ -6,8 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 interface ModalPessoaProps {
   isOpen: boolean;
   onClose: () => void;
-  pessoaAtual?: any; // Recebe dados se for edição
-  onSave: (dados: any) => void; // Envia para a API (pode receber FormData)
+  pessoaAtual?: any;
+  onSave: (dados: any) => void;
 }
 
 export default function ModalPessoa({
@@ -35,7 +35,6 @@ export default function ModalPessoa({
       setCargo(pessoaAtual.cargo || "");
       setDescricao(pessoaAtual.descricao || "");
       setSelectedFile(null);
-      // exibe imagem existente enquanto nenhum arquivo é selecionado
       setPreviewUrl(pessoaAtual.imagemUrl || null);
     } else {
       setNome("");
@@ -56,6 +55,13 @@ export default function ModalPessoa({
       URL.revokeObjectURL(url);
     };
   }, [selectedFile]);
+
+  const getFullImageUrl = (url: string | null) => {
+    if (!url) return "";
+    if (url.startsWith("blob:") || url.startsWith("http")) return url;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -180,8 +186,13 @@ export default function ModalPessoa({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Descrição
             </label>
+            <span
+              className={`text-xs ${descricao.length >= 500 ? "text-red-500 font-medium" : "text-gray-400"}`}
+            >
+              {descricao.length}/500
+            </span>
             <textarea
-              rows={3}
+              rows={6}
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               className="w-full border border-gray-300 rounded-xl px-4 py-2.5 resize-none"
@@ -201,33 +212,41 @@ export default function ModalPessoa({
               className="hidden"
             />
 
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={handlePickFile}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-medium hover:opacity-90"
-              >
-                <ImageIcon className="w-4 h-4" />
-                {selectedFile ? "Alterar Imagem" : "Selecionar Imagem"}
-              </button>
+            <div className="flex items-center gap-6">
+              <div className="flex flex-col items-start gap-2">
+                <button
+                  type="button"
+                  onClick={handlePickFile}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-medium hover:opacity-90"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  {selectedFile || previewUrl
+                    ? "Alterar Imagem"
+                    : "Selecionar Imagem"}
+                </button>
+                <p className="text-xs text-gray-500">
+                  Envie uma imagem para a pessoa.
+                </p>
+              </div>
 
-              {previewUrl ? (
-                <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-                  <img
-                    src={previewUrl}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center text-gray-400">
-                  <User className="w-6 h-6" />
-                </div>
-              )}
+              <div className="w-32 shrink-0">
+                {previewUrl ? (
+                  <div className="group relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-gray-100">
+                    <img
+                      src={getFullImageUrl(previewUrl)}
+                      alt={nome || "Preview"}
+                      draggable={false}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                ) : (
+                  <div className="w-full aspect-square rounded-xl overflow-hidden border border-gray-200 flex items-center justify-center text-gray-400 bg-gray-50">
+                    <User className="w-8 h-8" />
+                  </div>
+                )}
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Envie uma imagem para a pessoa (obrigatório ao criar).
-            </p>
           </div>
         </div>
 

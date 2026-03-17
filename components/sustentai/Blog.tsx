@@ -124,7 +124,7 @@ export default function NewsletterDestaque() {
   };
 
   return (
-    <section className="mb-16 bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
+    <section className="mb-16 bg-white border-y border-gray-200 rounded-3xl shadow-sm overflow-hidden">
       {/* Cabeçalho */}
       <FadeInScroll>
         <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[200px]">
@@ -138,7 +138,7 @@ export default function NewsletterDestaque() {
         </div>
       </FadeInScroll>
 
-      <div className="p-8 md:p-12 max-w-6xl mx-auto space-y-20">
+      <div className="py-8 max-w-6xl mx-auto space-y-20">
         {/* ========================================== */}
         {/* SEÇÃO 1: AÇÕES                             */}
         {/* ========================================== */}

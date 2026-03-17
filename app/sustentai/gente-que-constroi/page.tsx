@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, HeartHandshake, Loader2, Search } from "lucide-react";
-
-// Importa a função que busca todas as pessoas no Backend
+import { ArrowLeft, HeartHandshake, Loader2, Search, X } from "lucide-react";
 import { getPessoasSustentai } from "@/lib/api";
 
 export default function HistoricoGenteQueConstroiPage() {
@@ -11,9 +9,8 @@ export default function HistoricoGenteQueConstroiPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [busca, setBusca] = useState("");
 
-  // ==========================================
-  // EFEITO: BUSCAR DADOS DA API AO CARREGAR
-  // ==========================================
+  const [pessoaSelecionada, setPessoaSelecionada] = useState<any | null>(null);
+
   useEffect(() => {
     const carregarHistorico = async () => {
       try {
@@ -29,18 +26,21 @@ export default function HistoricoGenteQueConstroiPage() {
     carregarHistorico();
   }, []);
 
-  // ==========================================
-  // FILTRO INTELIGENTE
-  // ==========================================
+  const getFullImageUrl = (url: string | null) => {
+    if (!url) return "/placeholder-user.jpg";
+    if (url.startsWith("http") || url.startsWith("blob:")) return url;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
+
   const pessoasFiltradas = pessoas.filter(
     (pessoa) =>
       pessoa.nome.toLowerCase().includes(busca.toLowerCase()) ||
       pessoa.cargo.toLowerCase().includes(busca.toLowerCase()),
   );
 
-  // ==========================================
-  // TELA DE CARREGAMENTO
-  // ==========================================
+  const LIMITE_DESCRICAO = 120;
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
@@ -53,11 +53,8 @@ export default function HistoricoGenteQueConstroiPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12">
+    <div className="min-h-screen bg-gray-50 py-12 md:py-20 px-4 sm:px-6 md:px-12 relative">
       <div className="max-w-7xl mx-auto space-y-12">
-        {/* ========================================== */}
-        {/* HEADER DA PÁGINA                           */}
-        {/* ========================================== */}
         <div className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="w-full md:w-auto">
             <Link
@@ -94,40 +91,58 @@ export default function HistoricoGenteQueConstroiPage() {
           </div>
         </div>
 
-        {/* ========================================== */}
-        {/* GRID DE PESSOAS                            */}
-        {/* ========================================== */}
         {pessoasFiltradas.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-            {pessoasFiltradas.map((pessoa) => (
-              <div
-                key={pessoa.id}
-                className="group flex flex-col h-full bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-              >
-                {/* Imagem */}
-                <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
-                  <img
-                    src={pessoa.imagemUrl}
-                    alt={pessoa.nome}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
+            {pessoasFiltradas.map((pessoa) => {
+              const precisaVerMais =
+                pessoa.descricao?.length > LIMITE_DESCRICAO;
 
-                {/* Textos */}
-                <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
-                  <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
-                    {pessoa.nome}
-                  </h4>
-                  <p className="text-[10px] sm:text-sm text-[#D7386E] font-bold mb-2 sm:mb-3 uppercase tracking-wider line-clamp-2">
-                    {pessoa.cargo}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 line-clamp-3 sm:line-clamp-none">
-                    {pessoa.descricao}
-                  </p>
+              return (
+                <div
+                  key={pessoa.id}
+                  className="group flex flex-col h-full bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+                    <img
+                      src={getFullImageUrl(pessoa.imagemUrl)}
+                      alt={pessoa.nome}
+                      draggable={false}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+
+                  <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
+                    <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
+                      {pessoa.nome}
+                    </h4>
+                    <p className="text-[12px] sm:text-sm text-[#D7386E] font-bold mb-2 sm:mb-3 line-clamp-2">
+                      {pessoa.cargo}
+                    </p>
+
+                    <div className="md:hidden text-xs text-gray-600 leading-relaxed mb-4 flex-grow text-justify">
+                      {precisaVerMais ? (
+                        <>
+                          {pessoa.descricao.substring(0, LIMITE_DESCRICAO)}...
+                          <button
+                            onClick={() => setPessoaSelecionada(pessoa)}
+                            className="text-[#3C6AB2] font-semibold hover:underline ml-1 focus:outline-none"
+                          >
+                            Ler mais
+                          </button>
+                        </>
+                      ) : (
+                        pessoa.descricao
+                      )}
+                    </div>
+
+                    <div className="hidden md:block text-sm text-gray-600 leading-relaxed mb-4 flex-grow text-justify">
+                      {pessoa.descricao}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-20 bg-white rounded-[2rem] border border-gray-200 border-dashed shadow-sm">
@@ -141,6 +156,49 @@ export default function HistoricoGenteQueConstroiPage() {
           </div>
         )}
       </div>
+
+      {/* ========================================== */}
+      {/* MODAL / POP-UP (LER MAIS)                    */}
+      {/* ========================================== */}
+      {pessoaSelecionada && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl w-full max-w-md p-4 sm:p-6 overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-200 flex flex-col">
+            {/* Botão Fechar */}
+            <button
+              onClick={() => setPessoaSelecionada(null)}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors z-10 shadow-sm"
+              title="Fechar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Imagem no Modal usando as EXATAS mesmas classes da parte de fora para evitar cortes */}
+            <div className="relative w-full aspect-square mb-4 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+              <img
+                src={getFullImageUrl(pessoaSelecionada.imagemUrl)}
+                alt={pessoaSelecionada.nome}
+                draggable={false}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Textos Completos no Modal */}
+            <div className="flex flex-col text-center px-1 sm:px-2">
+              <h4 className="font-bold text-[#3C6AB2] text-xl sm:text-2xl mb-1 leading-tight">
+                {pessoaSelecionada.nome}
+              </h4>
+              <p className="text-sm sm:text-base text-[#D7386E] font-bold mb-4">
+                {pessoaSelecionada.cargo}
+              </p>
+
+              {/* Área de scroll se a descrição for colossal */}
+              <div className="text-sm text-gray-600 leading-relaxed text-justify max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
+                {pessoaSelecionada.descricao}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
