@@ -50,7 +50,9 @@ export default function PreviewPessoas({
       pessoa.nome.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
-  const LIMITE_DESCRICAO = 120;
+  // Limites de caracteres definidos para cada tela
+  const LIMITE_MOBILE = 120;
+  const LIMITE_DESKTOP = 350;
 
   return (
     <div className="w-full">
@@ -66,9 +68,9 @@ export default function PreviewPessoas({
         </p>
       </div>
 
-      <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-3xl p-6 md:p-8 lg:p-12 overflow-hidden relative shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200/60 pb-6">
-          <div className="flex items-center gap-3">
+      <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-3xl  overflow-hidden relative shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200/60 p-6 md:p-8 lg:p-12">
+          <div className="flex items-center ">
             <div className="bg-pink-100 p-3 rounded-full">
               <HeartHandshake className="text-[#D7386E] w-6 h-6" />
             </div>
@@ -129,52 +131,68 @@ export default function PreviewPessoas({
               }
               className="w-full !pb-4 !px-2"
             >
-              {filteredPessoas.map((pessoa) => (
-                <SwiperSlide key={pessoa.id} className="h-auto">
-                  <div className="flex flex-col h-full bg-white md:rounded-2xl p-6 md:p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all group relative">
-                    {/* BOTÕES DE ADMINISTRAÇÃO (Ícones Redondos) */}
-                    <div className="absolute top-8 right-8 md:top-6 md:right-6 flex flex-col gap-2 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => onEdit(pessoa.id)}
-                        className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-[#3C6AB2] hover:bg-[#3C6AB2] hover:text-white rounded-full shadow-sm border border-gray-200 transition-all"
-                        title="Editar Perfil"
-                      >
-                        <Edit className="w-4 h-4 ml-0.5" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(pessoa.id)}
-                        className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-red-500 hover:bg-red-500 hover:text-white rounded-full shadow-sm border border-gray-200 transition-all"
-                        title="Excluir Perfil"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {filteredPessoas.map((pessoa) => {
+                // Variável para armazenar a descrição com fallback vazio
+                const desc = pessoa.descricao || "";
 
-                    <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
-                      <img
-                        src={getFullImageUrl(pessoa.imagemUrl)}
-                        alt={pessoa.nome}
-                        draggable={false}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
+                return (
+                  <SwiperSlide key={pessoa.id} className="h-auto">
+                    <div className="flex flex-col h-full bg-white md:rounded-2xl p-6 md:p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all group relative">
+                      {/* BOTÕES DE ADMINISTRAÇÃO (Ícones Redondos) */}
+                      <div className="absolute top-8 right-8 md:top-6 md:right-6 flex flex-col gap-2 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => onEdit(pessoa.id)}
+                          className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-[#3C6AB2] hover:bg-[#3C6AB2] hover:text-white rounded-full shadow-sm border border-gray-200 transition-all"
+                          title="Editar Perfil"
+                        >
+                          <Edit className="w-4 h-4 ml-0.5" />
+                        </button>
+                        <button
+                          onClick={() => onDelete(pessoa.id)}
+                          className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm text-red-500 hover:bg-red-500 hover:text-white rounded-full shadow-sm border border-gray-200 transition-all"
+                          title="Excluir Perfil"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
 
-                    {/* Textos */}
-                    <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
-                      <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
-                        {pessoa.nome}
-                      </h4>
-                      <p className="text-[12px] sm:text-sm text-[#D7386E] font-bold mb-2 sm:mb-3 line-clamp-3">
-                        {pessoa.cargo}
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 line-clamp-3 sm:line-clamp-none">
-                        {pessoa.descricao}
-                      </p>
+                      <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+                        <img
+                          src={getFullImageUrl(pessoa.imagemUrl)}
+                          alt={pessoa.nome}
+                          draggable={false}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+
+                      {/* Textos */}
+                      <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
+                        <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
+                          {pessoa.nome}
+                        </h4>
+                        <p className="text-[12px] sm:text-sm text-[#D7386E] font-bold mb-2 sm:mb-3 line-clamp-2">
+                          {pessoa.cargo}
+                        </p>
+
+                        {/* Descrição em Telas Pequenas (Mobile) - Limite 120 caracteres */}
+                        <div className="md:hidden text-xs text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-justify">
+                          {desc.length > LIMITE_MOBILE
+                            ? `${desc.substring(0, LIMITE_MOBILE)}...`
+                            : desc}
+                        </div>
+
+                        {/* Descrição em Telas Médias/Grandes (Desktop) - Limite 350 caracteres */}
+                        <div className="hidden md:block text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-justify">
+                          {desc.length > LIMITE_DESKTOP
+                            ? `${desc.substring(0, LIMITE_DESKTOP)}...`
+                            : desc}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              ))}
+                  </SwiperSlide>
+                );
+              })}
             </Swiper>
           </div>
         )}

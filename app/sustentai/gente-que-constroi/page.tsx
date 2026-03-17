@@ -92,7 +92,7 @@ export default function HistoricoGenteQueConstroiPage() {
         </div>
 
         {pessoasFiltradas.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+          <div className="columns-2 lg:columns-3 xl:columns-4 gap-3 sm:gap-6">
             {pessoasFiltradas.map((pessoa) => {
               const precisaVerMais =
                 pessoa.descricao?.length > LIMITE_DESCRICAO;
@@ -100,7 +100,7 @@ export default function HistoricoGenteQueConstroiPage() {
               return (
                 <div
                   key={pessoa.id}
-                  className="group flex flex-col h-full bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                  className="break-inside-avoid mb-3 sm:mb-6 group flex flex-col h-fit bg-white rounded-2xl..."
                 >
                   <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
                     <img

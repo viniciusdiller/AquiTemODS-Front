@@ -494,7 +494,15 @@ export default function AdminSustentaiPage() {
         {/* ÁREA DE PREVIEW */}
         <section className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
           <div className="relative group">
-            <div className="bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] p-8 text-white text-center transition-opacity duration-300 group-hover:opacity-90">
+            <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[200px]">
+              <div className="absolute inset-0">
+                <img
+                  src="/Sustentai.png"
+                  alt="Logo_Sustentai"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
               <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
                 Prefeitura de Saquarema
               </p>
