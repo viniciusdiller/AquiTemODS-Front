@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,11 +14,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import Image from "next/image";
-import { loginUser } from "@/lib/api";
+import { loginUser, resendConfirmationEmail } from "@/lib/api";
 import { AnimatePresence } from "framer-motion";
 import { Notification, NotificationType } from "@/components/ui/notification";
 import { useAuth } from "@/context/AuthContext";
-import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Mail,
+} from "lucide-react";
 
 export default function LoginPage() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -26,6 +33,12 @@ export default function LoginPage() {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Novos estados para a funcionalidade de reenvio
+  const [showResend, setShowResend] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
   const { login } = useAuth();
 
   const addNotification = (text: string, type: "success" | "error") => {
@@ -44,6 +57,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowResend(false); // Reseta a exibição do botão a cada tentativa
 
     const loginData = {
       username: emailOrUsername,
@@ -60,18 +74,58 @@ export default function LoginPage() {
     } catch (err: any) {
       const errorMessage = err?.response?.data?.message || err.message;
 
-      if (errorMessage.includes("Conta não ativada")) {
+      // Verifica se o erro é sobre conta não ativada (seja por "não foi verificada" ou "Conta não ativada")
+      if (
+        errorMessage.toLowerCase().includes("não foi verificada") ||
+        errorMessage.toLowerCase().includes("conta não ativada")
+      ) {
         addNotification(
           "Sua conta ainda não foi verificada. Por favor, confirme seu e-mail antes de entrar.",
-          "error"
+          "error",
         );
+        setShowResend(true); // Exibe o botão de reenviar e-mail
       } else {
-        addNotification("Email/usuário ou senha inválidos. Tente novamente.", "error");
+        addNotification(
+          errorMessage || "Email/usuário ou senha inválidos. Tente novamente.",
+          "error",
+        );
       }
 
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Efeito para gerenciar o contador de reenvio
+  useEffect(() => {
+    if (countdown > 0) {
+      const timerId = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timerId);
+    }
+  }, [countdown]);
+
+  // Função para reenviar o e-mail
+  const handleResendEmail = async () => {
+    setIsResending(true);
+    try {
+      // Utiliza a função do api.ts
+      const data = await resendConfirmationEmail({ username: emailOrUsername });
+
+      addNotification(
+        data.message ||
+          "E-mail reenviado com sucesso! Verifique sua caixa de entrada.",
+        "success",
+      );
+      setCountdown(60); // Inicia o tempo de espera
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error.message ||
+        "Erro de conexão ao tentar reenviar o e-mail.";
+      addNotification(errorMessage, "error");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -168,12 +222,53 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Bloco condicional de Reenviar E-mail mantendo a identidade visual */}
+                {showResend && (
+                  <div className="mt-2 p-4 bg-[#3C6AB2]/10 border border-[#3C6AB2]/20 rounded-xl flex flex-col items-center text-center space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center gap-2 text-[#3C6AB2] font-semibold text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      Conta não ativada
+                    </div>
+                    <p className="text-xs text-gray-600">
+                      Enviamos um link de confirmação para o seu e-mail. Não
+                      encontrou?
+                    </p>
+
+                    {countdown > 0 ? (
+                      <div className="py-2 px-4 bg-[#3C6AB2]/20 rounded-lg text-xs font-medium text-[#3C6AB2] flex items-center gap-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Aguarde {countdown}s para reenviar
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={handleResendEmail}
+                        disabled={isResending}
+                        variant="outline"
+                        className="h-9 px-4 text-xs font-medium text-[#3C6AB2] border-[#3C6AB2]/40 hover:bg-[#3C6AB2]/10 hover:text-[#3C6AB2] hover:border-[#3C6AB2] rounded-lg transition-all w-full shadow-sm"
+                      >
+                        {isResending ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Enviando...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Mail className="w-3.5 h-3.5" />
+                            Reenviar e-mail
+                          </span>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
               <CardFooter className="flex flex-col items-center space-y-4">
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="hover:bg-[#D7386E] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#3C6AB2]/70 w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="hover:bg-[#D7386E] rounded-2xl hover:text-white flex justify-center mx-auto px-10 text-gray-700 border border-[#3C6AB2]/70 w-full disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   {isLoading ? (
                     <>
@@ -186,7 +281,7 @@ export default function LoginPage() {
                 </Button>
                 <Link href="/cadastro" className=" text-gray-600 ">
                   Novo por aqui?{" "}
-                  <strong className="underline hover:text-[#D7386E]">
+                  <strong className="underline hover:text-[#D7386E] transition-colors">
                     {" "}
                     Cadastre-se
                   </strong>
@@ -197,7 +292,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center text-sm">
             <Link
               href="/esqueci-senha"
-              className="underline text-gray-600 hover:text-[#D7386E]"
+              className="underline text-gray-600 hover:text-[#D7386E] transition-colors"
             >
               Esqueceu sua senha?
             </Link>

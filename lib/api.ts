@@ -124,6 +124,12 @@ export const confirmAccount = (token: string) =>
     method: "GET",
   });
 
+export const resendConfirmationEmail = (data: { username: string }) =>
+  fetchApi("/api/auth/resend-confirmation", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
 export const updateUserProfile = (
   data: { nomeCompleto?: string; email?: string },
   token: string,
