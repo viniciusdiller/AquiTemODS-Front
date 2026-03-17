@@ -149,23 +149,25 @@ export default function PreviewPessoas({
                       </button>
                     </div>
 
-                    <div className="relative w-full aspect-video md:aspect-[4/3] mb-5 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100">
+                    <div className="relative w-full aspect-square mb-3 sm:mb-5 rounded-xl overflow-hidden shrink-0 border border-gray-100">
                       <img
                         src={getFullImageUrl(pessoa.imagemUrl)}
                         alt={pessoa.nome}
                         draggable={false}
-                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
 
-                    <div className="flex flex-col flex-grow text-left pr-12 md:pr-0">
-                      <h4 className="font-bold text-[#3C6AB2] text-xl sm:text-2xl md:text-xl line-clamp-1">
+                    {/* Textos */}
+                    <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
+                      <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
                         {pessoa.nome}
                       </h4>
-                      <p className="text-sm sm:text-base md:text-sm text-[#D7386E] font-bold mt-1 mb-3 line-clamp-1">
+                      <p className="text-[12px] sm:text-sm text-[#D7386E] font-bold mb-2 sm:mb-3 line-clamp-3">
                         {pessoa.cargo}
                       </p>
-                      <p className="text-sm sm:text-base md:text-sm text-gray-600 leading-relaxed line-clamp-4">
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 line-clamp-3 sm:line-clamp-none">
                         {pessoa.descricao}
                       </p>
                     </div>

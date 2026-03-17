@@ -213,8 +213,6 @@ export default function ModalPessoa({
 
               {previewUrl ? (
                 <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-                  {/* mostra preview local (object URL) ou url retornada */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={previewUrl}
                     alt="preview"
