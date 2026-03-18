@@ -36,7 +36,7 @@ export default function PreviewPessoas({
 }: PreviewPessoasProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const getFullImageUrl = (path?: string) => {
     if (!path) return "/placeholder-user.jpg";

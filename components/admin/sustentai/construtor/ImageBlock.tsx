@@ -1,6 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { ImageIcon, Trash2, Plus, GripVertical } from "lucide-react";
+import {
+  ImageIcon,
+  Trash2,
+  Plus,
+  GripVertical,
+  ChevronRight,
+} from "lucide-react";
 import { BlockImage } from "@/app/admin/sustentai/acao/[id]/page";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -66,6 +72,15 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
       handleUpdateImage(index, "url", reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const formatImageUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+    return `${baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
   };
 
   return (
@@ -142,9 +157,9 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
                 {img.url ? (
                   <div className="w-56 h-40 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-white shrink-0">
                     <img
-                      src={img.url}
-                      alt={`Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      src={formatImageUrl(img.url)}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ) : (
@@ -200,32 +215,62 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
           </button>
         </div>
 
-        {images.length > 0 && images.some((img) => img.url) && (
+        {images.some((img) => img.url) && (
           <div className="mt-6 border-t pt-4">
-            <label className="text-xs font-semibold text-gray-400 uppercase mb-2 block">
-              Pré-visualização
+            <label className="text-xs font-semibold text-gray-400 uppercase mb-4 block">
+              Pré-visualização (Visão do Público)
             </label>
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 custom-scrollbar">
-              {images.map((img, idx) => {
-                if (!img.url) return null;
-                return (
-                  <div
-                    key={idx}
-                    className="snap-center shrink-0 w-full md:w-3/4 lg:w-2/3 h-48 md:h-64 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 relative shadow-sm"
-                  >
-                    <img
-                      src={img.url}
-                      alt={`Preview ${idx + 1}`}
-                      className="w-full h-full object-contain"
-                    />
-                    {images.length > 1 && (
-                      <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg backdrop-blur-md">
-                        {idx + 1} / {images.length}
+
+            {/* Removi o padding interno (p-4) para a imagem encostar nas bordas, e deixei um fundo muito sutil */}
+            <div className="bg-gray-50/30 rounded-2xl w-full">
+              {(() => {
+                const validImages = images.filter((img) => img.url);
+
+                // Múltiplas imagens = CARROSSEL (Idêntico ao público)
+                if (validImages.length > 1) {
+                  return (
+                    <div className="w-full relative my-10">
+                      <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 custom-scrollbar items-center">
+                        {validImages.map((img, idx) => (
+                          <div
+                            key={idx}
+                            className="w-[85%] sm:w-[75%] md:w-[70%] flex-shrink-0 snap-center relative group aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden shadow-sm bg-gray-100 border border-gray-200"
+                          >
+                            <img
+                              src={formatImageUrl(img.url)}
+                              alt={`Preview ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-10 pointer-events-none">
+                              {idx + 1} / {validImages.length}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      <div className="flex items-center justify-center gap-2 text-gray-400 text-sm mt-0 font-medium opacity-80">
+                        Deslize para ver mais{" "}
+                        <ChevronRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                // IMAGEM ÚNICA (Idêntico ao MediaViewer do público)
+                if (validImages.length === 1) {
+                  return (
+                    <div className="w-full my-10 group relative flex justify-center">
+                      <img
+                        src={formatImageUrl(validImages[0].url)}
+                        alt="Preview Único"
+                        // Estas são as exatas classes geradas pelo seu MediaViewer no frontend
+                        className="w-full object-cover h-auto max-h-[600px] rounded-2xl shadow-md"
+                      />
+                    </div>
+                  );
+                }
+
+                return null;
+              })()}
             </div>
           </div>
         )}

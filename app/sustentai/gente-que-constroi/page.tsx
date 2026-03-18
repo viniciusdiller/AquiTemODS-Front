@@ -29,7 +29,7 @@ export default function HistoricoGenteQueConstroiPage() {
   const getFullImageUrl = (url: string | null) => {
     if (!url) return "/placeholder-user.jpg";
     if (url.startsWith("http") || url.startsWith("blob:")) return url;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
   };
 
