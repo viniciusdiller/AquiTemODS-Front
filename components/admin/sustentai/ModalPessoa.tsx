@@ -187,9 +187,9 @@ export default function ModalPessoa({
               Descrição
             </label>
             <span
-              className={`text-xs ${descricao.length >= 500 ? "text-red-500 font-medium" : "text-gray-400"}`}
+              className={`text-xs ${descricao.length >= 300 ? "text-red-500 font-medium" : "text-gray-400"}`}
             >
-              {descricao.length}/500
+              {descricao.length}/300
             </span>
             <textarea
               rows={6}

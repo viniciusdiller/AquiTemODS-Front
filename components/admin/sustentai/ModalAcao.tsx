@@ -155,16 +155,24 @@ export default function ModalAcao({
         const tituloNormalize = (titulo || "").trim().toLowerCase();
         const conflitante = todas.find((a: any) => {
           if (!a) return false;
-          const otherTitle = (a.titulo || a.title || a.name || "").trim().toLowerCase();
+          const otherTitle = (a.titulo || a.title || a.name || "")
+            .trim()
+            .toLowerCase();
           if (!otherTitle) return false;
           // se estivermos editando, ignorar o próprio registro
-          if (acaoAtual && (acaoAtual.id || acaoAtual._id) && (a.id === acaoAtual.id || a.id === acaoAtual._id)) return false;
+          if (
+            acaoAtual &&
+            (acaoAtual.id || acaoAtual._id) &&
+            (a.id === acaoAtual.id || a.id === acaoAtual._id)
+          )
+            return false;
           return otherTitle === tituloNormalize;
         });
         if (conflitante) {
           toast({
             title: "Título duplicado",
-            description: "Já existe uma ação com esse título. Escolha outro título ou edite a existente.",
+            description:
+              "Já existe uma ação com esse título. Escolha outro título ou edite a existente.",
             variant: "destructive",
           });
           setIsSubmitting(false);
@@ -291,7 +299,7 @@ export default function ModalAcao({
                 Descrição
               </label>
               <textarea
-                rows={3}
+                rows={6}
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
                 placeholder="Descreva a ação em poucas linhas..."

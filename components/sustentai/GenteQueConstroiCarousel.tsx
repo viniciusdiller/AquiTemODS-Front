@@ -52,10 +52,10 @@ export default function GenteQueConstroiCarousel({
           }}
           breakpoints={{
             768: {
-              slidesPerView: 3,
+              slidesPerView: 2,
             },
             1024: {
-              slidesPerView: 4,
+              slidesPerView: 3,
             },
           }}
           className="w-full !pb-4 cursor-grab active:cursor-grabbing"
@@ -86,14 +86,14 @@ export default function GenteQueConstroiCarousel({
                     </p>
 
                     {/* Descrição em Telas Pequenas (Mobile) - Limite 120 caracteres */}
-                    <div className="md:hidden text-xs text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-justify">
+                    <div className="md:hidden text-xs text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-center">
                       {desc.length > LIMITE_MOBILE
                         ? `${desc.substring(0, LIMITE_MOBILE)}...`
                         : desc}
                     </div>
 
                     {/* Descrição em Telas Médias/Grandes (Desktop) - Limite 350 caracteres */}
-                    <div className="hidden md:block text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-justify">
+                    <div className="hidden md:block text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-center">
                       {desc.length > LIMITE_DESKTOP
                         ? `${desc.substring(0, LIMITE_DESKTOP)}...`
                         : desc}
