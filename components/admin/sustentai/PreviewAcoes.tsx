@@ -34,7 +34,6 @@ export default function PreviewAcoes({
   const getFullImageUrl = (path?: string) => {
     if (!path) return "/placeholder.svg";
     if (path.startsWith("http") || path.startsWith("blob:")) return path;
-    // normaliza barras e garante concatenação correta
     const normalized = path.replace(/\\/g, "/");
     return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
   };
@@ -52,10 +51,6 @@ export default function PreviewAcoes({
 
   return (
     <div className="w-full">
-      {/* ========================================== */}
-      {/* BOTÃO ADICIONAR (Agora isolado acima de tudo) */}
-      {/* ========================================== */}
-      {/* Botão que abre o modal de criação (chama onAdd) */}
       <button
         type="button"
         onClick={(e) => {
@@ -63,7 +58,7 @@ export default function PreviewAcoes({
           if (typeof onAdd === "function") onAdd();
         }}
         aria-label="Adicionar Novo Card"
-        className="w-full mb-16 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:text-[#D7386E] hover:border-[#D7386E] hover:bg-pink-50 cursor-pointer transition-all py-10 shadow-sm"
+        className="w-full mb-16 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:text-[#355472] hover:border-[#089ccc] hover:bg-[#089ccc]/10 cursor-pointer transition-all py-10 shadow-sm"
       >
         <Plus className="w-10 h-10 mb-2" />
         <span className="font-bold text-lg">Adicionar Novo Card</span>
@@ -82,14 +77,12 @@ export default function PreviewAcoes({
           </p>
         </div>
 
-        {/* GRID MASONRY (Exatamente igual ao front) */}
         <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
           {currentAcoes.map((acao) => (
             <div
               key={acao.id}
               className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-all duration-300 hover:shadow-md break-inside-avoid`}
             >
-              {/* IMAGEM + TAG */}
               <div className="relative w-full h-auto">
                 {(() => {
                   const raw = acao.imagemUrl || "";
@@ -121,7 +114,6 @@ export default function PreviewAcoes({
                     );
                   }
 
-                  // fallback: renderizar imagem (suporta data:image, blob:, http...)
                   return (
                     <img
                       src={src}
@@ -132,14 +124,14 @@ export default function PreviewAcoes({
                 })()}
                 {acao.tag && (
                   <div
-                    className={`absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}
+                    className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}
                   >
                     {acao.tag}
                   </div>
                 )}
               </div>
 
-              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95 ">
+              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
                 <h4 className={`font-bold ${acao.corTexto} text-lg mb-3`}>
                   {acao.titulo}
                 </h4>
@@ -148,8 +140,7 @@ export default function PreviewAcoes({
                 >
                   {acao.descricao}
                 </p>
-                {/* No admin, permite visualizar o artigo público */}
-                {/* monta o href público usando slug quando disponível, senão usa id */}
+
                 <Link
                   href={`/sustentai/${acao.slug || acao.slugUrl || acao.slug_url || acao.id}`}
                   target="_blank"
@@ -160,8 +151,8 @@ export default function PreviewAcoes({
                 </Link>
               </div>
 
-              {/* OVERLAY DE ADMIN (Editar/Excluir) */}
-              <div className="absolute inset-0 flex items-start justify-end gap-2 p-2">
+              {/* OVERLAY DE ADMIN */}
+              <div className="absolute inset-0 flex items-start justify-start gap-2 p-2">
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -187,7 +178,6 @@ export default function PreviewAcoes({
           ))}
         </div>
 
-        {/* PAGINAÇÃO */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-12 pt-8 border-t border-gray-100">
             <Pagination>

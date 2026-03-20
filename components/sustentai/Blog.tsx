@@ -127,7 +127,7 @@ export default function NewsletterDestaque() {
     <section className="mb-16 bg-white border-y border-gray-200 rounded-3xl shadow-sm overflow-hidden">
       {/* Cabeçalho */}
       <FadeInScroll>
-        <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[200px]">
+        <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[250px]">
           <div className="absolute inset-0">
             <img
               src="/Sustentai.png"

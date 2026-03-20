@@ -50,13 +50,11 @@ export default function PreviewPessoas({
       pessoa.nome.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
-  // Limites de caracteres definidos para cada tela
   const LIMITE_MOBILE = 120;
   const LIMITE_DESKTOP = 350;
 
   return (
     <div className="w-full">
-      {/* BOTÃO ADICIONAR PESSOA */}
       <div
         onClick={onAdd}
         className="w-full mb-12 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:text-[#3C6AB2] hover:border-[#3C6AB2] hover:bg-blue-50 cursor-pointer transition-all py-10 shadow-sm"
@@ -68,10 +66,10 @@ export default function PreviewPessoas({
         </p>
       </div>
 
-      <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-3xl  overflow-hidden relative shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200/60 p-6 md:p-8 lg:p-12">
-          <div className="flex items-center ">
-            <div className="bg-pink-100 p-3 rounded-full">
+      <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-3xl overflow-hidden relative shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200/60 p-6 md:p-8 lg:px-12 lg:pt-12 lg:pb-8">
+          <div className="flex items-center">
+            <div className="bg-pink-100 p-3 rounded-full mr-4">
               <HeartHandshake className="text-[#D7386E] w-6 h-6" />
             </div>
             <div>
@@ -99,7 +97,7 @@ export default function PreviewPessoas({
         </div>
 
         {filteredPessoas.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+          <div className="text-center py-16 bg-white mx-6 mb-6 md:mx-12 md:mb-12 rounded-2xl border-2 border-dashed border-gray-200">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-gray-600">
               Nenhuma pessoa encontrada
@@ -111,7 +109,7 @@ export default function PreviewPessoas({
             </p>
           </div>
         ) : (
-          <div className="w-full px-2 md:px-8 relative">
+          <div className="w-full px-2 md:px-8 lg:px-12 relative pb-8 md:pb-12">
             <Swiper
               modules={[Navigation]}
               spaceBetween={24}
@@ -131,13 +129,12 @@ export default function PreviewPessoas({
               className="w-full !pb-4 !px-2"
             >
               {filteredPessoas.map((pessoa) => {
-                // Variável para armazenar a descrição com fallback vazio
                 const desc = pessoa.descricao || "";
 
                 return (
                   <SwiperSlide key={pessoa.id} className="h-auto">
-                    <div className="flex flex-col h-full bg-white md:rounded-2xl p-6 md:p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all group relative">
-                      {/* BOTÕES DE ADMINISTRAÇÃO (Ícones Redondos) */}
+                    {/* Alinhamento Exato de Classes do Card Público */}
+                    <div className="flex flex-col h-full bg-white md:rounded-2xl p-6 md:p-4 md:shadow-sm border-t py-2 md:border border-gray-100 hover:bg-gray-50 md:hover:bg-white md:hover:shadow-md transition-all group relative">
                       <div className="absolute top-8 right-8 md:top-6 md:right-6 flex flex-col gap-2 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => onEdit(pessoa.id)}
@@ -165,7 +162,6 @@ export default function PreviewPessoas({
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
 
-                      {/* Textos */}
                       <div className="flex flex-col flex-grow text-center px-1 sm:px-2">
                         <h4 className="font-bold text-[#3C6AB2] text-base sm:text-xl mb-1 leading-tight">
                           {pessoa.nome}
@@ -174,14 +170,12 @@ export default function PreviewPessoas({
                           {pessoa.cargo}
                         </p>
 
-                        {/* Descrição em Telas Pequenas (Mobile) - Limite 120 caracteres */}
                         <div className="md:hidden text-xs text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-center">
                           {desc.length > LIMITE_MOBILE
                             ? `${desc.substring(0, LIMITE_MOBILE)}...`
                             : desc}
                         </div>
 
-                        {/* Descrição em Telas Médias/Grandes (Desktop) - Limite 350 caracteres */}
                         <div className="hidden md:block text-sm text-gray-600 leading-relaxed mb-2 sm:mb-4 flex-grow text-center">
                           {desc.length > LIMITE_DESKTOP
                             ? `${desc.substring(0, LIMITE_DESKTOP)}...`

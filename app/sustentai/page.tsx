@@ -1,3 +1,4 @@
+//sustentai/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -99,14 +100,14 @@ export default function SustentAiPage() {
   };
 
   return (
-    <div className="min-h-screen py-20 px-6 sm:px-12">
+    <div className="min-h-screen py-20 px-6 sm:px-12 bg-gradient-to-r from-[#069bcc] to-[#355472]">
       <div className="max-w-screen-fullhd mx-auto bg-white rounded-3xl shadow-lg p-10 sm:p-16">
         {/* Cabeçalho */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <Newspaper className="text-black w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-4xl font-extrabold inline-block pb-2 bg-gradient-to-r from-gray-400 to-black bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
-              <span className="text-black">SustentAí</span>
+            <Newspaper className="text-[#355472] w-8 h-8 sm:w-10 sm:h-10" />
+            <h1 className="text-4xl font-extrabold inline-block pb-2 bg-gradient-to-r from-[#069bcc] to-[#355472] bg-no-repeat [background-position:0_100%] [background-size:100%_4px]">
+              <span className="text-[#069bcc]/80">SustentAí</span>
             </h1>
           </div>
 

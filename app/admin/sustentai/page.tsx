@@ -1,3 +1,4 @@
+// components/admin/sustentai/AdminSustentaiPage.tsx
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -36,7 +37,6 @@ export default function AdminSustentaiPage() {
   const [pessoas, setPessoas] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- ESTADOS DOS MODAIS ---
   const [isModalAcaoOpen, setIsModalAcaoOpen] = useState(false);
   const [acaoSendoEditada, setAcaoSendoEditada] = useState<any>(null);
 
@@ -47,7 +47,6 @@ export default function AdminSustentaiPage() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
   const isMobile =
     typeof window !== "undefined"
       ? window.matchMedia("(max-width: 640px)").matches
@@ -63,8 +62,7 @@ export default function AdminSustentaiPage() {
           console.warn("Falha ao buscar header SustentAí:", err);
           toast({
             title: "Backend não respondeu (header)",
-            description:
-              "Não foi possível carregar o cabeçalho. Verifique se o servidor backend está rodando e se NEXT_PUBLIC_API_URL está correto.",
+            description: "Não foi possível carregar o cabeçalho.",
             variant: "destructive",
           });
         }
@@ -82,8 +80,7 @@ export default function AdminSustentaiPage() {
           console.warn("Falha ao buscar ações (conteúdo) do SustentAí:", err);
           toast({
             title: "Backend não respondeu (ações)",
-            description:
-              "Não foi possível carregar as ações (conteúdo). Verifique o backend.",
+            description: "Não foi possível carregar as ações (conteúdo).",
             variant: "destructive",
           });
         }
@@ -101,8 +98,7 @@ export default function AdminSustentaiPage() {
           console.warn("Falha ao buscar pessoas SustentAí:", err);
           toast({
             title: "Backend não respondeu (pessoas)",
-            description:
-              "Não foi possível carregar as pessoas. Verifique o backend.",
+            description: "Não foi possível carregar as pessoas.",
             variant: "destructive",
           });
         }
@@ -118,12 +114,7 @@ export default function AdminSustentaiPage() {
   const savingRef = useRef(false);
 
   const handleSalvarAcao = async (dadosDaAcao: any) => {
-    if (savingRef.current) {
-      console.warn(
-        "handleSalvarAcao: já existe uma solicitação em andamento — ignorando",
-      );
-      return null;
-    }
+    if (savingRef.current) return null;
     savingRef.current = true;
     try {
       if (!dadosDaAcao) return;
@@ -170,7 +161,6 @@ export default function AdminSustentaiPage() {
       savingRef.current = false;
       return resultado;
     } catch (error) {
-      console.error("Erro ao salvar a ação:", error);
       toast({
         title: "Erro",
         description: "Erro ao salvar a ação no servidor.",
@@ -190,6 +180,7 @@ export default function AdminSustentaiPage() {
       });
       return;
     }
+
     if (isMobile) {
       const t = toast({
         title: "Confirmar exclusão",
@@ -273,14 +264,7 @@ export default function AdminSustentaiPage() {
   };
 
   const handleSalvarPessoa = async (dados: any) => {
-    if (!token) {
-      toast({
-        title: "Sessão expirada",
-        description: "Faça login novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!token) return;
     try {
       if (pessoaSendoEditada) {
         const pessoaAtualizada = await adminUpdatePessoa(
@@ -308,14 +292,8 @@ export default function AdminSustentaiPage() {
   };
 
   const handleDeletePessoa = async (id: number) => {
-    if (!token) {
-      toast({
-        title: "Sessão expirada",
-        description: "Faça login novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!token) return;
+
     if (isMobile) {
       const t = toast({
         title: "Confirmar exclusão",
@@ -398,24 +376,15 @@ export default function AdminSustentaiPage() {
   };
 
   const handleSalvarHeader = async (dados: any) => {
-    if (!token) {
-      toast({
-        title: "Sessão expirada",
-        description: "Faça login novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    if (!token) return;
     try {
       const headerAtualizado = await adminUpdateHeader(dados, token);
-
       setHeader(headerAtualizado);
       setIsModalHeaderOpen(false);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Erro ao atualizar o cabeçalho. Tente novamente.",
+        description: "Erro ao atualizar o cabeçalho.",
         variant: "destructive",
       });
     }
@@ -429,7 +398,6 @@ export default function AdminSustentaiPage() {
     setAcaoSendoEditada(acoes.find((a) => a.id === id));
     setIsModalAcaoOpen(true);
   };
-
   const handleAbrirCriarPessoa = () => {
     setPessoaSendoEditada(null);
     setIsModalPessoaOpen(true);
@@ -450,8 +418,10 @@ export default function AdminSustentaiPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
-      <div className="max-w-7xl mx-auto space-y-8">
+    // AJUSTE 1: Aplicado o mesmo padding lateral e vertical do page.tsx público (py-20 px-6 sm:px-12)
+    <div className="min-h-screen bg-gradient-to-r from-[#069bcc] to-[#355472] pb-20 px-6 sm:px-12">
+      {/* AJUSTE 2: Trocado max-w-7xl por max-w-screen-fullhd para igualar a expansão */}
+      <div className="max-w-screen-fullhd mx-auto space-y-8">
         {/* HEADER DO ADMIN */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-5">
@@ -462,7 +432,6 @@ export default function AdminSustentaiPage() {
             >
               <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
             </Link>
-
             <div>
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-1 font-medium">
                 <LayoutDashboard className="w-4 h-4" />
@@ -494,7 +463,7 @@ export default function AdminSustentaiPage() {
         {/* ÁREA DE PREVIEW */}
         <section className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
           <div className="relative group">
-            <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[200px]">
+            <div className="p-10 text-black text-center justify-center overflow-hidden min-h-[250px]">
               <div className="absolute inset-0">
                 <img
                   src="/Sustentai.png"
@@ -503,17 +472,14 @@ export default function AdminSustentaiPage() {
                 />
               </div>
 
-              <p className="uppercase tracking-widest text-sm font-semibold mb-2 opacity-90">
-                Prefeitura de Saquarema
-              </p>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-4 relative z-10">
                 {header?.titulo}
               </h2>
-              <p className="text-lg opacity-90">
-                {header?.subtitulo} - {header?.data}
+              <p className="text-lg opacity-90 relative z-10">
+                {header?.subtitulo} {header?.data}
               </p>
             </div>
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={() => setIsModalHeaderOpen(true)}
                 className="bg-white text-gray-800 p-2 rounded-lg shadow-lg hover:bg-gray-100 flex items-center gap-2 font-medium"
@@ -523,7 +489,7 @@ export default function AdminSustentaiPage() {
             </div>
           </div>
 
-          <div className="p-8 md:p-12 max-w-6xl mx-auto space-y-20">
+          <div className="py-8 px-4 md:px-8 max-w-6xl mx-auto space-y-20">
             <PreviewAcoes
               acoes={acoes}
               onAdd={handleAbrirCriarAcao}
@@ -540,21 +506,18 @@ export default function AdminSustentaiPage() {
         </section>
       </div>
 
-      {/* RENDERIZAÇÃO DE MODAIS */}
       <ModalAcao
         isOpen={isModalAcaoOpen}
         onClose={() => setIsModalAcaoOpen(false)}
         acaoAtual={acaoSendoEditada}
         onSave={handleSalvarAcao}
       />
-
       <ModalPessoa
         isOpen={isModalPessoaOpen}
         onClose={() => setIsModalPessoaOpen(false)}
         pessoaAtual={pessoaSendoEditada}
         onSave={handleSalvarPessoa}
       />
-
       <ModalHeader
         isOpen={isModalHeaderOpen}
         onClose={() => setIsModalHeaderOpen(false)}

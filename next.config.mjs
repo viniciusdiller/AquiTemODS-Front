@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const backend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const backend = process.env.NEXT_PUBLIC_API_URL;
 
 const nextConfig = {
   eslint: {
@@ -35,8 +35,6 @@ const nextConfig = {
         source: "/api/:path*",
         destination: `${base}/api/:path*`,
       },
-      // NOTA: não proxyar rotas de frontend como /admin ou /sustentai,
-      // pois assim o Next não consegue renderizá-las localmente.
     ];
   },
 };
