@@ -22,7 +22,7 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const backendInternalUrl = "http://127.0.0.1:3303";
+    const backendInternalUrl = "http://172.16.32.199:3303";
 
     return [
       {
