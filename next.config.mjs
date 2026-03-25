@@ -22,15 +22,16 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const base = backend.replace(/\/$/, "");
+    const backendInternalUrl = "http://127.0.0.1:3303";
+
     return [
       {
         source: "/uploads/:path*",
-        destination: `${base}/uploads/:path*`,
+        destination: `${backendInternalUrl}/uploads/:path*`,
       },
       {
         source: "/api/:path*",
-        destination: `${base}/api/:path*`,
+        destination: `${backendInternalUrl}/api/:path*`,
       },
     ];
   },
