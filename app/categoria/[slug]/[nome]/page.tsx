@@ -271,7 +271,7 @@ function ProjetoPageContent() {
   const portfolioImages = (projeto.projetoImg || []).map(
     (image: any, index: number) => ({
       id: `${projeto.projetoId}-${index}`,
-      img: `${API_URL}/${normalizeImagePath(image.url)}`,
+      img: `/${normalizeImagePath(image.url)}`,
     }),
   );
 
