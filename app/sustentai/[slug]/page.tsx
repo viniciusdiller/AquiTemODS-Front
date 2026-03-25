@@ -24,16 +24,23 @@ export default function PaginaAcaoInterna() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // SOLUÇÃO: Gera o carimbo de cache apenas UMA VEZ ao carregar a página
+  const [cacheBuster] = useState(() => Date.now());
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const getFullImageUrl = (path: string) => {
     if (!path) return "/enigmas_do_futuro.png";
-    if (
-      path.startsWith("http") ||
-      path.startsWith("blob:") ||
-      path.startsWith("data:")
-    )
-      return path;
-    return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+    if (path.startsWith("blob:") || path.startsWith("data:")) return path;
+
+    let finalUrl = path;
+    if (!path.startsWith("http")) {
+      finalUrl = `${API_URL || ""}${path.startsWith("/") ? "" : "/"}${path}`;
+    }
+
+    // Adiciona o quebrador de cache para garantir a foto mais atualizada
+    const separator = finalUrl.includes("?") ? "&" : "?";
+    return `${finalUrl}${separator}v=${cacheBuster}`;
   };
 
   useEffect(() => {
@@ -146,7 +153,7 @@ export default function PaginaAcaoInterna() {
           ];
         }
 
-        // Normalização dos Blocos (AGORA SUPORTA ARRAY DE IMAGENS)
+        // Normalização dos Blocos
         const normalized = {
           titulo: dados.titulo || dados.title || "",
           data: dados.data || dados.createdAt || "",
@@ -158,14 +165,12 @@ export default function PaginaAcaoInterna() {
               const rawSingle =
                 b.content || b.url || b.imagemUrl || b.imagem || "";
 
-              // Se tiver array de images (novo padrão do admin)
               if (b.images && Array.isArray(b.images) && b.images.length > 0) {
                 b.images = b.images.map((img: any) => ({
                   ...img,
                   url: getFullImageUrl(img.url),
                 }));
               } else {
-                // Retrocompatibilidade para ações antigas
                 b.images = rawSingle
                   ? [{ url: getFullImageUrl(rawSingle), link: b.link || "" }]
                   : [];
@@ -278,7 +283,6 @@ export default function PaginaAcaoInterna() {
     }
   };
 
-  // Subcomponente de renderização da mídia (Agora trata se é Carrossel ou Imagem Única)
   const MediaViewer = ({
     img,
     idx,
@@ -305,8 +309,8 @@ export default function PaginaAcaoInterna() {
         alt={`Mídia ${idx + 1}`}
         className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] ${
           isCarousel
-            ? "h-full absolute inset-0" // Preenche toda a caixa do carrossel rigorosamente
-            : "h-auto max-h-[600px] rounded-2xl shadow-md" // Comportamento normal para imagem única
+            ? "h-full absolute inset-0"
+            : "h-auto max-h-[600px] rounded-2xl shadow-md"
         }`}
       />
     );
@@ -383,7 +387,6 @@ export default function PaginaAcaoInterna() {
                 const images = bloco.images || [];
                 if (images.length === 0) return null;
 
-                // Múltiplas imagens = CARROSSEL
                 if (images.length > 1) {
                   return (
                     <div
@@ -394,8 +397,6 @@ export default function PaginaAcaoInterna() {
                         {images.map((img: any, i: number) => (
                           <div
                             key={i}
-                            // Largura de 85% a 70% permite ver a borda da próxima foto (ajuda a saber que dá pra deslizar)
-                            // O aspect-[4/3] (celular) e aspect-video (PC) forçam uma altura limite perfeita.
                             className="w-[85%] sm:w-[75%] md:w-[70%] flex-shrink-0 snap-center relative group aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden shadow-sm bg-gray-100 border border-gray-200"
                           >
                             <MediaViewer img={img} idx={i} isCarousel={true} />
@@ -414,7 +415,6 @@ export default function PaginaAcaoInterna() {
                   );
                 }
 
-                // IMAGEM ÚNICA (Sem alteração do antigo)
                 return (
                   <div
                     key={bloco.id || idx}
@@ -425,7 +425,6 @@ export default function PaginaAcaoInterna() {
                 );
               }
 
-              // BLOCO DE TEXTO
               if (bloco.type === "text") {
                 const hexColor = getBgColor(bloco.bgColor);
                 const isColoredBox =

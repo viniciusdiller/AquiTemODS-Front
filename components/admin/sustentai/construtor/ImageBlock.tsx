@@ -23,6 +23,9 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
 
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
 
+  // SOLUÇÃO: Cache-Buster imutável por sessão de edição (evita a imagem piscar)
+  const [cacheBuster] = useState(() => Date.now());
+
   const dndStyle = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -36,12 +39,10 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
     updateBlock(block.id, "images", [...images, { url: "", link: "" }]);
   };
 
-  // Abre modal interno
   const confirmRemoveImage = (index: number) => {
     setImageToDelete(index);
   };
 
-  // Executa a remoção e fecha
   const executeRemoveImage = () => {
     if (imageToDelete !== null) {
       const newImages = [...images];
@@ -76,11 +77,18 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
 
   const formatImageUrl = (url: string) => {
     if (!url) return "";
-    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    // O base64 de preview em tempo real ignora cache (Isso faz o upload no admin parecer instantâneo)
+    if (url.startsWith("blob:") || url.startsWith("data:")) return url;
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    let finalUrl = url;
+    if (!url.startsWith("http")) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      finalUrl = `${baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
+    }
 
-    return `${baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
+    // Aplica o quebrador de cache travado para evitar flickering
+    const separator = finalUrl.includes("?") ? "&" : "?";
+    return `${finalUrl}${separator}v=${cacheBuster}`;
   };
 
   return (
@@ -152,7 +160,6 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
                 <Trash2 className="w-4 h-4" />
               </button>
 
-              {/* ESQUERDA: Apenas a miniatura da imagem */}
               <div className="flex justify-center md:justify-start">
                 {img.url ? (
                   <div className="w-56 h-40 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-white shrink-0">
@@ -169,7 +176,6 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
                 )}
               </div>
 
-              {/* DIREITA: Input da URL e botão de upload abaixo */}
               <div className="md:col-span-2 space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-500 uppercase ml-1">
@@ -221,12 +227,10 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
               Pré-visualização (Visão do Público)
             </label>
 
-            {/* Removi o padding interno (p-4) para a imagem encostar nas bordas, e deixei um fundo muito sutil */}
             <div className="bg-gray-50/30 rounded-2xl w-full">
               {(() => {
                 const validImages = images.filter((img) => img.url);
 
-                // Múltiplas imagens = CARROSSEL (Idêntico ao público)
                 if (validImages.length > 1) {
                   return (
                     <div className="w-full relative my-10">
@@ -255,14 +259,12 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
                   );
                 }
 
-                // IMAGEM ÚNICA (Idêntico ao MediaViewer do público)
                 if (validImages.length === 1) {
                   return (
                     <div className="w-full my-10 group relative flex justify-center">
                       <img
                         src={formatImageUrl(validImages[0].url)}
                         alt="Preview Único"
-                        // Estas são as exatas classes geradas pelo seu MediaViewer no frontend
                         className="w-full object-cover h-auto max-h-[600px] rounded-2xl shadow-md"
                       />
                     </div>
