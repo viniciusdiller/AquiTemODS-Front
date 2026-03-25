@@ -1,8 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Button, Statistic, Row, Col, Spin, Empty, Divider, Pagination } from "antd";
-import { ArrowLeftOutlined, EyeOutlined, BarChartOutlined, TrophyOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Button,
+  Statistic,
+  Row,
+  Col,
+  Spin,
+  Empty,
+  Divider,
+  Pagination,
+} from "antd";
+import {
+  ArrowLeftOutlined,
+  EyeOutlined,
+  BarChartOutlined,
+  TrophyOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -32,7 +47,7 @@ const IndicadoresSustentai = () => {
     return `${API_URL}${path}`;
   };
 
-  // Tenta priorizar o endpoint de AÇÕES do SustentAí e normaliza o resultado
+  // Tenta priorizar o endpoint de AÇÕES da SustentAí e normaliza o resultado
   const fetchData = async () => {
     setLoading(true);
     setFetchError(null);
@@ -67,11 +82,16 @@ const IndicadoresSustentai = () => {
           titulo: d.titulo || d.title || d.name || "",
           descricao: d.descricao || d.description || d.summary || "",
           imagemUrl: d.imagemUrl || d.imagem || d.imagem_url || d.image || "",
-          cliques: typeof d.cliques === "number" ? d.cliques : d.views || d.accesses || 0,
+          cliques:
+            typeof d.cliques === "number"
+              ? d.cliques
+              : d.views || d.accesses || 0,
           ativo: typeof d.ativo === "boolean" ? d.ativo : true,
         }));
 
-        const sorted = normalized.sort((a: BlocoStats, b: BlocoStats) => b.cliques - a.cliques);
+        const sorted = normalized.sort(
+          (a: BlocoStats, b: BlocoStats) => b.cliques - a.cliques,
+        );
         setBlocos(sorted);
         setLastEndpoint(ep);
         setLoading(false);
@@ -85,7 +105,7 @@ const IndicadoresSustentai = () => {
     // Se nenhum endpoint de AÇÕES respondeu, mostra instrução clara ao admin
     setBlocos([]);
     setFetchError(
-      "Nenhum endpoint de AÇÕES (/api/sustentai/acoes) respondeu com dados. Peça ao backend para expor GET /api/sustentai/acoes retornando lista de ações com campo `cliques` e POST /api/sustentai/acoes/:id/click para incrementar. Verifique NEXT_PUBLIC_API_URL."
+      "Nenhum endpoint de AÇÕES (/api/sustentai/acoes) respondeu com dados. Peça ao backend para expor GET /api/sustentai/acoes retornando lista de ações com campo `cliques` e POST /api/sustentai/acoes/:id/click para incrementar. Verifique NEXT_PUBLIC_API_URL.",
     );
     setLastEndpoint(null);
     setLoading(false);
@@ -100,7 +120,10 @@ const IndicadoresSustentai = () => {
     setCurrentPage(1);
   }, [blocos.length]);
 
-  const totalCliques = blocos.reduce((acc, curr) => acc + (curr.cliques || 0), 0);
+  const totalCliques = blocos.reduce(
+    (acc, curr) => acc + (curr.cliques || 0),
+    0,
+  );
   const blocoMaisClicado = blocos.length > 0 ? blocos[0] : null;
 
   const totalBlocks = blocos.length;
@@ -120,8 +143,12 @@ const IndicadoresSustentai = () => {
             className="border-none shadow-none hover:bg-gray-100"
           />
           <div>
-            <h3 className="text-gray-800 text-lg m-0">Indicadores do SustentAí</h3>
-            <div className="text-xs text-gray-500">Cliques por bloco do SustentAí</div>
+            <h3 className="text-gray-800 text-lg m-0">
+              Indicadores da SustentAí
+            </h3>
+            <div className="text-xs text-gray-500">
+              Cliques por bloco da SustentAí
+            </div>
           </div>
 
           {/* espaço reservado à direita (botão Recarregar removido conforme solicitado) */}
@@ -139,7 +166,10 @@ const IndicadoresSustentai = () => {
         <Spin spinning={loading}>
           <Row gutter={[24, 24]} className="mb-8">
             <Col xs={24} md={8}>
-              <Card className="shadow-sm border-l-4 border-l-green-500 w-full flex flex-col justify-center" style={{ minHeight: 120 }}>
+              <Card
+                className="shadow-sm border-l-4 border-l-green-500 w-full flex flex-col justify-center"
+                style={{ minHeight: 120 }}
+              >
                 <Statistic
                   title="Total de Cliques (SustentAí)"
                   value={totalCliques}
@@ -150,7 +180,10 @@ const IndicadoresSustentai = () => {
             </Col>
 
             <Col xs={24} md={8}>
-              <Card className="shadow-sm border-l-4 border-l-blue-500 w-full flex flex-col justify-center" style={{ minHeight: 120 }}>
+              <Card
+                className="shadow-sm border-l-4 border-l-blue-500 w-full flex flex-col justify-center"
+                style={{ minHeight: 120 }}
+              >
                 <Statistic
                   title="Total de Blocos"
                   value={totalBlocks}
@@ -161,25 +194,44 @@ const IndicadoresSustentai = () => {
             </Col>
 
             <Col xs={24} md={8}>
-              <Card className="shadow-sm border-l-4 border-l-yellow-500 w-full flex flex-col justify-center" style={{ minHeight: 120 }}>
+              <Card
+                className="shadow-sm border-l-4 border-l-yellow-500 w-full flex flex-col justify-center"
+                style={{ minHeight: 120 }}
+              >
                 {blocoMaisClicado ? (
                   <div className="flex justify-between items-center">
                     <div className="pr-4">
-                      <div className="block mb-1 text-xs uppercase tracking-wide text-gray-500">Bloco Mais Clicado</div>
-                      <div className="text-lg font-semibold text-gray-800 line-clamp-2" title={blocoMaisClicado.titulo}>
+                      <div className="block mb-1 text-xs uppercase tracking-wide text-gray-500">
+                        Bloco Mais Clicado
+                      </div>
+                      <div
+                        className="text-lg font-semibold text-gray-800 line-clamp-2"
+                        title={blocoMaisClicado.titulo}
+                      >
                         {blocoMaisClicado.titulo}
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold">
-                          {blocoMaisClicado.cliques} {blocoMaisClicado.cliques === 1 ? 'clique' : 'cliques'}
+                          {blocoMaisClicado.cliques}{" "}
+                          {blocoMaisClicado.cliques === 1
+                            ? "clique"
+                            : "cliques"}
                         </span>
                         {!blocoMaisClicado.ativo && (
-                          <span className="text-red-500 text-xs border border-red-200 px-1 rounded">Arquivado</span>
+                          <span className="text-red-500 text-xs border border-red-200 px-1 rounded">
+                            Arquivado
+                          </span>
                         )}
                       </div>
                     </div>
                     <div className="flex-shrink-0">
-                      <TrophyOutlined style={{ fontSize: '1.9rem', color: '#faad14', opacity: 0.3 }} />
+                      <TrophyOutlined
+                        style={{
+                          fontSize: "1.9rem",
+                          color: "#faad14",
+                          opacity: 0.3,
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (
@@ -189,7 +241,9 @@ const IndicadoresSustentai = () => {
             </Col>
           </Row>
 
-          <Divider orientation="left" className="text-gray-500">Detalhamento por Bloco</Divider>
+          <Divider orientation="left" className="text-gray-500">
+            Detalhamento por Bloco
+          </Divider>
 
           {blocos.length > 0 ? (
             <>
@@ -198,25 +252,45 @@ const IndicadoresSustentai = () => {
                   <Card
                     key={bloco.id}
                     hoverable
-                    className={`shadow-sm transition-all hover:-translate-y-1 relative overflow-hidden ${!bloco.ativo ? 'opacity-70 grayscale bg-gray-50' : 'bg-white'}`}
+                    className={`shadow-sm transition-all hover:-translate-y-1 relative overflow-hidden ${!bloco.ativo ? "opacity-70 grayscale bg-gray-50" : "bg-white"}`}
                     bodyStyle={{ padding: 0 }}
                   >
                     {!bloco.ativo && (
-                      <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-br z-10">ARQUIVADO</div>
+                      <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-br z-10">
+                        ARQUIVADO
+                      </div>
                     )}
 
                     <div className="relative h-32 w-full bg-gray-100 border-b">
                       {bloco.imagemUrl ? (
-                        <Image src={getFullImageUrl(bloco.imagemUrl)} alt={bloco.titulo} fill className="object-cover" />
+                        <Image
+                          src={getFullImageUrl(bloco.imagemUrl)}
+                          alt={bloco.titulo}
+                          fill
+                          className="object-cover"
+                        />
                       ) : null}
                     </div>
 
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 h-10 leading-tight" title={bloco.titulo}>{bloco.titulo}</h3>
-                      {bloco.descricao && <p className="text-xs text-gray-500 line-clamp-3 mb-2">{bloco.descricao}</p>}
+                      <h3
+                        className="font-semibold text-gray-800 mb-3 line-clamp-2 h-10 leading-tight"
+                        title={bloco.titulo}
+                      >
+                        {bloco.titulo}
+                      </h3>
+                      {bloco.descricao && (
+                        <p className="text-xs text-gray-500 line-clamp-3 mb-2">
+                          {bloco.descricao}
+                        </p>
+                      )}
                       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                        <div className="text-xs text-gray-500">Total de Cliques</div>
-                        <div className="text-lg font-bold text-green-600 flex items-center gap-2"><BarChartOutlined /> {bloco.cliques}</div>
+                        <div className="text-xs text-gray-500">
+                          Total de Cliques
+                        </div>
+                        <div className="text-lg font-bold text-green-600 flex items-center gap-2">
+                          <BarChartOutlined /> {bloco.cliques}
+                        </div>
                       </div>
                     </div>
                   </Card>

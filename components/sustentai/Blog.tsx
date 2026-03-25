@@ -146,7 +146,7 @@ export default function NewsletterDestaque() {
           <FadeInScroll delay={100}>
             <div className="text-center mb-10">
               <h3 className="text-3xl font-bold text-gray-800">
-                Veja as últimas atualizações do SustentAí!
+                Veja as últimas atualizações da SustentAí!
               </h3>
               <p className="text-gray-500 mt-2">
                 Iniciativas que transformam a nossa cidade.

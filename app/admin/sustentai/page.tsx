@@ -77,7 +77,7 @@ export default function AdminSustentaiPage() {
             : [];
           setAcoes(mappedAcoes);
         } catch (err) {
-          console.warn("Falha ao buscar ações (conteúdo) do SustentAí:", err);
+          console.warn("Falha ao buscar ações (conteúdo) da SustentAí:", err);
           toast({
             title: "Backend não respondeu (ações)",
             description: "Não foi possível carregar as ações (conteúdo).",
