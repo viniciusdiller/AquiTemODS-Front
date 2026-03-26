@@ -392,7 +392,7 @@ export default function AdminConstrutorAcaoPage() {
             className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm ${
               isSaving
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white hover:opacity-90"
+                : "bg-gradient-to-r from-[#069bcc] to-[#355472] text-white hover:opacity-90"
             }`}
           >
             {isSaving ? (

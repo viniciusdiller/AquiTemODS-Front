@@ -132,7 +132,7 @@ export default function PreviewAcoes({
               </div>
 
               <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
-                <h4 className={`font-bold ${acao.corTexto} text-lg mb-3`}>
+                <h4 className={`font-bold ${acao.corDestaque} text-lg mb-3`}>
                   {acao.titulo}
                 </h4>
                 <p
@@ -189,7 +189,7 @@ export default function PreviewAcoes({
                       e.preventDefault();
                       handlePageChange(currentPage - 1);
                     }}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === 1 ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"}`}
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === 1 ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#069bcc] hover:bg-blue-50 hover:border-blue-100"}`}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </PaginationLink>
@@ -204,7 +204,7 @@ export default function PreviewAcoes({
                           e.preventDefault();
                           handlePageChange(page);
                         }}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${page === currentPage ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110" : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"}`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${page === currentPage ? "bg-[#069bcc] text-white border-[#069bcc] shadow-md shadow-blue-200 transform scale-110" : "bg-white text-gray-500 border-gray-100 hover:border-[#069bcc] hover:text-[#069bcc] hover:bg-blue-50"}`}
                       >
                         {page}
                       </PaginationLink>
@@ -218,7 +218,7 @@ export default function PreviewAcoes({
                       e.preventDefault();
                       handlePageChange(currentPage + 1);
                     }}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === totalPages ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"}`}
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${currentPage === totalPages ? "pointer-events-none opacity-40 text-gray-400" : "text-gray-600 hover:text-[#069bcc] hover:bg-blue-50 hover:border-blue-100"}`}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </PaginationLink>

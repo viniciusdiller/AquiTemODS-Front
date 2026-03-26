@@ -89,7 +89,7 @@ export default function ModalHeader({
           </button>
           <button
             onClick={handleSalvar}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center gap-2 hover:opacity-90"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#069bcc] to-[#355472] text-white font-bold flex items-center gap-2 hover:opacity-90"
           >
             <Save className="w-4 h-4" /> Salvar Alterações
           </button>

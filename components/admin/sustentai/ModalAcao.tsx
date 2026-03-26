@@ -320,15 +320,34 @@ export default function ModalAcao({
               </label>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <div>
-                  <label className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-4 py-2 rounded-xl font-medium cursor-pointer shadow-md hover:opacity-90">
+                  <label className="inline-flex items-center gap-2 bg-gradient-to-r from-[#069bcc] to-[#355472] text-white px-4 py-2 rounded-xl font-medium cursor-pointer shadow-md hover:opacity-90">
                     <ImageIcon className="w-4 h-4" />
                     <span className="text-sm">Selecionar imagem</span>
                     <input
                       type="file"
-                      accept="image/*,application/pdf"
+                      accept="image/*"
                       onChange={(e) => {
                         const f = e.target.files?.[0] ?? null;
-                        setSelectedFile(f);
+
+                        if (f) {
+                          if (
+                            f.type === "application/pdf" ||
+                            f.name.toLowerCase().endsWith(".pdf")
+                          ) {
+                            toast({
+                              title: "Formato inválido",
+                              description:
+                                "O envio de arquivos PDF não é permitido. Selecione apenas imagens.",
+                              className:
+                                "bg-red-100 border-red-300 text-red-600",
+                            });
+                            e.target.value = "";
+                            return;
+                          }
+                          setSelectedFile(f);
+                        } else {
+                          setSelectedFile(null);
+                        }
                       }}
                       className="sr-only"
                     />
@@ -513,7 +532,7 @@ export default function ModalAcao({
               onClick={handleSave}
               disabled={isSubmitting}
               aria-busy={isSubmitting}
-              className={`px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto ${isSubmitting ? "opacity-60 pointer-events-none" : ""}`}
+              className={`px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#069bcc] to-[#355472] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto ${isSubmitting ? "opacity-60 pointer-events-none" : ""}`}
             >
               {isSubmitting ? (
                 <>

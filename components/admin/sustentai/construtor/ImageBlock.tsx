@@ -10,6 +10,7 @@ import {
 import { BlockImage } from "@/app/admin/sustentai/acao/[id]/page";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
   const {
@@ -20,6 +21,8 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
     transition,
     isDragging,
   } = useSortable({ id: String(block.id) });
+
+  const { toast } = useToast();
 
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
 
@@ -68,6 +71,19 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf")
+    ) {
+      toast({
+        title: "Formato não suportado",
+        description:
+          "O envio de arquivos PDF não é permitido neste bloco. Selecione apenas imagens.",
+        className: "bg-red-100 border-red-300 text-red-600",
+      });
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       handleUpdateImage(index, "url", reader.result as string);
@@ -193,7 +209,7 @@ export default function ImageBlock({ block, updateBlock, removeBlock }: any) {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <label className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D7386E] to-[#3C6AB2] text-white px-5 py-2.5 rounded-xl font-medium cursor-pointer shadow-sm hover:opacity-90 transition-opacity">
+                  <label className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#069bcc] to-[#355472] text-white px-5 py-2.5 rounded-xl font-medium cursor-pointer shadow-sm hover:opacity-90 transition-opacity">
                     <span className="text-sm whitespace-nowrap">
                       {img.url ? "Alterar arquivo" : "Selecionar arquivo"}
                     </span>

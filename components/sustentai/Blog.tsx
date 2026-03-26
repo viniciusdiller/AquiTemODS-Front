@@ -101,7 +101,7 @@ export default function NewsletterDestaque() {
   if (isLoading) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center bg-gray-50/50 rounded-3xl mb-16 gap-4">
-        <Loader2 className="w-10 h-10 text-[#D7386E] animate-spin" />
+        <Loader2 className="w-10 h-10 text-[#069acb] animate-spin" />
         <p className="text-gray-500 font-medium animate-pulse">
           Carregando novidades...
         </p>
@@ -181,7 +181,9 @@ export default function NewsletterDestaque() {
                   </div>
 
                   <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
-                    <h4 className={`font-bold ${acao.corTexto} text-lg mb-3`}>
+                    <h4
+                      className={`font-bold ${acao.corDestaque} text-lg mb-3`}
+                    >
                       {acao.titulo}
                     </h4>
                     <p
@@ -231,7 +233,7 @@ export default function NewsletterDestaque() {
                       className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
                         currentPage === 1
                           ? "pointer-events-none opacity-40 text-gray-400"
-                          : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
+                          : "text-gray-600 hover:text-[#069acb] hover:bg-blue-50 hover:border-blue-100"
                       }`}
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -250,8 +252,8 @@ export default function NewsletterDestaque() {
                           }}
                           className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border ${
                             page === currentPage
-                              ? "bg-[#D7386E] text-white border-[#D7386E] shadow-md shadow-pink-200 transform scale-110"
-                              : "bg-white text-gray-500 border-gray-100 hover:border-[#D7386E] hover:text-[#D7386E] hover:bg-pink-50"
+                              ? "bg-[#069acb] text-white border-[#069acb] shadow-md shadow-blue-200 transform scale-110"
+                              : "bg-white text-gray-500 border-gray-100 hover:border-[#069acb] hover:text-[#069acb] hover:bg-blue-50"
                           }`}
                         >
                           {page}
@@ -270,7 +272,7 @@ export default function NewsletterDestaque() {
                       className={`group flex items-center gap-2 px-4 py-2 rounded-full border border-transparent transition-all duration-300 ${
                         currentPage === totalPages
                           ? "pointer-events-none opacity-40 text-gray-400"
-                          : "text-gray-600 hover:text-[#D7386E] hover:bg-pink-50 hover:border-pink-100"
+                          : "text-gray-600 hover:text-[#069acb] hover:bg-blue-50 hover:border-blue-100"
                       }`}
                     >
                       <ChevronRight className="h-4 w-4" />
