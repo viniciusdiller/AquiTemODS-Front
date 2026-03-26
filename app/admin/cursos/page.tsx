@@ -45,6 +45,14 @@ const AdminCursos = () => {
         cache: "no-store",
       });
 
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem("admin_token");
+        document.cookie = "admin_token=; path=/; max-age=0;";
+        message.error("Sua sessão expirou. Faça login novamente.");
+        router.push("/admin/login");
+        return;
+      }
+
       if (!res.ok) throw new Error("Erro ao buscar dados");
       const data = await res.json();
       setCards(data);
