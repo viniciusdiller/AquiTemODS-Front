@@ -165,19 +165,39 @@ export default function NewsletterDestaque() {
                   className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105  transition-all duration-300 hover:shadow-md`}
                 >
                   <div className="relative w-full h-auto">
-                    <img
-                      src={acao.imagemUrl}
-                      alt={acao.titulo}
-                      className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
-                    />
-                    {acao.tag && (
-                      <div
-                        className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase 
+                    <Link
+                      href={`/sustentai/${acao.id}`}
+                      className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
+                      onClick={async () => {
+                        try {
+                          await registerSustentAiCardClick(acao.id);
+                        } catch (err) {
+                          // fallback para rota alternativa esperada pelo admin
+                          try {
+                            await registerSustentaiActionClick(acao.id);
+                          } catch (e) {
+                            console.debug(
+                              "Falha ao registrar clique (fallback):",
+                              e,
+                            );
+                          }
+                        }
+                      }}
+                    >
+                      <img
+                        src={acao.imagemUrl}
+                        alt={acao.titulo}
+                        className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
+                      />
+                      {acao.tag && (
+                        <div
+                          className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase 
                         tracking-wider shadow-sm ${acao.corDestaque}`}
-                      >
-                        {acao.tag}
-                      </div>
-                    )}
+                        >
+                          {acao.tag}
+                        </div>
+                      )}
+                    </Link>
                   </div>
 
                   <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">

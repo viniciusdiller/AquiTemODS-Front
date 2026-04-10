@@ -307,7 +307,7 @@ export default function PaginaAcaoInterna() {
       <img
         src={img.url}
         alt={`Mídia ${idx + 1}`}
-        className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] ${
+        className={`w-full object-cover transition-transform duration-700  ${
           isCarousel
             ? "h-full absolute inset-0"
             : "h-auto max-h-[600px] rounded-2xl shadow-md"
