@@ -48,12 +48,11 @@ export default function ModalAcao({
     return `${API_URL}${normalized.startsWith("/") ? "" : "/"}${normalized}`;
   };
 
-  // Estados das cores
   const [corDestaque, setCorDestaque] = useState("text-[#D7386E]");
   const [corFundo, setCorFundo] = useState("bg-pink-50/30");
   const [corBorda, setCorBorda] = useState("border-pink-100");
-  const [corTexto, setCorTexto] = useState("text-gray-800"); // NOVO ESTADO
-
+  const [corTexto, setCorTexto] = useState("text-gray-800");
+  const [publicado, setPublicado] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
@@ -69,6 +68,7 @@ export default function ModalAcao({
       setCorFundo(acaoAtual.corFundo || "bg-pink-50/30");
       setCorBorda(acaoAtual.corBorda || "border-pink-100");
       setCorTexto(acaoAtual.corTexto || "text-gray-800");
+      setPublicado(acaoAtual.publicado || false);
     } else {
       setTitulo("");
       setDescricao("");
@@ -79,10 +79,10 @@ export default function ModalAcao({
       setCorFundo("bg-pink-50/30");
       setCorBorda("border-pink-100");
       setCorTexto("text-gray-800");
+      setPublicado(false);
     }
   }, [acaoAtual, isOpen]);
 
-  // Libera objectURL para evitar memory leaks
   useEffect(() => {
     if (!selectedFile) return;
     const url = URL.createObjectURL(selectedFile);
@@ -142,13 +142,12 @@ export default function ModalAcao({
       corDestaque,
       corFundo,
       corBorda,
-      corTexto, // ENVIANDO A NOVA PROPRIEDADE
+      corTexto,
       slug: acaoAtual?.slug || generateSlug(titulo),
-      publicado: true,
+      publicado: publicado,
       ordem: acaoAtual?.ordem ?? 0,
     };
 
-    // Verificação local prévia: evita criar duas ações com mesmo título
     try {
       const todas = await getAcoesSustentai().catch(() => []);
       if (Array.isArray(todas) && todas.length > 0) {
@@ -159,7 +158,6 @@ export default function ModalAcao({
             .trim()
             .toLowerCase();
           if (!otherTitle) return false;
-          // se estivermos editando, ignorar o próprio registro
           if (
             acaoAtual &&
             (acaoAtual.id || acaoAtual._id) &&
@@ -181,7 +179,6 @@ export default function ModalAcao({
         }
       }
     } catch (e) {
-      // se falhar a verificação, continua e deixa o backend validar
       console.debug("Verificação de títulos falhou, prosseguindo:", e);
     }
 
@@ -246,6 +243,7 @@ export default function ModalAcao({
 
   if (!isOpen) return null;
 
+  const limiteCaracteres = 250;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -295,9 +293,21 @@ export default function ModalAcao({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descrição
-              </label>
+              <div className="flex justify-between items-end mb-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Descrição
+                </label>
+                <div
+                  className={`text-xs font-medium ${
+                    descricao.length > limiteCaracteres
+                      ? "text-red-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {descricao.length} / {limiteCaracteres}
+                </div>
+              </div>
+
               <textarea
                 rows={6}
                 value={descricao}
@@ -306,6 +316,30 @@ export default function ModalAcao({
                 className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D7386E]/50 focus:border-[#D7386E] resize-none"
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status de Publicação
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={publicado}
+                  onChange={(e) => setPublicado(e.target.checked)}
+                />
+                <div
+                  className={`block w-14 h-8 rounded-full transition-colors ${publicado ? "bg-green-500" : "bg-gray-300"}`}
+                ></div>
+                <div
+                  className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${publicado ? "translate-x-6" : ""}`}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                {publicado ? "Visível ao público" : "Inativo (Rascunho)"}
+              </span>
+            </label>
           </div>
 
           <hr className="border-gray-100" />
