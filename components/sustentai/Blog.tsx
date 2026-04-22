@@ -61,17 +61,24 @@ export default function NewsletterDestaque() {
       if (!mounted) return;
 
       const mappedAcoes = Array.isArray(acoesResult)
-        ? acoesResult.map((a: any) => ({
-            ...a,
-            imagemUrl: getFullImageUrl(
-              a.imagemUrl || a.imagem || a.imagem_url || "",
-            ),
-            linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
-            cliques:
-              typeof a.cliques === "number"
-                ? a.cliques
-                : a.views || a.accesses || 0,
-          }))
+        ? acoesResult
+            .filter(
+              (a: any) =>
+                a.publicado === true ||
+                a.publicado === "true" ||
+                a.publicado === 1,
+            )
+            .map((a: any) => ({
+              ...a,
+              imagemUrl: getFullImageUrl(
+                a.imagemUrl || a.imagem || a.imagem_url || "",
+              ),
+              linkDestino: a.linkDestino || a.link || `/sustentai/${a.id}`,
+              cliques:
+                typeof a.cliques === "number"
+                  ? a.cliques
+                  : a.views || a.accesses || 0,
+            }))
         : [];
 
       const mappedPessoas = Array.isArray(pessoasResult)
@@ -154,7 +161,7 @@ export default function NewsletterDestaque() {
             </div>
           </FadeInScroll>
 
-          <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+          <div className="columns-1 sm:columns-2 milecem:columns-3 gap-6 space-y-6">
             {currentAcoes.map((acao, index) => (
               <FadeInScroll
                 key={`page-${currentPage}-item-${acao.id}`}

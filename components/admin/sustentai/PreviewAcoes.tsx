@@ -78,104 +78,117 @@ export default function PreviewAcoes({
         </div>
 
         <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
-          {currentAcoes.map((acao) => (
-            <div
-              key={acao.id}
-              className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-all duration-300 hover:shadow-md break-inside-avoid`}
-            >
-              <div className="relative w-full h-auto">
-                {(() => {
-                  const raw = acao.imagemUrl || "";
-                  const src = getFullImageUrl(raw);
-                  const lower = (raw || "").toLowerCase();
-                  const isDataPdf = lower.startsWith("data:application/pdf");
-                  const isPdfExt =
-                    src && src.toLowerCase().split("?")[0].endsWith(".pdf");
-                  const isPdf =
-                    isDataPdf ||
-                    isPdfExt ||
-                    (src && src.includes("application/pdf"));
+          {currentAcoes.map((acao) => {
+            const isPublicado =
+              acao.publicado === true ||
+              acao.publicado === "true" ||
+              acao.publicado === 1;
 
-                  if (isPdf) {
-                    return (
-                      <div className="w-full h-56 md:h-72 rounded-t-2xl overflow-hidden bg-gray-100 border-b border-white/50">
-                        <object
-                          data={src}
-                          type="application/pdf"
-                          className="w-full h-full"
-                        >
-                          <iframe
-                            src={src}
-                            className="w-full h-full"
-                            title={acao.titulo}
-                          />
-                        </object>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <img
-                      src={src}
-                      alt={acao.titulo}
-                      className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
-                    />
-                  );
-                })()}
-                {acao.tag && (
-                  <div
-                    className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}
-                  >
-                    {acao.tag}
+            return (
+              <div
+                key={acao.id}
+                className={`relative group border rounded-2xl overflow-hidden flex flex-col h-fit ${acao.corFundo} ${acao.corBorda} transform hover:scale-105 transition-all duration-300 hover:shadow-md break-inside-avoid ${!isPublicado ? "grayscale opacity-60" : ""}`}
+              >
+                {!isPublicado && (
+                  <div className="absolute bottom-3 left-3 z-20 bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg border border-gray-600">
+                    Inativo
                   </div>
                 )}
-              </div>
 
-              <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
-                <h4 className={`font-bold ${acao.corDestaque} text-lg mb-3`}>
-                  {acao.titulo}
-                </h4>
-                <p
-                  className={`text-gray-600 mb-6 flex-grow leading-relaxed ${acao.corTexto}`}
-                >
-                  {acao.descricao}
-                </p>
+                <div className="relative w-full h-auto">
+                  {(() => {
+                    const raw = acao.imagemUrl || "";
+                    const src = getFullImageUrl(raw);
+                    const lower = (raw || "").toLowerCase();
+                    const isDataPdf = lower.startsWith("data:application/pdf");
+                    const isPdfExt =
+                      src && src.toLowerCase().split("?")[0].endsWith(".pdf");
+                    const isPdf =
+                      isDataPdf ||
+                      isPdfExt ||
+                      (src && src.includes("application/pdf"));
 
-                <Link
-                  href={`/sustentai/${acao.slug || acao.slugUrl || acao.slug_url || acao.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
-                >
-                  Ler artigo <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+                    if (isPdf) {
+                      return (
+                        <div className="w-full h-56 md:h-72 rounded-t-2xl overflow-hidden bg-gray-100 border-b border-white/50">
+                          <object
+                            data={src}
+                            type="application/pdf"
+                            className="w-full h-full"
+                          >
+                            <iframe
+                              src={src}
+                              className="w-full h-full"
+                              title={acao.titulo}
+                            />
+                          </object>
+                        </div>
+                      );
+                    }
 
-              {/* OVERLAY DE ADMIN */}
-              <div className="absolute inset-0 flex items-start justify-start gap-2 p-2">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEdit(acao.id);
-                  }}
-                  className="bg-white p-2 rounded-full text-blue-600 hover:scale-110 transition-transform shadow-xl"
-                  title="Editar"
-                >
-                  <Edit className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onDelete(acao.id);
-                  }}
-                  className="bg-red-500 p-2 rounded-full text-white hover:scale-110 transition-transform shadow-xl"
-                  title="Excluir"
-                >
-                  <Trash2 className="w-6 h-6" />
-                </button>
+                    return (
+                      <img
+                        src={src}
+                        alt={acao.titulo}
+                        className="w-full h-auto object-cover border-b border-white/50 group-hover:brightness-50 transition-all duration-300"
+                      />
+                    );
+                  })()}
+                  {acao.tag && (
+                    <div
+                      className={`absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${acao.corDestaque}`}
+                    >
+                      {acao.tag}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-6 flex flex-col flex-grow transition-all duration-300 group-hover:brightness-95">
+                  <h4 className={`font-bold ${acao.corDestaque} text-lg mb-3`}>
+                    {acao.titulo}
+                  </h4>
+                  <p
+                    className={`text-gray-600 mb-6 flex-grow leading-relaxed ${acao.corTexto}`}
+                  >
+                    {acao.descricao}
+                  </p>
+
+                  <Link
+                    href={`/sustentai/${acao.slug || acao.slugUrl || acao.slug_url || acao.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-2 font-bold hover:underline transition-all w-fit ${acao.corDestaque}`}
+                  >
+                    Ler artigo <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+
+                {/* OVERLAY DE ADMIN */}
+                <div className="absolute inset-0 flex items-start justify-start gap-2 p-2">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onEdit(acao.id);
+                    }}
+                    className="bg-white p-2 rounded-full text-blue-600 hover:scale-110 transition-transform shadow-xl"
+                    title="Editar"
+                  >
+                    <Edit className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onDelete(acao.id);
+                    }}
+                    className="bg-red-500 p-2 rounded-full text-white hover:scale-110 transition-transform shadow-xl"
+                    title="Excluir"
+                  >
+                    <Trash2 className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {totalPages > 1 && (
