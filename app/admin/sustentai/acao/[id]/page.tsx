@@ -52,6 +52,7 @@ export interface Block {
   isBold: boolean;
   link?: string;
   images?: BlockImage[];
+  videos?: BlockImage[];
 }
 
 const generateUniqueId = () =>
@@ -119,6 +120,14 @@ export default function AdminConstrutorAcaoPage() {
               return {
                 ...b,
                 images: b.content
+                  ? [{ url: b.content, link: b.link || "" }]
+                  : [],
+              };
+            }
+            if (b.type === "video" && !b.videos) {
+              return {
+                ...b,
+                videos: b.content
                   ? [{ url: b.content, link: b.link || "" }]
                   : [],
               };
@@ -198,6 +207,7 @@ export default function AdminConstrutorAcaoPage() {
         content: "",
         bgColor: "#ffffff",
         isBold: false,
+        videos: [],
       },
     ]);
   };
@@ -252,10 +262,20 @@ export default function AdminConstrutorAcaoPage() {
     setIsSaving(true);
     try {
       let targetId = idAcao;
-      const blocksParaSalvar = blocks.map((b, index) => ({
-        ...b,
-        ordem: index,
-      }));
+      // Prepara blocos para salvamento com compatibilidade
+      const blocksParaSalvar = blocks.map((b, index) => {
+        const bloco = {
+          ...b,
+          ordem: index,
+        };
+
+        // Compatibilidade: se tem múltiplos vídeos, salva o primeiro em 'content' também
+        if (bloco.type === "video" && bloco.videos && bloco.videos.length > 0) {
+          bloco.content = bloco.videos[0].url;
+        }
+
+        return bloco;
+      });
 
       if (idAcao === "novo") {
         const created = await adminCreateAcao(
