@@ -488,7 +488,7 @@ export default function PaginaAcaoInterna() {
                               src={getFullImageUrl(video.url)}
                               controls
                               preload="metadata"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain rounded-2xl bg-black"
                             >
                               <source
                                 src={getFullImageUrl(video.url)}
@@ -528,7 +528,7 @@ export default function PaginaAcaoInterna() {
                     <video
                       controls
                       preload="metadata"
-                      className="w-full max-w-4xl rounded-2xl shadow-md bg-black"
+                      className="w-full h-auto max-h-[500px] md:max-h-[600px] object-contain rounded-2xl shadow-md bg-black mx-auto"
                     >
                       <source
                         src={getFullImageUrl(videos[0].url)}

@@ -187,21 +187,6 @@ export default function VideoBlock({ block, updateBlock, removeBlock }: any) {
               </div>
 
               <div className="md:col-span-2 space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">
-                    URL do Vídeo
-                  </label>
-                  <input
-                    type="text"
-                    value={video.url}
-                    onChange={(e) =>
-                      handleUpdateVideo(index, "url", e.target.value)
-                    }
-                    placeholder="Cole o link (URL) do vídeo aqui"
-                    className="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#3C6AB2]/50 focus:outline-none text-sm"
-                  />
-                </div>
-
                 <div className="flex items-center gap-4">
                   <label className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#069bcc] to-[#355472] text-white px-5 py-2.5 rounded-xl font-medium cursor-pointer shadow-sm hover:opacity-90 transition-opacity">
                     <span className="text-sm whitespace-nowrap">
@@ -275,7 +260,7 @@ export default function VideoBlock({ block, updateBlock, removeBlock }: any) {
                       <video
                         src={formatVideoUrl(validVideos[0].url)}
                         controls
-                        className="w-full object-cover h-auto max-h-[600px] rounded-2xl shadow-md bg-black"
+                        className="w-full h-auto max-h-[500px] md:max-h-[600px] object-contain rounded-2xl shadow-md bg-black mx-auto"
                       />
                     </div>
                   );
