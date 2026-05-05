@@ -444,6 +444,31 @@ export default function PaginaAcaoInterna() {
                   </div>
                 );
               }
+              if (bloco.type === "video") {
+                const videoUrl = bloco.content
+                  ? getFullImageUrl(bloco.content)
+                  : "";
+
+                if (!videoUrl) return null;
+
+                return (
+                  <div
+                    key={bloco.id || idx}
+                    className="w-full my-10 flex justify-center relative group"
+                  >
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full max-w-4xl rounded-2xl shadow-md bg-black"
+                    >
+                      <source src={videoUrl} type="video/mp4" />
+                      <source src={videoUrl} type="video/webm" />
+                      <source src={videoUrl} type="video/ogg" />
+                      Seu navegador não suporta a exibição de vídeos.
+                    </video>
+                  </div>
+                );
+              }
 
               return null;
             })
