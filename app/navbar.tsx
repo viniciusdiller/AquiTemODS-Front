@@ -382,7 +382,7 @@ export function Navbar() {
               <Globe size={20} /> Site da Prefeitura
             </a>
             <Link
-              href="mailto:aquitemods@gmail.com"
+              href="mailto:sac-lab.isa@saquarema.rj.gov.br"
               rel="noopener noreferrer"
               className="flex items-center gap-3 text-gray-700 hover:text-blue-700 transition-colors"
             >
