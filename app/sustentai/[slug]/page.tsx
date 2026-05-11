@@ -176,6 +176,21 @@ export default function PaginaAcaoInterna() {
                   : [];
               }
             }
+            if (b && b.type === "video") {
+              const rawSingle =
+                b.content || b.url || b.videoUrl || b.vídeo || "";
+
+              if (b.videos && Array.isArray(b.videos) && b.videos.length > 0) {
+                b.videos = b.videos.map((video: any) => ({
+                  ...video,
+                  url: getFullImageUrl(video.url),
+                }));
+              } else {
+                b.videos = rawSingle
+                  ? [{ url: getFullImageUrl(rawSingle), link: b.link || "" }]
+                  : [];
+              }
+            }
             return b;
           }),
         };
@@ -441,6 +456,94 @@ export default function PaginaAcaoInterna() {
                       className={`prose prose-lg max-w-none text-gray-700 leading-relaxed ${bloco.isBold ? "font-bold text-gray-900" : ""}`}
                       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                     />
+                  </div>
+                );
+              }
+              if (bloco.type === "video") {
+                // Compatibilidade: suporta tanto campo 'videos' (novo) quanto 'content' (antigo)
+                let videos: any[] = [];
+
+                if (bloco.videos && Array.isArray(bloco.videos)) {
+                  videos = bloco.videos.filter((v: any) => v.url);
+                } else if (bloco.content) {
+                  videos = [{ url: bloco.content, link: bloco.link || "" }];
+                }
+
+                if (videos.length === 0) return null;
+
+                // Renderiza múltiplos vídeos em carrossel
+                if (videos.length > 1) {
+                  return (
+                    <div
+                      key={bloco.id || idx}
+                      className="w-full my-10 relative"
+                    >
+                      <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 custom-scrollbar items-center">
+                        {videos.map((video: any, i: number) => (
+                          <div
+                            key={i}
+                            className="w-[85%] sm:w-[75%] md:w-[70%] flex-shrink-0 snap-center relative group aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden shadow-sm bg-black border border-gray-200"
+                          >
+                            <video
+                              src={getFullImageUrl(video.url)}
+                              controls
+                              preload="metadata"
+                              className="w-full h-full object-contain rounded-2xl bg-black"
+                            >
+                              <source
+                                src={getFullImageUrl(video.url)}
+                                type="video/mp4"
+                              />
+                              <source
+                                src={getFullImageUrl(video.url)}
+                                type="video/webm"
+                              />
+                              <source
+                                src={getFullImageUrl(video.url)}
+                                type="video/ogg"
+                              />
+                              Seu navegador não suporta a exibição de vídeos.
+                            </video>
+
+                            <div className="absolute top-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md z-10 pointer-events-none">
+                              {i + 1} / {videos.length}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-gray-400 text-sm mt-0 font-medium opacity-80">
+                        Deslize para ver mais{" "}
+                        <ChevronRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Renderiza vídeo único
+                return (
+                  <div
+                    key={bloco.id || idx}
+                    className="w-full my-10 group relative flex justify-center"
+                  >
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full h-auto max-h-[500px] md:max-h-[600px] object-contain rounded-2xl shadow-md bg-black mx-auto"
+                    >
+                      <source
+                        src={getFullImageUrl(videos[0].url)}
+                        type="video/mp4"
+                      />
+                      <source
+                        src={getFullImageUrl(videos[0].url)}
+                        type="video/webm"
+                      />
+                      <source
+                        src={getFullImageUrl(videos[0].url)}
+                        type="video/ogg"
+                      />
+                      Seu navegador não suporta a exibição de vídeos.
+                    </video>
                   </div>
                 );
               }

@@ -9,6 +9,7 @@ import {
   Save,
   Loader2,
   AlertTriangle,
+  Video,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/lib/api";
 import TextBlock from "@/components/admin/sustentai/construtor/TextBlock";
 import ImageBlock from "@/components/admin/sustentai/construtor/ImageBlock";
+import VideoBlock from "@/components/admin/sustentai/construtor/VideoBlock";
 import {
   DndContext,
   closestCenter,
@@ -35,7 +37,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-type BlockType = "text" | "image";
+type BlockType = "text" | "image" | "video";
 
 export interface BlockImage {
   url: string;
@@ -50,6 +52,7 @@ export interface Block {
   isBold: boolean;
   link?: string;
   images?: BlockImage[];
+  videos?: BlockImage[];
 }
 
 const generateUniqueId = () =>
@@ -121,6 +124,14 @@ export default function AdminConstrutorAcaoPage() {
                   : [],
               };
             }
+            if (b.type === "video" && !b.videos) {
+              return {
+                ...b,
+                videos: b.content
+                  ? [{ url: b.content, link: b.link || "" }]
+                  : [],
+              };
+            }
             return b;
           });
           setBlocks(blocosMigrados);
@@ -187,6 +198,20 @@ export default function AdminConstrutorAcaoPage() {
     ]);
   };
 
+  const addVideoBlock = () => {
+    setBlocks((prev) => [
+      ...prev,
+      {
+        id: generateUniqueId(),
+        type: "video",
+        content: "",
+        bgColor: "#ffffff",
+        isBold: false,
+        videos: [],
+      },
+    ]);
+  };
+
   const updateBlock = (id: string | number, field: keyof Block, value: any) => {
     setBlocks((prev) =>
       prev.map((b) =>
@@ -237,10 +262,20 @@ export default function AdminConstrutorAcaoPage() {
     setIsSaving(true);
     try {
       let targetId = idAcao;
-      const blocksParaSalvar = blocks.map((b, index) => ({
-        ...b,
-        ordem: index,
-      }));
+      // Prepara blocos para salvamento com compatibilidade
+      const blocksParaSalvar = blocks.map((b, index) => {
+        const bloco = {
+          ...b,
+          ordem: index,
+        };
+
+        // Compatibilidade: se tem múltiplos vídeos, salva o primeiro em 'content' também
+        if (bloco.type === "video" && bloco.videos && bloco.videos.length > 0) {
+          bloco.content = bloco.videos[0].url;
+        }
+
+        return bloco;
+      });
 
       if (idAcao === "novo") {
         const created = await adminCreateAcao(
@@ -414,23 +449,36 @@ export default function AdminConstrutorAcaoPage() {
               items={blocks.map((b) => String(b.id))}
               strategy={verticalListSortingStrategy}
             >
-              {blocks.map((block) =>
-                block.type === "text" ? (
-                  <TextBlock
-                    key={block.id}
-                    block={block}
-                    updateBlock={updateBlock}
-                    removeBlock={confirmRemoveBlock}
-                  />
-                ) : (
-                  <ImageBlock
-                    key={block.id}
-                    block={block}
-                    updateBlock={updateBlock}
-                    removeBlock={confirmRemoveBlock}
-                  />
-                ),
-              )}
+              {blocks.map((block) => {
+                if (block.type === "text") {
+                  return (
+                    <TextBlock
+                      key={block.id}
+                      block={block}
+                      updateBlock={updateBlock}
+                      removeBlock={confirmRemoveBlock}
+                    />
+                  );
+                } else if (block.type === "video") {
+                  return (
+                    <VideoBlock
+                      key={block.id}
+                      block={block}
+                      updateBlock={updateBlock}
+                      removeBlock={confirmRemoveBlock}
+                    />
+                  );
+                } else {
+                  return (
+                    <ImageBlock
+                      key={block.id}
+                      block={block}
+                      updateBlock={updateBlock}
+                      removeBlock={confirmRemoveBlock}
+                    />
+                  );
+                }
+              })}
             </SortableContext>
           </DndContext>
         </div>
@@ -449,6 +497,13 @@ export default function AdminConstrutorAcaoPage() {
           >
             <Plus className="w-5 h-5" /> <ImageIcon className="w-5 h-5" />{" "}
             Adicionar Imagem
+          </button>
+          <button
+            onClick={addVideoBlock}
+            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium hover:border-[#3C6AB2] hover:text-[#3C6AB2] transition-all"
+          >
+            <Plus className="w-5 h-5" /> <Video className="w-5 h-5" /> Adicionar
+            Vídeo
           </button>
         </div>
       </div>
