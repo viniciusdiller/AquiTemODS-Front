@@ -435,7 +435,7 @@ export default function AdminConstrutorAcaoPage() {
             ) : (
               <Save className="w-5 h-5" />
             )}
-            {isSaving ? "A Guardar..." : "Guardar Página"}
+            {isSaving ? "Salvando..." : "Salvar"}
           </button>
         </div>
 
@@ -504,6 +504,22 @@ export default function AdminConstrutorAcaoPage() {
           >
             <Plus className="w-5 h-5" /> <Video className="w-5 h-5" /> Adicionar
             Vídeo
+          </button>
+          <button
+            onClick={handleSalvar}
+            disabled={isSaving}
+            className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm ${
+              isSaving
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-[#069bcc] to-[#355472] text-white hover:opacity-90"
+            }`}
+          >
+            {isSaving ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Save className="w-5 h-5" />
+            )}
+            {isSaving ? "Salvando..." : "Salvar"}
           </button>
         </div>
       </div>

@@ -76,6 +76,17 @@ export default function VideoBlock({ block, updateBlock, removeBlock }: any) {
       return;
     }
 
+    const maxSizeInBytes = 30 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O vídeo excede o limite permitido de 30MB.",
+        className: "bg-red-100 border-red-300 text-red-600",
+      });
+      e.target.value = "";
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       handleUpdateVideo(index, "url", reader.result as string);
@@ -200,7 +211,7 @@ export default function VideoBlock({ block, updateBlock, removeBlock }: any) {
                     />
                   </label>
                   <span className="text-xs text-gray-400 font-medium">
-                    MP4, WebM ou OGG
+                    MP4, WebM ou OGG (Máx. 30MB).
                   </span>
                 </div>
               </div>
