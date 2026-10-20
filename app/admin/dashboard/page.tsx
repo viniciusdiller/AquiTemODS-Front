@@ -1,27 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { Row, Modal, message, Spin, Typography, Input } from "antd";
 import {
-  Row,
-  Button,
-  Modal,
-  message,
-  Spin,
-  Typography,
-  Input,
-  Dropdown,
-  MenuProps,
-  Grid,
-} from "antd";
-import {
-  DatabaseOutlined,
-  CommentOutlined,
-  HomeOutlined,
-  ReadOutlined,
-  TeamOutlined,
-  MenuOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
+  Home,
+  Database,
+  Newspaper,
+  GraduationCap,
+  MessageSquare,
+  Users,
+  BarChart3,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
@@ -32,11 +21,13 @@ import {
   StatusProjeto,
 } from "@/components/admin/dashboard/DashboardConstants";
 import { DashboardListCard } from "@/components/admin/dashboard/DashboardListCard";
+import {
+  AdminPageHeader,
+  headerButtonClass,
+} from "@/components/admin/AdminPageHeader";
 import { ProjectDetailsModal } from "@/components/admin/dashboard/ProjectDetailsModal";
 
-const { Title } = Typography;
 const { TextArea } = Input;
-const { useBreakpoint } = Grid;
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface PendingData {
@@ -66,46 +57,43 @@ const AdminDashboard: React.FC = () => {
     atualizacoes: 1,
     exclusoes: 1,
   });
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
 
-  const menuItems: MenuProps["items"] = [
+  const atalhos = [
     {
-      key: "home",
-      label: (
-        <Link href="/" target="_blank" rel="noopener noreferrer">
-          Ir para Home (Site)
-        </Link>
-      ),
-      icon: <HomeOutlined />,
-    },
-    { type: "divider" },
-    {
-      key: "projetos",
-      label: (
-        <Link href="/admin/projetos-ativos">Gerenciar Projetos Ativos</Link>
-      ),
-      icon: <DatabaseOutlined style={{ color: "#1890ff" }} />,
+      href: "/admin/projetos-ativos",
+      label: "Projetos Ativos",
+      desc: "Editar, ocultar e exportar",
+      icon: <Database className="h-5 w-5" />,
     },
     {
-      key: "sustentai",
-      label: <Link href="/admin/sustentai">Gerenciar SustentAí</Link>,
-      icon: <ReadOutlined style={{ color: "#D7386E" }} />,
+      href: "/admin/usuarios",
+      label: "Usuários",
+      desc: "Contas, senhas e status",
+      icon: <Users className="h-5 w-5" />,
     },
     {
-      key: "cursos",
-      label: <Link href="/admin/cursos">Gerenciar Cursos (Espaço ODS)</Link>,
-      icon: <BookOutlined style={{ color: "#52c41a" }} />,
+      href: "/admin/comentarios",
+      label: "Comentários",
+      desc: "Moderar avaliações",
+      icon: <MessageSquare className="h-5 w-5" />,
     },
     {
-      key: "comentarios",
-      label: <Link href="/admin/comentarios">Gerenciar Comentários</Link>,
-      icon: <CommentOutlined style={{ color: "#3C6AB2" }} />,
+      href: "/admin/sustentai",
+      label: "SustentAí",
+      desc: "Ações e newsletter",
+      icon: <Newspaper className="h-5 w-5" />,
     },
     {
-      key: "usuarios",
-      label: <Link href="/admin/usuarios">Gerenciar Usuários</Link>,
-      icon: <TeamOutlined style={{ color: "#52c41a" }} />,
+      href: "/admin/cursos",
+      label: "Cursos (Espaço ODS)",
+      desc: "Gerenciar cursos",
+      icon: <GraduationCap className="h-5 w-5" />,
+    },
+    {
+      href: "/admin/indicadores",
+      label: "Indicadores",
+      desc: "Números da plataforma",
+      icon: <BarChart3 className="h-5 w-5" />,
     },
   ];
 
@@ -241,74 +229,110 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="p-8">
-      <Spin spinning={loading}>
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <Title
-            level={isMobile ? 3 : 2}
-            className="m-0 md:text-left text-center"
-          >
-            Painel de Administração
-          </Title>
-          <div className="w-full md:w-auto flex justify-center md:justify-end">
-            <Dropdown
-              menu={{ items: menuItems }}
-              trigger={["click"]}
-              placement="bottomRight"
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <AdminPageHeader
+          title="Painel de Administração"
+          subtitle="Analise as solicitações pendentes e acesse as áreas de gestão da plataforma."
+          actions={
+            <Link
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={headerButtonClass}
             >
-              <Button
-                size="large"
-                icon={<MenuOutlined />}
-                className="flex items-center gap-2"
-              >
-                Navegar pelo Sistema
-              </Button>
-            </Dropdown>
-          </div>
-        </div>
+              <Home className="h-4 w-4" />
+              Ir para o site
+            </Link>
+          }
+          stats={[
+            { label: "Novos cadastros", value: data.cadastros.length },
+            { label: "Atualizações", value: data.atualizacoes.length },
+            { label: "Exclusões", value: data.exclusoes.length },
+            {
+              label: "Total pendente",
+              value:
+                data.cadastros.length +
+                data.atualizacoes.length +
+                data.exclusoes.length,
+            },
+          ]}
+        />
 
-        <Row gutter={[16, 16]}>
-          <DashboardListCard
-            title="Novos Cadastros"
-            listData={data.cadastros}
-            currentPage={currentPages.cadastros}
-            pageSize={DASHBOARD_PAGE_SIZE}
-            onPageChange={(p) =>
-              setCurrentPages((prev) => ({ ...prev, cadastros: p }))
-            }
-            onDetailsClick={(item) => {
-              setSelectedItem(item);
-              setModalVisible(true);
-            }}
-          />
-          <DashboardListCard
-            title="Atualizações"
-            listData={data.atualizacoes}
-            currentPage={currentPages.atualizacoes}
-            pageSize={DASHBOARD_PAGE_SIZE}
-            onPageChange={(p) =>
-              setCurrentPages((prev) => ({ ...prev, atualizacoes: p }))
-            }
-            onDetailsClick={(item) => {
-              setSelectedItem(item);
-              setModalVisible(true);
-            }}
-          />
-          <DashboardListCard
-            title="Exclusões"
-            listData={data.exclusoes}
-            currentPage={currentPages.exclusoes}
-            pageSize={DASHBOARD_PAGE_SIZE}
-            onPageChange={(p) =>
-              setCurrentPages((prev) => ({ ...prev, exclusoes: p }))
-            }
-            onDetailsClick={(item) => {
-              setSelectedItem(item);
-              setModalVisible(true);
-            }}
-          />
-        </Row>
-      </Spin>
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
+            Acesso rápido
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {atalhos.map((a) => (
+              <Link
+                key={a.href}
+                href={a.href}
+                className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                  {a.icon}
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-semibold text-gray-800">
+                    {a.label}
+                  </span>
+                  <span className="block text-xs text-gray-500">{a.desc}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
+            Solicitações pendentes
+          </h2>
+          <Spin spinning={loading}>
+            <Row gutter={[16, 16]}>
+              <DashboardListCard
+                title="Novos Cadastros"
+                listData={data.cadastros}
+                currentPage={currentPages.cadastros}
+                pageSize={DASHBOARD_PAGE_SIZE}
+                onPageChange={(p) =>
+                  setCurrentPages((prev) => ({ ...prev, cadastros: p }))
+                }
+                onDetailsClick={(item) => {
+                  setSelectedItem(item);
+                  setModalVisible(true);
+                }}
+              />
+              <DashboardListCard
+                title="Atualizações"
+                listData={data.atualizacoes}
+                currentPage={currentPages.atualizacoes}
+                pageSize={DASHBOARD_PAGE_SIZE}
+                onPageChange={(p) =>
+                  setCurrentPages((prev) => ({ ...prev, atualizacoes: p }))
+                }
+                onDetailsClick={(item) => {
+                  setSelectedItem(item);
+                  setModalVisible(true);
+                }}
+              />
+              <DashboardListCard
+                title="Exclusões"
+                listData={data.exclusoes}
+                currentPage={currentPages.exclusoes}
+                pageSize={DASHBOARD_PAGE_SIZE}
+                onPageChange={(p) =>
+                  setCurrentPages((prev) => ({ ...prev, exclusoes: p }))
+                }
+                onDetailsClick={(item) => {
+                  setSelectedItem(item);
+                  setModalVisible(true);
+                }}
+              />
+            </Row>
+          </Spin>
+        </section>
+      </div>
 
       <ProjectDetailsModal
         visible={modalVisible}

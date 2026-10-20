@@ -25,9 +25,8 @@ import {
   Divider,
 } from "antd";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import {
-  ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
   UserOutlined,
@@ -37,7 +36,6 @@ import {
   KeyOutlined,
   SendOutlined,
   LockOutlined,
-  FilterOutlined,
 } from "@ant-design/icons";
 import {
   getAllUsers,
@@ -47,7 +45,7 @@ import {
   adminResendConfirmation,
 } from "@/lib/api";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { Search } = Input;
 const { useBreakpoint } = Grid;
 
@@ -225,7 +223,7 @@ const AdminUsuariosPage: React.FC = () => {
             <Col xs={24} xl={12} key={user.usuarioId}>
               <Card
                 bordered={false}
-                className="shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden border border-gray-100"
+                className="group overflow-hidden rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
                 bodyStyle={{ padding: "20px" }}
               >
                 <div className="flex items-start justify-between">
@@ -233,8 +231,7 @@ const AdminUsuariosPage: React.FC = () => {
                     <Avatar
                       size={64}
                       icon={<UserOutlined />}
-                      className={`shadow-inner ${user.enabled ? "bg-emerald-100 text-emerald-600" : "bg-orange-100 text-orange-600"}`}
-                      style={{ border: "2px solid #fff" }}
+                      className={`shrink-0 shadow-inner ${user.enabled ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-400"}`}
                     />
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-1">
@@ -268,7 +265,7 @@ const AdminUsuariosPage: React.FC = () => {
                         shape="circle"
                         icon={<EditOutlined />}
                         onClick={() => handleEdit(user)}
-                        className="hover:text-blue-600 hover:border-blue-600"
+                        className="hover:!border-primary hover:!text-primary"
                       />
                     </Tooltip>
                     <Tooltip title="Segurança">
@@ -276,6 +273,7 @@ const AdminUsuariosPage: React.FC = () => {
                         shape="circle"
                         icon={<KeyOutlined />}
                         onClick={() => handleOpenPasswordModal(user)}
+                        className="hover:!border-primary hover:!text-primary"
                       />
                     </Tooltip>
                   </div>
@@ -293,7 +291,7 @@ const AdminUsuariosPage: React.FC = () => {
                     className={
                       user.enabled
                         ? "text-gray-400"
-                        : "text-blue-600 font-medium"
+                        : "!font-medium !text-primary"
                     }
                   >
                     Reenviar Email
@@ -338,39 +336,25 @@ const AdminUsuariosPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-10">
-      {/* Header Section */}
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <Link
-              href="/admin/dashboard"
-              className="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2 mb-2"
-            >
-              <ArrowLeftOutlined /> <span>Painel de Controle</span>
-            </Link>
-            <Title
-              level={2}
-              style={{ margin: 0 }}
-              className="font-extrabold tracking-tight"
-            >
-              Gestão de Usuários
-            </Title>
-            <Text type="secondary" className="text-base">
-              Gerencie permissões, contas e segurança dos membros da plataforma.
-            </Text>
-          </div>
+        <AdminPageHeader
+          title="Gestão de Usuários"
+          subtitle="Gerencie permissões, contas e segurança dos membros da plataforma."
+          backHref="/admin/dashboard"
+          backLabel="Painel de Controle"
+          stats={[
+            { label: "Total", value: users.length },
+            { label: "Ativos", value: users.filter((u) => u.enabled).length },
+            {
+              label: "Inativos",
+              value: users.filter((u) => !u.enabled).length,
+            },
+            { label: "Resultados", value: filteredUsers.length },
+          ]}
+        />
 
-          <div className="bg-blue-600 p-4 rounded-2xl text-white shadow-lg shadow-blue-200 min-w-[180px]">
-            <div className="text-xs opacity-80 uppercase font-bold tracking-widest">
-              Total de Usuários
-            </div>
-            <div className="text-3xl font-black">{users.length}</div>
-          </div>
-        </div>
-
-        {/* Search & Filter Bar */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center">
+        <div className="my-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
           <Search
             placeholder="Buscar por nome, email ou username..."
             onSearch={handleSearch}
@@ -378,18 +362,7 @@ const AdminUsuariosPage: React.FC = () => {
             size="large"
             allowClear
             className="max-w-2xl custom-search"
-            style={{ borderRadius: "12px" }}
           />
-          <div className="flex-1" />
-          <Space>
-            <Tag
-              color="blue"
-              className="m-0 px-3 py-1 rounded-md border-none font-medium"
-            >
-              <FilterOutlined className="mr-2" />
-              {filteredUsers.length} resultados
-            </Tag>
-          </Space>
         </div>
 
         <Spin spinning={loading} tip="Carregando base de usuários...">
@@ -554,6 +527,15 @@ const AdminUsuariosPage: React.FC = () => {
         .custom-tabs .ant-tabs-tab {
           font-weight: 500;
           padding: 12px 8px;
+        }
+        .custom-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+          color: #d6386d !important;
+        }
+        .custom-tabs .ant-tabs-ink-bar {
+          background: #d6386d !important;
+        }
+        .custom-search .ant-input-search-button {
+          background: #d6386d !important;
         }
         .custom-search .ant-input-affix-wrapper {
           border-radius: 12px;

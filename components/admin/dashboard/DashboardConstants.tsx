@@ -14,8 +14,8 @@ export enum StatusProjeto {
 }
 
 export const listIcons: { [key: string]: React.ReactNode } = {
-  "Novos Cadastros": <UserAddOutlined style={{ color: "#52c41a" }} />,
-  Atualizações: <EditOutlined style={{ color: "#1890ff" }} />,
+  "Novos Cadastros": <UserAddOutlined style={{ color: "#16a34a" }} />,
+  Atualizações: <EditOutlined style={{ color: "#d6386d" }} />,
   Exclusões: <DeleteOutlined style={{ color: "#f5222d" }} />,
 };
 

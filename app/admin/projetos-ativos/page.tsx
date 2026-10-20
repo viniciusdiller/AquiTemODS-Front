@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Spin,
-  Typography,
   message,
   Empty,
   Card,
@@ -19,7 +18,10 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeftOutlined,
+  AdminPageHeader,
+  headerButtonClass,
+} from "@/components/admin/AdminPageHeader";
+import {
   EditOutlined,
   DeleteOutlined,
   DownloadOutlined,
@@ -37,7 +39,6 @@ import AdminProjetoModal from "@/components/AdminProjetoModal";
 import { Projeto } from "@/types/Interface-Projeto";
 import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo"; // <--- Importação adicionada
 
-const { Title, Text } = Typography;
 const { Search } = Input;
 const { TabPane } = Tabs;
 const { useBreakpoint } = Grid;
@@ -200,23 +201,80 @@ const ProjetosAtivosPage: React.FC = () => {
           {projetosToShow.map((projeto) => (
             <Col xs={24} md={12} lg={8} key={projeto.projetoId}>
               <Card
-                hoverable
-                className={
-                  !projeto.ativo
-                    ? "grayscale opacity-80 bg-gray-50 border-gray-300"
-                    : ""
-                }
-                actions={[
+                className={`h-full overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+                  projeto.ativo
+                    ? "border-gray-100 hover:border-primary/30"
+                    : "border-gray-200 bg-gray-50"
+                }`}
+                styles={{ body: { padding: 0 } }}
+              >
+                <div className={`p-5 ${!projeto.ativo ? "opacity-70" : ""}`}>
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                      <PrefeituraLogo
+                        nomePrefeitura={projeto.prefeitura || ""}
+                        tipo="p"
+                        className="h-full w-full object-contain p-1"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3
+                          className={`m-0 text-base font-semibold leading-snug ${
+                            projeto.ativo
+                              ? "text-gray-900"
+                              : "text-gray-500 line-through"
+                          }`}
+                        >
+                          {projeto.nomeProjeto}
+                        </h3>
+                        <span
+                          className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            projeto.ativo
+                              ? "bg-emerald-50 text-emerald-600"
+                              : "bg-red-50 text-red-500"
+                          }`}
+                        >
+                          {projeto.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-400">
+                        ID #{projeto.projetoId}
+                      </p>
+                    </div>
+                  </div>
+
+                  <dl className="mt-4 space-y-1.5 text-sm">
+                    <div className="flex gap-2">
+                      <dt className="shrink-0 font-medium text-gray-500">
+                        Prefeitura
+                      </dt>
+                      <dd className="m-0 text-gray-800">
+                        {projeto.prefeitura}
+                      </dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="shrink-0 font-medium text-gray-500">
+                        Secretaria
+                      </dt>
+                      <dd className="m-0 text-gray-800">
+                        {projeto.secretaria}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/70 px-3 py-2">
                   <Button
                     type="text"
+                    size="small"
                     icon={<EditOutlined />}
                     onClick={() => openEditModal(projeto)}
-                    className="hover:!bg-blue-500 hover:!text-white text-blue-500"
+                    className="!font-medium !text-primary hover:!bg-primary/10"
                   >
                     Editar
-                  </Button>,
+                  </Button>
                   <Popconfirm
-                    key="toggle"
                     title={
                       projeto.ativo ? "Desativar Projeto" : "Reativar Projeto"
                     }
@@ -231,6 +289,7 @@ const ProjetosAtivosPage: React.FC = () => {
                   >
                     <Button
                       type="text"
+                      size="small"
                       icon={
                         projeto.ativo ? (
                           <StopOutlined />
@@ -240,15 +299,14 @@ const ProjetosAtivosPage: React.FC = () => {
                       }
                       className={
                         projeto.ativo
-                          ? "hover:!bg-orange-500 hover:!text-white text-orange-500"
-                          : "hover:!bg-green-500 hover:!text-white text-green-600"
+                          ? "!text-orange-500 hover:!bg-orange-50"
+                          : "!text-green-600 hover:!bg-green-50"
                       }
                     >
                       {projeto.ativo ? "Desativar" : "Reativar"}
                     </Button>
-                  </Popconfirm>,
+                  </Popconfirm>
                   <Popconfirm
-                    key="delete"
                     title="Excluir do Banco de Dados"
                     description="ATENÇÃO: Deseja apagar definitivamente? Isso não pode ser desfeito."
                     onConfirm={() => handleDeleteDefinitivo(projeto.projetoId)}
@@ -259,57 +317,13 @@ const ProjetosAtivosPage: React.FC = () => {
                     <Button
                       type="text"
                       danger
+                      size="small"
                       icon={<DeleteOutlined />}
-                      className="hover:!bg-red-500 hover:!text-white"
                     >
                       Excluir BD
                     </Button>
-                  </Popconfirm>,
-                ]}
-              >
-                <Card.Meta
-                  // --- AQUI ESTÁ A INTEGRAÇÃO COM O PrefeituraLogo ---
-                  avatar={
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 overflow-hidden shrink-0">
-                      <PrefeituraLogo
-                        nomePrefeitura={projeto.prefeitura || ""}
-                        tipo="p"
-                        className="w-full h-full object-contain p-1"
-                      />
-                    </div>
-                  }
-                  title={
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={
-                          !projeto.ativo ? "line-through text-gray-500" : ""
-                        }
-                      >
-                        {projeto.nomeProjeto}
-                      </span>
-                      {!projeto.ativo && (
-                        <span className="text-red-500 text-xs font-normal border border-red-500 rounded px-1">
-                          Inativo
-                        </span>
-                      )}
-                    </span>
-                  }
-                  description={
-                    <>
-                      <Text>
-                        <strong>ID do Projeto:</strong> {projeto.projetoId}
-                      </Text>
-                      <br />
-                      <Text>
-                        <strong>Prefeitura:</strong> {projeto.prefeitura}
-                      </Text>
-                      <br />
-                      <Text>
-                        <strong>Secretaria:</strong> {projeto.secretaria}
-                      </Text>
-                    </>
-                  }
-                />
+                  </Popconfirm>
+                </div>
               </Card>
             </Col>
           ))}
@@ -331,111 +345,127 @@ const ProjetosAtivosPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
-        <Link href="/admin/dashboard" passHref>
-          <Button icon={<ArrowLeftOutlined />} type="text">
-            Voltar ao Dashboard
-          </Button>
-        </Link>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <AdminPageHeader
+          title="Gerenciar Projetos"
+          subtitle="Edite, oculte do site público ou exclua os projetos cadastrados."
+          backHref="/admin/dashboard"
+          backLabel="Voltar ao Dashboard"
+          actions={
+            <>
+              <Link href="/admin/indicadores" className={headerButtonClass}>
+                <BarChartOutlined />
+                Ver Indicadores
+              </Link>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={exporting}
+                className={headerButtonClass}
+              >
+                <DownloadOutlined />
+                {exporting ? "Gerando..." : "Exportar CSV"}
+              </button>
+            </>
+          }
+          stats={[
+            { label: "Projetos", value: projetos.length },
+            { label: "Ativos", value: projetos.filter((p) => p.ativo).length },
+            {
+              label: "Inativos",
+              value: projetos.filter((p) => !p.ativo).length,
+            },
+            { label: "Resultados", value: filteredProjetos.length },
+          ]}
+        />
 
-        <div className="flex gap-3 flex-wrap">
-          <Link href="/admin/indicadores" passHref>
-            <Button
-              type="primary"
-              icon={<BarChartOutlined />}
-              className="bg-[#D7386E] hover:!bg-[#b32e5a] border-[#D7386E] hover:!border-[#2e5491] text-white"
-            >
-              Ver Indicadores
-            </Button>
-          </Link>
-
-          <Button
-            type="primary"
-            icon={<DownloadOutlined />}
-            onClick={handleExport}
-            loading={exporting}
-            className="bg-green-600 hover:!bg-green-700 border-green-600 hover:!border-green-700"
-          >
-            Exportar CSV
-          </Button>
+        <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <Search
+            placeholder="Buscar por ID, nome, prefeitura ou secretaria..."
+            onSearch={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+            enterButton
+            size="large"
+            allowClear
+            className="max-w-3xl custom-search"
+          />
         </div>
+
+        <Spin spinning={loading}>
+          {filteredProjetos.length === 0 && !loading ? (
+            <Empty description="Nenhum projeto encontrado com este filtro." />
+          ) : (
+            <Tabs
+              defaultActiveKey="geral"
+              tabPosition={tabPosition}
+              onChange={handleTabChange}
+            >
+              <TabPane
+                tab={
+                  <span className="font-semibold text-gray-700">
+                    Geral ({filteredProjetos.length})
+                  </span>
+                }
+                key="geral"
+              >
+                {renderProjetosGrid(filteredProjetos)}
+              </TabPane>
+
+              <TabPane
+                tab={
+                  <span className="font-semibold text-green-600">
+                    Ativos ({ativos.length})
+                  </span>
+                }
+                key="ativos"
+              >
+                {renderProjetosGrid(ativos)}
+              </TabPane>
+
+              <TabPane
+                tab={
+                  <span className="font-semibold text-red-500">
+                    Inativos ({inativos.length})
+                  </span>
+                }
+                key="inativos"
+              >
+                {renderProjetosGrid(inativos)}
+              </TabPane>
+
+              {sortedCategories.map((ods) => {
+                const odsList = groupedProjetos[ods];
+                return (
+                  <TabPane tab={`${ods} (${odsList.length})`} key={ods}>
+                    {renderProjetosGrid(odsList)}
+                  </TabPane>
+                );
+              })}
+            </Tabs>
+          )}
+        </Spin>
+
+        <AdminProjetoModal
+          projeto={selectedItem}
+          visible={isEditModalVisible}
+          onClose={handleModalClose}
+          mode="edit-only"
+          onEditAndApprove={async () => {}}
+        />
       </div>
 
-      <Title level={2} className="mb-6">
-        Gerenciar Projetos ({filteredProjetos.length})
-      </Title>
-
-      <Search
-        placeholder="Buscar por ID, nome, prefeitura ou secretaria..."
-        onSearch={handleSearch}
-        onChange={(e) => handleSearch(e.target.value)}
-        enterButton
-        size="large"
-        className="mb-6"
-      />
-
-      <Spin spinning={loading}>
-        {filteredProjetos.length === 0 && !loading ? (
-          <Empty description="Nenhum projeto encontrado com este filtro." />
-        ) : (
-          <Tabs
-            defaultActiveKey="geral"
-            tabPosition={tabPosition}
-            onChange={handleTabChange}
-          >
-            <TabPane
-              tab={
-                <span className="font-semibold text-gray-700">
-                  Geral ({filteredProjetos.length})
-                </span>
-              }
-              key="geral"
-            >
-              {renderProjetosGrid(filteredProjetos)}
-            </TabPane>
-
-            <TabPane
-              tab={
-                <span className="font-semibold text-green-600">
-                  Ativos ({ativos.length})
-                </span>
-              }
-              key="ativos"
-            >
-              {renderProjetosGrid(ativos)}
-            </TabPane>
-
-            <TabPane
-              tab={
-                <span className="font-semibold text-red-500">
-                  Inativos ({inativos.length})
-                </span>
-              }
-              key="inativos"
-            >
-              {renderProjetosGrid(inativos)}
-            </TabPane>
-
-            {sortedCategories.map((ods) => {
-              const odsList = groupedProjetos[ods];
-              return (
-                <TabPane tab={`${ods} (${odsList.length})`} key={ods}>
-                  {renderProjetosGrid(odsList)}
-                </TabPane>
-              );
-            })}
-          </Tabs>
-        )}
-      </Spin>
-
-      <AdminProjetoModal
-        projeto={selectedItem}
-        visible={isEditModalVisible}
-        onClose={handleModalClose}
-        mode="edit-only"
-        onEditAndApprove={async () => {}}
-      />
+      <style jsx global>{`
+        .custom-search .ant-input-search-button {
+          background: #d6386d !important;
+        }
+        .ant-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+          color: #d6386d !important;
+        }
+        .ant-tabs .ant-tabs-ink-bar {
+          background: #d6386d !important;
+        }
+      `}</style>
     </div>
   );
 };
