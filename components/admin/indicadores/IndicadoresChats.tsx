@@ -57,7 +57,7 @@ const hoverCursorColor = { fill: "#d1d5db", opacity: 0.15 };
 
 // Configurações do Shadcn UI Charts
 const chartConfigProjetos = {
-  qtd: { label: "Projetos", color: "#3C6AB2" },
+  qtd: { label: "Projetos", color: "#d6386d" },
 } satisfies ChartConfig;
 const chartConfigViews = {
   views: { label: "Acessos", color: "#8884d8" },
@@ -74,11 +74,11 @@ export const OfertaProjetosChart = ({ data }: { data: any[] }) => (
   <Card
     title={
       <>
-        <BulbOutlined className="mr-2 text-blue-600" />
+        <BulbOutlined className="mr-2 text-primary" />
         Oferta de Projetos (Cadastrados)
       </>
     }
-    className="shadow-sm rounded-lg h-full"
+    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
     size="small"
     bordered={false}
   >
@@ -142,7 +142,7 @@ export const InteressePublicoChart = ({ data }: { data: any[] }) => (
         Interesse Público (Acessos)
       </>
     }
-    className="shadow-sm rounded-lg h-full"
+    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
     size="small"
     bordered={false}
   >
@@ -207,7 +207,7 @@ export const ApoioPlanejamentoChart = ({ data }: { data: any[] }) => (
         De que forma a plataforma pode Apoiar ao Planejamento
       </>
     }
-    className="shadow-sm rounded-lg h-full"
+    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
     size="small"
     bordered={false}
   >
@@ -262,7 +262,7 @@ export const EscalaImpactoChart = ({ data }: { data: any[] }) => (
         Distribuição da Escala de Impacto
       </>
     }
-    className="shadow-sm rounded-lg h-full"
+    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
     size="small"
     bordered={false}
   >

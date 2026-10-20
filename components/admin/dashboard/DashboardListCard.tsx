@@ -30,10 +30,15 @@ export const DashboardListCard: React.FC<Props> = ({
   return (
     <Col xs={24} md={12} lg={8}>
       <Card
+        className="h-full overflow-hidden rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
+        styles={{ header: { borderBottom: "1px solid #f3f4f6" } }}
         title={
-          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span className="flex items-center gap-2">
             {listIcons[title] || null}
-            {title} ({totalCount})
+            <span className="font-semibold">{title}</span>
+            <span className="ml-auto rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
+              {totalCount}
+            </span>
           </span>
         }
       >
@@ -44,7 +49,11 @@ export const DashboardListCard: React.FC<Props> = ({
               renderItem={(item) => (
                 <List.Item
                   actions={[
-                    <Button type="link" onClick={() => onDetailsClick(item)}>
+                    <Button
+                      type="text"
+                      className="!font-medium !text-primary hover:!bg-primary/10"
+                      onClick={() => onDetailsClick(item)}
+                    >
                       Detalhes
                     </Button>,
                   ]}
@@ -79,7 +88,10 @@ export const DashboardListCard: React.FC<Props> = ({
             )}
           </>
         ) : (
-          <Empty description="Nenhuma solicitação" />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="Nenhuma solicitação"
+          />
         )}
       </Card>
     </Col>

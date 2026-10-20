@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Spin,
-  message,
-  Typography,
-  Button,
-  DatePicker,
-} from "antd";
+import { Row, Col, Spin, message, Typography, DatePicker } from "antd";
 import {
   ArrowLeftOutlined,
   TrophyOutlined,
@@ -29,6 +20,10 @@ import Link from "next/link";
 import { getAdminStats } from "@/lib/api";
 import dayjs from "dayjs";
 import { Newspaper } from "lucide-react";
+import {
+  AdminPageHeader,
+  headerButtonClass,
+} from "@/components/admin/AdminPageHeader";
 
 // Nossos componentes separados
 import { SummaryCard } from "@/components/admin//indicadores/SummaryCard";
@@ -39,7 +34,7 @@ import {
   EscalaImpactoChart,
 } from "@/components/admin//indicadores/IndicadoresChats";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 export default function AdminIndicadoresPage() {
@@ -185,91 +180,67 @@ export default function AdminIndicadoresPage() {
     );
 
   return (
-    <div className="p-6 min-h-screen bg-[#f4f7fe]">
-      <div className="max-w-7xl mx-auto">
-        {/* CABEÇALHO E FILTRO */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
-          <div className="flex items-center">
-            <Link href="/admin/dashboard" passHref>
-              <Button icon={<ArrowLeftOutlined />} type="text" className="mr-4">
-                Voltar
-              </Button>
-            </Link>
-            <div>
-              <Title level={3} style={{ margin: 0, color: "#333" }}>
-                Painel de Indicadores
-              </Title>
-              <Text type="secondary">
-                Visão geral do impacto dos projetos ativos.
-              </Text>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <AdminPageHeader
+          title="Painel de Indicadores"
+          subtitle="Visão geral do impacto dos projetos ativos."
+          backHref="/admin/dashboard"
+          backLabel="Voltar"
+          actions={
+            <>
+              <div className="flex items-center rounded-xl bg-white px-3 py-1 shadow-sm">
+                <CalendarOutlined className="mr-2 text-primary" />
+                <RangePicker
+                  format="DD/MM/YYYY"
+                  placeholder={["Data Inicial", "Data Final"]}
+                  bordered={false}
+                  onChange={(dates) => setDateRange(dates as any)}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleExportIndicators}
+                className={headerButtonClass}
+              >
+                <DownloadOutlined />
+                Exportar (Excel)
+              </button>
+            </>
+          }
+        />
 
-          <div className="flex items-center flex-wrap gap-4">
-            <div className="flex items-center bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-              <CalendarOutlined className="text-gray-400 mr-2 ml-2" />
-              <RangePicker
-                format="DD/MM/YYYY"
-                placeholder={["Data Inicial", "Data Final"]}
-                bordered={false}
-                onChange={(dates) => setDateRange(dates as any)}
-                className="w-full sm:w-auto"
-              />
-            </div>
-            <Button
-              type="primary"
-              icon={<DownloadOutlined />}
-              onClick={handleExportIndicators}
-              style={{ backgroundColor: "#1D6F42", borderColor: "#1D6F42" }}
-            >
-              Exportar (Excel)
-            </Button>
-          </div>
-        </div>
-
-        {/* LOADING DO FILTRO */}
         {loading && data && (
-          <div className="w-full text-center py-4 mb-4">
+          <div className="w-full text-center">
             <Spin tip="Atualizando painel..." />
           </div>
         )}
 
-        {/* NAVEGAÇÃO PREFEITURAS */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24}>
-            <Link href="/admin/indicadores/prefeituras">
-              <Card
-                hoverable
-                className="cursor-pointer shadow-sm border-l-4 border-l-[#1D6F42]"
-                bodyStyle={{ padding: "20px" }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-green-100 rounded-full text-[#1D6F42]">
-                      <HomeOutlined style={{ fontSize: "24px" }} />
-                    </div>
-                    <div>
-                      <Title level={4} style={{ margin: 0, color: "#333" }}>
-                        Relatório por Prefeitura
-                      </Title>
-                      <Text type="secondary">
-                        Clique para visualizar a distribuição de projetos entre
-                        as 92 prefeituras.
-                      </Text>
-                    </div>
-                  </div>
-                  <ArrowLeftOutlined
-                    style={{ fontSize: "20px", transform: "rotate(180deg)" }}
-                    className="text-gray-400"
-                  />
-                </div>
-              </Card>
-            </Link>
-          </Col>
-        </Row>
+        <Link
+          href="/admin/indicadores/prefeituras"
+          className="group flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+        >
+          <div className="flex items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xl text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+              <HomeOutlined />
+            </span>
+            <div>
+              <div className="text-lg font-semibold text-gray-900">
+                Relatório por Prefeitura
+              </div>
+              <div className="text-sm text-gray-500">
+                Veja a distribuição de projetos entre as 92 prefeituras.
+              </div>
+            </div>
+          </div>
+          <ArrowLeftOutlined
+            className="text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-primary"
+            style={{ transform: "rotate(180deg)" }}
+          />
+        </Link>
 
         {/* 1. CARDS DE RESUMO GERAL */}
-        <Row gutter={[16, 16]} className="mb-6">
+        <Row gutter={[16, 16]}>
           <Col xs={24} sm={8}>
             <SummaryCard
               title="Projetos Ativos"
@@ -302,93 +273,97 @@ export default function AdminIndicadoresPage() {
         </Row>
 
         {/* 2. CARDS DE TRÁFEGO */}
-        <Title
-          level={5}
-          className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-8"
-        >
-          Tráfego e Engajamento
-        </Title>
-        <Row gutter={[16, 16]} className="mb-8">
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Usuários Cadastrados"
-              value={data?.totalUsuarios || 0}
-              icon={<UserOutlined />}
-              colorBg="#F6FFED"
-              colorText="#389E0D"
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Acessos Página Inicial"
-              value={data?.pageViews?.home || 0}
-              icon={<HomeOutlined />}
-              colorBg="#E6F7FF"
-              colorText="#0050B3"
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Acessos Espaço ODS"
-              value={data?.pageViews?.espacoOds || 0}
-              icon={<GlobalOutlined />}
-              colorBg="#F0F5FF"
-              colorText="#2F54EB"
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Cliques 'Enigmas do Futuro'"
-              value={data?.pageViews?.gameClick || 0}
-              icon={<RocketOutlined />}
-              colorBg="#FFF2E8"
-              colorText="#D4380D"
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Acessos SustentAí"
-              value={data?.pageViews?.sustentAiNav || 0}
-              icon={<Newspaper size={28} />}
-              colorBg="#FFF0F6"
-              colorText="#D7386E"
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <SummaryCard
-              title="Compartilhamento de Projetos"
-              value={data?.pageViews?.compartilhamento || 0}
-              icon={<ShareAltOutlined />}
-              colorBg="#FFF0F6"
-              colorText="#EB2F96"
-            />
-          </Col>
-        </Row>
+        <section className="space-y-3">
+          <Title
+            level={5}
+            className="!mb-0 !text-xs !font-semibold uppercase !tracking-wider !text-gray-500"
+          >
+            Tráfego e Engajamento
+          </Title>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Usuários Cadastrados"
+                value={data?.totalUsuarios || 0}
+                icon={<UserOutlined />}
+                colorBg="#F6FFED"
+                colorText="#389E0D"
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Acessos Página Inicial"
+                value={data?.pageViews?.home || 0}
+                icon={<HomeOutlined />}
+                colorBg="#E6F7FF"
+                colorText="#0050B3"
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Acessos Espaço ODS"
+                value={data?.pageViews?.espacoOds || 0}
+                icon={<GlobalOutlined />}
+                colorBg="#F0F5FF"
+                colorText="#2F54EB"
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Cliques 'Enigmas do Futuro'"
+                value={data?.pageViews?.gameClick || 0}
+                icon={<RocketOutlined />}
+                colorBg="#FFF2E8"
+                colorText="#D4380D"
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Acessos SustentAí"
+                value={data?.pageViews?.sustentAiNav || 0}
+                icon={<Newspaper size={28} />}
+                colorBg="#FFF0F6"
+                colorText="#D7386E"
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <SummaryCard
+                title="Compartilhamento de Projetos"
+                value={data?.pageViews?.compartilhamento || 0}
+                icon={<ShareAltOutlined />}
+                colorBg="#FFF0F6"
+                colorText="#EB2F96"
+              />
+            </Col>
+          </Row>
+        </section>
 
         {/* 3. GRÁFICOS (Importados dos Componentes) */}
-        <Title
-          level={5}
-          className="mb-4 text-gray-500 uppercase text-xs tracking-widest mt-4"
-        >
-          Análise por ODS (Oferta vs Demanda)
-        </Title>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
-            <OfertaProjetosChart data={data?.chartProjetosPorOds} />
-          </Col>
-          <Col xs={24} lg={12}>
-            <InteressePublicoChart data={data?.chartVisualizacoes} />
-          </Col>
-        </Row>
+        <section className="space-y-4">
+          <Title
+            level={5}
+            className="!mb-0 !text-xs !font-semibold uppercase !tracking-wider !text-gray-500"
+          >
+            Análise por ODS (Oferta vs Demanda)
+          </Title>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={12}>
+              <OfertaProjetosChart data={data?.chartProjetosPorOds} />
+            </Col>
+            <Col xs={24} lg={12}>
+              <InteressePublicoChart data={data?.chartVisualizacoes} />
+            </Col>
+          </Row>
 
-        <Row gutter={[16, 16]} className="mt-6">
-          <Col xs={24} lg={12}>
-            <ApoioPlanejamentoChart data={data?.chartApoio} />
-          </Col>
-          <Col xs={24} lg={12}>
-            <EscalaImpactoChart data={data?.chartEscala} />
-          </Col>
-        </Row>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={12}>
+              <ApoioPlanejamentoChart data={data?.chartApoio} />
+            </Col>
+            <Col xs={24} lg={12}>
+              <EscalaImpactoChart data={data?.chartEscala} />
+            </Col>
+          </Row>
+        </section>
       </div>
     </div>
   );
