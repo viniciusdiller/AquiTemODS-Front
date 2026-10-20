@@ -1,15 +1,10 @@
 import React from "react";
-import AdminTokenTimer from "@/components/admin/AdminTokenTimer";
+import AdminShell from "@/components/admin/AdminShell";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <AdminTokenTimer />
-      {children}
-    </>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }
