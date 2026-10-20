@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import { useAuth } from "@/context/AuthContext";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -144,14 +145,14 @@ export default function PerfilPage() {
 
       if (profileData.email) {
         toast.success(
-          "Dados atualizados! Um e-mail de confirmação foi enviado para o seu novo endereço."
+          "Dados atualizados! Um e-mail de confirmação foi enviado para o seu novo endereço.",
         );
       } else {
         toast.success("Nome de usuário atualizado com sucesso!");
       }
       setIsProfileDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Erro ao atualizar perfil: ${error.message}`);
+      toast.error(`Erro ao atualizar perfil: ${getErrorMessage(error)}`);
     } finally {
       setIsUpdatingProfile(false); // Finaliza o carregamento
     }
@@ -180,7 +181,7 @@ export default function PerfilPage() {
       setConfirmPassword("");
       setIsPasswordDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Erro ao alterar senha: ${error.message}`);
+      toast.error(`Erro ao alterar senha: ${getErrorMessage(error)}`);
     } finally {
       setIsChangingPassword(false); // Finaliza o carregamento
     }
@@ -199,7 +200,7 @@ export default function PerfilPage() {
         logout();
       }, 2000);
     } catch (error: any) {
-      toast.error(`Erro ao excluir a conta: ${error.message}`);
+      toast.error(`Erro ao excluir a conta: ${getErrorMessage(error)}`);
     }
   };
 
@@ -468,7 +469,7 @@ export default function PerfilPage() {
                         onClick={handleDeleteAccount}
                         className={cn(
                           buttonVariants({ variant: "destructive" }) +
-                            " w-fit rounded-full transition-all transform hover:scale-105 hover:bg-red-500 active:scale-95 border-2 border-transparent hover:border-red-700"
+                            " w-fit rounded-full transition-all transform hover:scale-105 hover:bg-red-500 active:scale-95 border-2 border-transparent hover:border-red-700",
                         )}
                       >
                         Continuar

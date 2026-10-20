@@ -1,6 +1,7 @@
 // components/AvaliacaoModal.tsx
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import { AnimatePresence, motion } from "framer-motion";
 import { Dispatch, SetStateAction, useState, useEffect } from "react"; // <-- Importar useEffect
 import { Star } from "lucide-react";
@@ -90,8 +91,10 @@ const AvaliacaoModal = ({
     } catch (error: any) {
       console.error("Erro ao enviar:", error);
       toast.error(
-        error.message ||
-          "Erro ao enviar. Verifique se você já avaliou este local."
+        getErrorMessage(
+          error,
+          "Erro ao enviar. Verifique se você já avaliou este local.",
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -176,8 +179,8 @@ const AvaliacaoModal = ({
                   {isSubmitting
                     ? "Enviando..."
                     : isReply
-                    ? "Responder"
-                    : "Avaliar"}
+                      ? "Responder"
+                      : "Avaliar"}
                 </button>
               </div>
             </div>

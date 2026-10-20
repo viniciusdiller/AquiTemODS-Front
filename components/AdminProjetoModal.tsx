@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -198,7 +199,7 @@ const AdminProjetoModal: React.FC<AdminProjetoModalProps> = ({
 
       onClose(true);
     } catch (error: any) {
-      message.error(error.message || "Falha ao salvar.");
+      message.error(getErrorMessage(error, "Falha ao salvar."));
     } finally {
       setIsEditLoading(false);
     }

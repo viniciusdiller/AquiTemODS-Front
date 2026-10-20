@@ -1,4 +1,5 @@
 "use client";
+import { getErrorMessage } from "@/lib/http";
 import React, { useEffect, useState, useRef } from "react";
 import {
   X,
@@ -221,7 +222,10 @@ export default function ModalAcao({
       handleClose();
     } catch (error: any) {
       console.error("Erro ao salvar ação:", error);
-      const message = error?.message || "Ocorreu um erro ao salvar a ação.";
+      const message = getErrorMessage(
+        error,
+        "Ocorreu um erro ao salvar a ação.",
+      );
       const details = error?.data || error?.response?.data;
 
       submittedRef.current = false;

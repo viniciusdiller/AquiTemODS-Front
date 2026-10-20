@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
+import { safeFetch } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -82,10 +84,12 @@ const AdminSustentAi = () => {
       try {
         // eslint-disable-next-line no-console
         console.debug(`tryFetchSustentaiList: tentando ${full}`);
-        const res = await fetch(full);
+        const res = await safeFetch(full);
         if (!res.ok) {
           // eslint-disable-next-line no-console
-          console.debug(`tryFetchSustentaiList: ${full} respondeu ${res.status}`);
+          console.debug(
+            `tryFetchSustentaiList: ${full} respondeu ${res.status}`,
+          );
           continue;
         }
         return await res.json();
@@ -94,21 +98,29 @@ const AdminSustentAi = () => {
         console.debug(`tryFetchSustentaiList: erro em ${full}`, e);
       }
     }
-    const err: any = new Error(`Nenhum endpoint /sustentai respondeu corretamente. URLs tentadas: ${attempted.join(", ")}`);
+    const err: any = new Error(
+      `Nenhum endpoint /sustentai respondeu corretamente. URLs tentadas: ${attempted.join(", ")}`,
+    );
     err.attempted = attempted;
     throw err;
   }
 
-  async function trySubmitSustentai(formData: FormData, token: string, editingId?: number | null) {
+  async function trySubmitSustentai(
+    formData: FormData,
+    token: string,
+    editingId?: number | null,
+  ) {
     const attempted: string[] = [];
     const method = editingId ? "PUT" : "POST";
     for (const base of pathsToTryBase) {
-      const full = editingId ? `${API_URL}${base}/${editingId}` : `${API_URL}${base}`;
+      const full = editingId
+        ? `${API_URL}${base}/${editingId}`
+        : `${API_URL}${base}`;
       attempted.push(full);
       try {
         // eslint-disable-next-line no-console
         console.debug(`trySubmitSustentai: tentando ${method} ${full}`);
-        const res = await fetch(full, {
+        const res = await safeFetch(full, {
           method,
           headers: {
             Authorization: `Bearer ${token}`,
@@ -119,7 +131,10 @@ const AdminSustentAi = () => {
           try {
             const txt = await res.text();
             // eslint-disable-next-line no-console
-            console.debug(`trySubmitSustentai: ${full} respondeu ${res.status}`, txt);
+            console.debug(
+              `trySubmitSustentai: ${full} respondeu ${res.status}`,
+              txt,
+            );
           } catch (e) {}
           continue;
         }
@@ -129,7 +144,9 @@ const AdminSustentAi = () => {
         console.debug(`trySubmitSustentai: erro ao tentar ${full}`, e);
       }
     }
-    const err: any = new Error(`Falha ao salvar /sustentai. URLs tentadas: ${attempted.join(", ")}`);
+    const err: any = new Error(
+      `Falha ao salvar /sustentai. URLs tentadas: ${attempted.join(", ")}`,
+    );
     err.attempted = attempted;
     throw err;
   }
@@ -142,7 +159,7 @@ const AdminSustentAi = () => {
       try {
         // eslint-disable-next-line no-console
         console.debug(`tryDeleteSustentai: tentando DELETE ${full}`);
-        const res = await fetch(full, {
+        const res = await safeFetch(full, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -159,7 +176,9 @@ const AdminSustentAi = () => {
         console.debug(`tryDeleteSustentai: erro ao tentar ${full}`, e);
       }
     }
-    const err: any = new Error(`Falha ao excluir /sustentai. URLs tentadas: ${attempted.join(", ")}`);
+    const err: any = new Error(
+      `Falha ao excluir /sustentai. URLs tentadas: ${attempted.join(", ")}`,
+    );
     err.attempted = attempted;
     throw err;
   }
@@ -254,7 +273,9 @@ const AdminSustentAi = () => {
       cancelEdit();
       fetchCards();
     } catch (error: any) {
-      message.error(error?.message || "Erro ao salvar. Veja console para detalhes.");
+      message.error(
+        getErrorMessage(error, "Erro ao salvar. Veja console para detalhes."),
+      );
       // eslint-disable-next-line no-console
       console.error("trySubmitSustentai erro:", error);
     } finally {
@@ -330,7 +351,9 @@ const AdminSustentAi = () => {
                   ) : (
                     <PlusOutlined className="text-[#D7386E]" />
                   )}
-                  <span>{editingId ? `Editar Newsletter` : "Nova Newsletter"}</span>
+                  <span>
+                    {editingId ? `Editar Newsletter` : "Nova Newsletter"}
+                  </span>
                 </div>
               }
               className={`shadow-md border-t-4 sticky top-24 ${editingId ? "border-t-blue-500" : "border-t-[#D7386E]"}`}

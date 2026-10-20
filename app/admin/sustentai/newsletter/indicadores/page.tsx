@@ -1,5 +1,6 @@
 "use client";
 
+import { safeFetch } from "@/lib/http";
 import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
@@ -76,8 +77,8 @@ export default function SustentAiIndicatorsPage() {
       }
 
       const [resCards, resStats] = await Promise.all([
-        fetch(`${API_URL}/api/sustentai${queryParams}`),
-        fetch(`${API_URL}/api/admin/stats${queryParams}`, {
+        safeFetch(`${API_URL}/api/sustentai${queryParams}`),
+        safeFetch(`${API_URL}/api/admin/stats${queryParams}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
           },

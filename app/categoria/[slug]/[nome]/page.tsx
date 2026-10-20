@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import Link from "next/link";
 import { PrefeituraLogo } from "@/components/ui/PrefeituraLogo";
 import {
@@ -232,7 +233,9 @@ function ProjetoPageContent() {
       toast.success("Comentário excluído com sucesso!");
       fetchProjetoData();
     } catch (error: any) {
-      toast.error(error.message || "Não foi possível excluir o comentário.");
+      toast.error(
+        getErrorMessage(error, "Não foi possível excluir o comentário."),
+      );
     } finally {
       setIsDeleteDialogOpen(false);
       setReviewToDelete(null);

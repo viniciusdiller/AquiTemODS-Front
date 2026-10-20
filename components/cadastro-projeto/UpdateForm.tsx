@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -105,7 +106,7 @@ export const UpdateForm: React.FC<Props> = ({ setLoading, onSuccess }) => {
       });
     } catch (error: any) {
       message.error(
-        error.message || "Ocorreu um erro ao enviar a atualização.",
+        getErrorMessage(error, "Ocorreu um erro ao enviar a atualização."),
       );
     } finally {
       setLoading(false);

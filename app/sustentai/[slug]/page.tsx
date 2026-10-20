@@ -1,5 +1,6 @@
 // app/sustentai/[slug]/page.tsx
 "use client";
+import { getErrorMessage } from "@/lib/http";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -201,7 +202,8 @@ export default function PaginaAcaoInterna() {
         }
       } catch (err: any) {
         console.error("Erro ao carregar ação: ", err);
-        if (mounted) setError(err.message || "Erro ao carregar conteúdo");
+        if (mounted)
+          setError(getErrorMessage(err, "Erro ao carregar conteúdo"));
       } finally {
         if (mounted) setIsLoading(false);
       }

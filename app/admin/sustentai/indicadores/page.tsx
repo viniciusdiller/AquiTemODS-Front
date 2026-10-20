@@ -1,5 +1,6 @@
 "use client";
 
+import { safeFetch } from "@/lib/http";
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -62,7 +63,7 @@ const IndicadoresSustentai = () => {
     for (const ep of endpoints) {
       const url = `${API_URL}${ep}?t=${timestamp}`;
       try {
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await safeFetch(url, { cache: "no-store" });
         if (!res.ok) {
           console.debug(`endpoint ${ep} respondeu ${res.status}`);
           continue;

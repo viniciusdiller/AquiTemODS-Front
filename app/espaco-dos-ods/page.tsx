@@ -1,4 +1,5 @@
 "use client";
+import { safeFetch } from "@/lib/http";
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -27,7 +28,7 @@ export default function SobrePage() {
     // Contabiliza visualização da página Espaço ODS
     if (!jaContabilizou.current) {
       jaContabilizou.current = true;
-      fetch(
+      safeFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/ESPACO_ODS`,
         { method: "POST" },
       ).catch((err) => console.error("Erro contador Espaço ODS:", err));
@@ -36,7 +37,7 @@ export default function SobrePage() {
     // Busca os cursos ativos no backend
     const fetchCursos = async () => {
       try {
-        const res = await fetch(
+        const res = await safeFetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/cursos?status=ativo`,
         );
         if (res.ok) {
@@ -64,7 +65,7 @@ export default function SobrePage() {
   // Registra o clique no curso de forma assíncrona sem travar a navegação
   const handleCursoClick = async (id: number) => {
     try {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos/${id}/click`, {
+      safeFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cursos/${id}/click`, {
         method: "PATCH",
       });
     } catch (error) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Spin,
@@ -144,7 +145,7 @@ const AdminComentariosPage: React.FC = () => {
       setProjetos(projetosComComentarios);
       setFilteredProjetos(projetosComComentarios);
     } catch (error: any) {
-      message.error(error.message || "Falha ao buscar projetos.");
+      message.error(getErrorMessage(error, "Falha ao buscar projetos."));
     } finally {
       setLoading(false);
     }
