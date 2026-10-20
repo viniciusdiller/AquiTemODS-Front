@@ -1,5 +1,6 @@
 //sustentai/page.tsx
 "use client";
+import { safeFetch } from "@/lib/http";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -182,7 +183,9 @@ export default function SustentAiPage() {
                             "SustentAí: tentando fallback",
                             fallback,
                           );
-                          const res = await fetch(fallback, { method: "POST" });
+                          const res = await safeFetch(fallback, {
+                            method: "POST",
+                          });
                           if (res.ok) {
                             console.debug(
                               "SustentAí: fallback ok",

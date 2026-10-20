@@ -3,6 +3,7 @@
 "use client";
 
 // 1. Importe o 'useRef' do React
+import { getErrorMessage } from "@/lib/http";
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { confirmEmailChange } from "@/lib/api";
@@ -14,10 +15,10 @@ import { Button } from "@/components/ui/button";
 const ConfirmationContent = () => {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
+    "loading",
   );
   const [message, setMessage] = useState(
-    "Confirmando sua alteração de e-mail, por favor aguarde..."
+    "Confirmando sua alteração de e-mail, por favor aguarde...",
   );
 
   // 2. Crie uma referência para controlar a execução
@@ -46,7 +47,7 @@ const ConfirmationContent = () => {
         await confirmEmailChange(token);
         setStatus("success");
         setMessage(
-          "Seu e-mail foi alterado com sucesso! Você será redirecionado para a página de login."
+          "Seu e-mail foi alterado com sucesso! Você será redirecionado para a página de login.",
         );
 
         setTimeout(() => {
@@ -55,8 +56,10 @@ const ConfirmationContent = () => {
       } catch (error: any) {
         setStatus("error");
         setMessage(
-          error.message ||
-            "Ocorreu um erro ao confirmar sua alteração. O token pode ser inválido ou ter expirado."
+          getErrorMessage(
+            error,
+            "Ocorreu um erro ao confirmar sua alteração. O token pode ser inválido ou ter expirado.",
+          ),
         );
       }
     };

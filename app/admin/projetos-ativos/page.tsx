@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Spin,
@@ -69,7 +70,7 @@ const ProjetosAtivosPage: React.FC = () => {
       setProjetos(data);
       setFilteredProjetos(data);
     } catch (error: any) {
-      message.error(error.message || "Falha ao buscar projetos.");
+      message.error(getErrorMessage(error, "Falha ao buscar projetos."));
     } finally {
       setLoading(false);
     }
@@ -117,7 +118,9 @@ const ProjetosAtivosPage: React.FC = () => {
       );
       fetchData();
     } catch (error: any) {
-      message.error(error.message || "Falha ao alterar o status do projeto.");
+      message.error(
+        getErrorMessage(error, "Falha ao alterar o status do projeto."),
+      );
       setLoading(false);
     }
   };
@@ -131,7 +134,7 @@ const ProjetosAtivosPage: React.FC = () => {
       message.success("Projeto excluído permanentemente do banco de dados!");
       fetchData();
     } catch (error: any) {
-      message.error(error.message || "Falha ao excluir o projeto.");
+      message.error(getErrorMessage(error, "Falha ao excluir o projeto."));
       setLoading(false);
     }
   };

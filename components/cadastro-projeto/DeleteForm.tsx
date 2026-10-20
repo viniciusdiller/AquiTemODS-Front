@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React from "react";
 import { Form, Input, Button, Row, Col, Checkbox, message, Select } from "antd";
 import { solicitarExclusaoProjeto } from "@/lib/api";
@@ -32,7 +33,7 @@ export const DeleteForm: React.FC<Props> = ({ setLoading, onSuccess }) => {
       });
     } catch (error: any) {
       message.error(
-        error.message || "Ocorreu um erro ao solicitar a exclusão.",
+        getErrorMessage(error, "Ocorreu um erro ao solicitar a exclusão."),
       );
     } finally {
       setLoading(false);

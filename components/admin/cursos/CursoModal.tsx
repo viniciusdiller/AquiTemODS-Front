@@ -1,6 +1,7 @@
 // components/admin/cursos/CursoModal.tsx
 "use client";
 
+import { safeFetch, getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -124,7 +125,7 @@ export default function CursoModal({
         : `${API_URL}/api/cursos`;
       const method = isEditing ? "PUT" : "POST";
 
-      const res = await fetch(url, {
+      const res = await safeFetch(url, {
         method,
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -136,7 +137,7 @@ export default function CursoModal({
       onSuccess();
       onClose();
     } catch (error: any) {
-      message.error(error.message);
+      message.error(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }

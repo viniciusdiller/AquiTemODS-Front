@@ -1,5 +1,6 @@
 "use client";
 
+import { safeFetch, getErrorMessage } from "@/lib/http";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -52,7 +53,7 @@ export default function CategoryPage() {
           const data = await getProjetosByOds(categoryInfo.title);
           setProjetos(data);
         } catch (err: any) {
-          setError(err.message || "Falha ao carregar os projetos.");
+          setError(getErrorMessage(err, "Falha ao carregar os projetos."));
         } finally {
           setIsLoading(false);
         }
@@ -67,7 +68,7 @@ export default function CategoryPage() {
     if (params.slug && !jaContabilizou.current) {
       jaContabilizou.current = true;
 
-      fetch(
+      safeFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/${params.slug}`,
         {
           method: "POST",

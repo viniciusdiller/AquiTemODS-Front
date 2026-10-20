@@ -1,12 +1,13 @@
 // Enigmas do Futuro
 "use client";
+import { safeFetch } from "@/lib/http";
 import React from "react";
 import FaleConoscoButton from "@/components/FaleConoscoButton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleGameClick = () => {
-  fetch(`${API_URL}/api/projetos/visualizacao/GAME_CLICK`, {
+  safeFetch(`${API_URL}/api/projetos/visualizacao/GAME_CLICK`, {
     method: "POST",
   }).catch((err) => console.error("Erro ao registrar clique:", err));
 };

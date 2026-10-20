@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  getErrorMessage,
+  readJsonSafe,
+  redirectToAdminLogin,
+  safeFetch,
+} from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import { Row, Modal, message, Spin, Typography, Input } from "antd";
 import {
@@ -110,7 +116,7 @@ const AdminDashboard: React.FC = () => {
       setData(pendingData);
       setCurrentPages({ cadastros: 1, atualizacoes: 1, exclusoes: 1 });
     } catch (error: any) {
-      message.error(error.message || "Falha ao buscar dados.");
+      message.error(getErrorMessage(error, "Falha ao buscar dados."));
     } finally {
       setLoading(false);
     }
@@ -145,19 +151,21 @@ const AdminDashboard: React.FC = () => {
         });
       }
 
-      const response = await fetch(
+      const response = await safeFetch(
         `${API_URL}/api/admin/${action}/${selectedItem.projetoId}`,
         fetchOptions,
       );
 
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        throw new Error("Sessão expirada. Faça login novamente.");
+      }
+
       if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const errorJson = JSON.parse(errorText);
-          throw new Error(errorJson.message || "Erro do servidor");
-        } catch (e) {
-          throw new Error("Falha na comunicação com o servidor.");
-        }
+        const errorJson = await readJsonSafe(response);
+        throw new Error(
+          errorJson?.message || "Falha na comunicação com o servidor.",
+        );
       }
 
       const result = await response.json();
@@ -185,7 +193,7 @@ const AdminDashboard: React.FC = () => {
       setSelectedItem(null);
       setRejectionReason("");
     } catch (error: any) {
-      message.error(error.message);
+      message.error(getErrorMessage(error));
     } finally {
       setIsActionLoading(false);
     }
@@ -203,7 +211,7 @@ const AdminDashboard: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
+      const response = await safeFetch(
         `${API_URL}/api/admin/edit-and-approve/${selectedItem.projetoId}`,
         {
           method: "POST",

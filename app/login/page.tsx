@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,7 +73,7 @@ export default function LoginPage() {
         window.location.href = "/";
       }, 2000);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err.message;
+      const errorMessage = err?.response?.data?.message || getErrorMessage(err);
 
       // Verifica se o erro é sobre conta não ativada (seja por "não foi verificada" ou "Conta não ativada")
       if (
@@ -121,8 +122,7 @@ export default function LoginPage() {
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message ||
-        error.message ||
-        "Erro de conexão ao tentar reenviar o e-mail.";
+        getErrorMessage(error, "Erro de conexão ao tentar reenviar o e-mail.");
       addNotification(errorMessage, "error");
     } finally {
       setIsResending(false);

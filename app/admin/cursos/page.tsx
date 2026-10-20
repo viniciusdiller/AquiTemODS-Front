@@ -1,6 +1,7 @@
 // app/admin/cursos/page.tsx
 "use client";
 
+import { safeFetch } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -41,7 +42,7 @@ const AdminCursos = () => {
     setLoading(true);
     try {
       const timestamp = new Date().getTime();
-      const res = await fetch(`${API_URL}/api/cursos?t=${timestamp}`, {
+      const res = await safeFetch(`${API_URL}/api/cursos?t=${timestamp}`, {
         cache: "no-store",
       });
 

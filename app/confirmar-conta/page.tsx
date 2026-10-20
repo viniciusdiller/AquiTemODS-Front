@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import { useEffect, useState, Suspense, useRef } from "react"; // 1. Importar o useRef
 import { useSearchParams } from "next/navigation";
 import { confirmAccount } from "@/lib/api";
@@ -12,10 +13,10 @@ import { Button } from "@/components/ui/button";
 const ConfirmationContent = () => {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
+    "loading",
   );
   const [message, setMessage] = useState(
-    "Confirmando sua conta, por favor aguarde..."
+    "Confirmando sua conta, por favor aguarde...",
   );
 
   // 2. Criar um ref para controlar a execução
@@ -43,7 +44,7 @@ const ConfirmationContent = () => {
         setStatus("success");
         setMessage(
           response.message ||
-            "Conta confirmada com sucesso! Você será redirecionado para a página de login em 5 segundos."
+            "Conta confirmada com sucesso! Você será redirecionado para a página de login em 5 segundos.",
         );
 
         setTimeout(() => {
@@ -52,8 +53,10 @@ const ConfirmationContent = () => {
       } catch (error: any) {
         setStatus("error");
         setMessage(
-          error.message ||
-            "Ocorreu um erro ao confirmar sua conta. O token pode ser inválido ou ter expirado."
+          getErrorMessage(
+            error,
+            "Ocorreu um erro ao confirmar sua conta. O token pode ser inválido ou ter expirado.",
+          ),
         );
       }
     };

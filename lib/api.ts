@@ -1,3 +1,5 @@
+import { readJsonSafe, redirectToAdminLogin, safeFetch } from "@/lib/http";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function fetchApi(path: string, options: RequestInit = {}) {
@@ -20,38 +22,7 @@ async function fetchApi(path: string, options: RequestInit = {}) {
 
   const url = `${API_URL}${path}`;
 
-  // Debug: logar detalhes da requisição para ajudar a diagnosticar 404/rotas não encontradas
-  try {
-    // Não vaza objetos grandes; converte body stringificada quando for string
-    const bodyPreview = options.body
-      ? typeof options.body === "string"
-        ? options.body
-        : "[non-string body]"
-      : undefined;
-    // eslint-disable-next-line no-console
-    console.debug("fetchApi ->", (options.method || "GET").toUpperCase(), url, {
-      headers,
-      body: bodyPreview,
-    });
-  } catch (e) {
-    // ignore
-  }
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      ...options,
-      headers,
-    });
-  } catch (networkError: any) {
-    // Erro de rede (backend offline, CORS, DNS, etc.)
-    const message = `Não foi possível conectar ao servidor API em ${API_URL}. Verifique se o backend está rodando.`;
-    const err: any = new Error(message);
-    err.cause = networkError;
-    // eslint-disable-next-line no-console
-    console.error(message, networkError);
-    throw err;
-  }
+  const response = await safeFetch(url, { ...options, headers });
 
   const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
@@ -72,6 +43,11 @@ async function fetchApi(path: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     if (response.status === 401) {
+      // Token de admin vencido: volta para o login do admin
+      if (path.startsWith("/api/admin") && path !== "/api/admin/login") {
+        redirectToAdminLogin();
+        throw new Error("Sessão expirada. Faça login novamente.");
+      }
       // SÓ REDIRECIONA SE O 401 NÃO VIER DA PÁGINA DE LOGIN
       if (path !== "/api/auth/login") {
         localStorage.removeItem("user");
@@ -268,26 +244,50 @@ export function formatarDataParaMesAno(dateString: string): string {
   }).format(data);
 }
 
-export const getAllActiveProjetos = async (token: string) => {
-  const response = await fetch(`${API_URL}/api/admin/projetos-ativos`, {
+/** Requisição admin com tratamento padrão: rede, 401 (sessão vencida) e mensagem do servidor. */
+async function adminRequest(
+  path: string,
+  token: string,
+  init: RequestInit = {},
+  fallbackMessage = "Falha na requisição.",
+): Promise<Response> {
+  const response = await safeFetch(`${API_URL}${path}`, {
+    ...init,
     headers: {
+      ...(init.headers as Record<string, string>),
       Authorization: `Bearer ${token}`,
     },
   });
-  if (!response.ok) {
-    throw new Error("Falha ao buscar projetos ativos");
+
+  if (response.status === 401) {
+    redirectToAdminLogin();
+    throw new Error("Sessão expirada. Faça login novamente.");
   }
+
+  if (!response.ok) {
+    const errorData = await readJsonSafe(response);
+    throw new Error(errorData?.message || fallbackMessage);
+  }
+  return response;
+}
+
+export const getAllActiveProjetos = async (token: string) => {
+  const response = await adminRequest(
+    "/api/admin/projetos-ativos",
+    token,
+    {},
+    "Falha ao buscar projetos ativos",
+  );
   return response.json();
 };
+
 export const adminGetAllProjetosGeral = async (token: string) => {
-  const response = await fetch(`${API_URL}/api/admin/projetos-geral`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!response.ok) {
-    throw new Error("Falha ao buscar todos os projetos");
-  }
+  const response = await adminRequest(
+    "/api/admin/projetos-geral",
+    token,
+    {},
+    "Falha ao buscar todos os projetos",
+  );
   return response.json();
 };
 
@@ -296,19 +296,16 @@ export const adminToggleProjetoStatus = async (
   ativo: boolean,
   token: string,
 ) => {
-  const response = await fetch(`${API_URL}/api/admin/projeto/${id}/status`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const response = await adminRequest(
+    `/api/admin/projeto/${id}/status`,
+    token,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ativo }),
     },
-    body: JSON.stringify({ ativo }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Falha ao alterar status do projeto");
-  }
+    "Falha ao alterar status do projeto",
+  );
   return response.json();
 };
 
@@ -317,34 +314,26 @@ export const adminUpdateProjeto = async (
   data: any,
   token: string,
 ) => {
-  const response = await fetch(`${API_URL}/api/admin/projeto/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const response = await adminRequest(
+    `/api/admin/projeto/${id}`,
+    token,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Falha ao atualizar projeto");
-  }
+    "Falha ao atualizar projeto",
+  );
   return response.json();
 };
 
 export const adminDeleteProjeto = async (id: number, token: string) => {
-  const response = await fetch(`${API_URL}/api/admin/projeto/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Falha ao excluir projeto");
-  }
+  await adminRequest(
+    `/api/admin/projeto/${id}`,
+    token,
+    { method: "DELETE" },
+    "Falha ao excluir projeto",
+  );
   // Respostas DELETE bem-sucedidas podem não ter corpo
   return { success: true };
 };
@@ -370,18 +359,12 @@ export const adminDeleteReview = (id: number, token: string) =>
   });
 
 export const adminExportProjetos = async (token: string) => {
-  const response = await fetch(`${API_URL}/api/admin/exportar-projetos`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Falha ao exportar projetos");
-  }
-
+  const response = await adminRequest(
+    "/api/admin/exportar-projetos",
+    token,
+    { method: "GET" },
+    "Falha ao exportar projetos",
+  );
   // Retorna o Blob do arquivo para download
   return response.blob();
 };
@@ -397,18 +380,12 @@ export const getAdminStats = async (
     queryParams = `?startDate=${startDate}&endDate=${endDate}`;
   }
 
-  // ATENÇÃO PARA ESTA LINHA: ela precisa concatenar o queryParams na URL
-  const response = await fetch(`${API_URL}/api/admin/stats${queryParams}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Erro ao buscar estatísticas do painel.");
-  }
-
+  const response = await adminRequest(
+    `/api/admin/stats${queryParams}`,
+    token,
+    { method: "GET" },
+    "Erro ao buscar estatísticas do painel.",
+  );
   return response.json();
 };
 

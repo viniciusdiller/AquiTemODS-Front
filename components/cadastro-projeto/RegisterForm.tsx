@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -138,7 +139,7 @@ export const RegisterForm: React.FC<Props> = ({ setLoading, onSuccess }) => {
       });
     } catch (error: any) {
       message.error(
-        error.message || "Ocorreu um erro. Por favor, tente novamente.",
+        getErrorMessage(error, "Ocorreu um erro. Por favor, tente novamente."),
       );
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
@@ -96,7 +97,7 @@ const AdminUsuariosPage: React.FC = () => {
       setUsers(sortedData);
       setFilteredUsers(sortedData);
     } catch (error: any) {
-      message.error(error.message || "Erro ao buscar usuários.");
+      message.error(getErrorMessage(error, "Erro ao buscar usuários."));
     } finally {
       setLoading(false);
     }
@@ -143,7 +144,7 @@ const AdminUsuariosPage: React.FC = () => {
       setEditingUser(null);
       fetchUsers();
     } catch (error: any) {
-      message.error(error.message || "Falha ao atualizar usuário.");
+      message.error(getErrorMessage(error, "Falha ao atualizar usuário."));
     } finally {
       setEditLoading(false);
     }
@@ -171,7 +172,7 @@ const AdminUsuariosPage: React.FC = () => {
       setIsPasswordModalVisible(false);
       setPasswordUser(null);
     } catch (error: any) {
-      message.error(error.message || "Falha ao alterar senha.");
+      message.error(getErrorMessage(error, "Falha ao alterar senha."));
     } finally {
       setPasswordLoading(false);
     }
@@ -187,7 +188,7 @@ const AdminUsuariosPage: React.FC = () => {
       message.success(`Email de confirmação enviado para ${user.email}`);
     } catch (error: any) {
       hide();
-      message.error(error.message || "Falha ao enviar email.");
+      message.error(getErrorMessage(error, "Falha ao enviar email."));
     }
   };
 
@@ -201,7 +202,7 @@ const AdminUsuariosPage: React.FC = () => {
       setUsers(newUsers);
       setFilteredUsers(filteredUsers.filter((u) => u.usuarioId !== id));
     } catch (error: any) {
-      message.error(error.message || "Falha ao excluir usuário.");
+      message.error(getErrorMessage(error, "Falha ao excluir usuário."));
     }
   };
 

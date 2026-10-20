@@ -1,4 +1,5 @@
 "use client";
+import { safeFetch } from "@/lib/http";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
@@ -21,7 +22,7 @@ export default function HomePage() {
     if (!jaContabilizou.current) {
       jaContabilizou.current = true;
       // Envia "HOME" como identificador
-      fetch(
+      safeFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/projetos/visualizacao/HOME`,
         {
           method: "POST",

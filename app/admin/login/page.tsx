@@ -1,5 +1,6 @@
 "use client";
 
+import { safeFetch } from "@/lib/http";
 import React, { useState } from "react";
 import { message } from "antd";
 import { useRouter } from "next/navigation";
@@ -31,7 +32,7 @@ const AdminLoginPage: React.FC = () => {
     const values = { username, password };
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/admin/login`, {
+      const response = await safeFetch(`${API_URL}/api/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

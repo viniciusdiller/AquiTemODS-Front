@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   List,
@@ -209,7 +210,7 @@ const AdminComentariosDoProjeto: React.FC = () => {
       setPageData(data);
       setCurrentPage(1);
     } catch (error: any) {
-      message.error(error.message || "Falha ao buscar comentários.");
+      message.error(getErrorMessage(error, "Falha ao buscar comentários."));
     } finally {
       setLoading(false);
     }
@@ -241,7 +242,7 @@ const AdminComentariosDoProjeto: React.FC = () => {
           message.success("Comentário excluído com sucesso!");
           fetchData(); // Recarrega a árvore de comentários
         } catch (error: any) {
-          message.error(error.message || "Falha ao excluir comentário.");
+          message.error(getErrorMessage(error, "Falha ao excluir comentário."));
         } finally {
           setIsActionLoading(false);
         }
@@ -260,7 +261,7 @@ const AdminComentariosDoProjeto: React.FC = () => {
   const totalCount = allAvaliacoes.length;
   const paginatedAvaliacoes = allAvaliacoes.slice(
     (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    currentPage * PAGE_SIZE,
   );
 
   return (

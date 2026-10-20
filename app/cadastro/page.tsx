@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/http";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,7 +93,7 @@ export default function Cadastro() {
       await registerUser(userData);
       addNotification(
         "Cadastro realizado com sucesso! Para finalizar, verifique seu email.",
-        "success"
+        "success",
       );
       setTimeout(() => {
         window.location.href = "/login";
@@ -100,9 +101,9 @@ export default function Cadastro() {
     } catch (err) {
       let errorMessage = "Erro ao cadastrar. Verifique seus dados.";
       if (err instanceof AxiosError && err.response) {
-        errorMessage = err.response.data.message || errorMessage;
+        errorMessage = err.response.data?.message || errorMessage;
       } else if (err instanceof Error) {
-        errorMessage = err.message || errorMessage;
+        errorMessage = getErrorMessage(err, errorMessage);
       }
       addNotification(errorMessage, "error");
       console.error(err);
