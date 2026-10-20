@@ -8,16 +8,6 @@ import {
 } from "@/lib/http";
 import React, { useState, useEffect, useCallback } from "react";
 import { Row, Modal, message, Spin, Typography, Input } from "antd";
-import {
-  Home,
-  Database,
-  Newspaper,
-  GraduationCap,
-  MessageSquare,
-  Users,
-  BarChart3,
-} from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getPendingAdminRequests } from "@/lib/api";
 import AdminProjetoModal from "@/components/AdminProjetoModal";
@@ -27,10 +17,7 @@ import {
   StatusProjeto,
 } from "@/components/admin/dashboard/DashboardConstants";
 import { DashboardListCard } from "@/components/admin/dashboard/DashboardListCard";
-import {
-  AdminPageHeader,
-  headerButtonClass,
-} from "@/components/admin/AdminPageHeader";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ProjectDetailsModal } from "@/components/admin/dashboard/ProjectDetailsModal";
 
 const { TextArea } = Input;
@@ -63,45 +50,6 @@ const AdminDashboard: React.FC = () => {
     atualizacoes: 1,
     exclusoes: 1,
   });
-
-  const atalhos = [
-    {
-      href: "/admin/projetos-ativos",
-      label: "Projetos Ativos",
-      desc: "Editar, ocultar e exportar",
-      icon: <Database className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/usuarios",
-      label: "Usuários",
-      desc: "Contas, senhas e status",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/comentarios",
-      label: "Comentários",
-      desc: "Moderar avaliações",
-      icon: <MessageSquare className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/sustentai",
-      label: "SustentAí",
-      desc: "Ações e newsletter",
-      icon: <Newspaper className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/cursos",
-      label: "Cursos (Espaço ODS)",
-      desc: "Gerenciar cursos",
-      icon: <GraduationCap className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/indicadores",
-      label: "Indicadores",
-      desc: "Números da plataforma",
-      icon: <BarChart3 className="h-5 w-5" />,
-    },
-  ];
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -237,22 +185,11 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <AdminPageHeader
           title="Painel de Administração"
           subtitle="Analise as solicitações pendentes e acesse as áreas de gestão da plataforma."
-          actions={
-            <Link
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={headerButtonClass}
-            >
-              <Home className="h-4 w-4" />
-              Ir para o site
-            </Link>
-          }
           stats={[
             { label: "Novos cadastros", value: data.cadastros.length },
             { label: "Atualizações", value: data.atualizacoes.length },
@@ -266,31 +203,6 @@ const AdminDashboard: React.FC = () => {
             },
           ]}
         />
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
-            Acesso rápido
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {atalhos.map((a) => (
-              <Link
-                key={a.href}
-                href={a.href}
-                className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-              >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                  {a.icon}
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-semibold text-gray-800">
-                    {a.label}
-                  </span>
-                  <span className="block text-xs text-gray-500">{a.desc}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
