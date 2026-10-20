@@ -9,11 +9,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
+  Building2,
+  CheckCircle2,
   Eye,
   EyeOff,
   Loader2,
   Lock,
-  ShieldCheck,
+  LogIn,
   User,
 } from "lucide-react";
 
@@ -72,155 +74,178 @@ const AdminLoginPage: React.FC = () => {
   };
 
   const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-gray-50/60 py-3 pl-11 pr-11 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all duration-200 focus:border-[hsl(339_65%_53%)] focus:bg-white focus:ring-4 focus:ring-[hsl(339_65%_53%)]/15 disabled:opacity-60";
+    "w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-11 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-primary/15 disabled:opacity-60";
+  const labelClass = "text-xs font-bold uppercase tracking-wider text-gray-700";
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       {/* Painel de marca */}
-      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[hsl(339_65%_30%)] via-primary to-[hsl(339_75%_68%)] lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full border-[48px] border-white/10" />
-        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#2b0a1c] via-[#5a1237] to-[#1b1030] lg:flex lg:flex-col lg:justify-between lg:p-14">
+        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/30 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 -right-40 h-[28rem] w-[28rem] rounded-full border-[56px] border-white/5" />
+        <div className="pointer-events-none absolute bottom-24 right-24 h-64 w-64 rounded-full bg-fuchsia-500/20 blur-3xl" />
 
-        <Link
-          href="/"
-          className="relative flex w-fit items-center gap-2 text-sm text-white/80 transition-colors hover:text-white"
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative mx-auto rounded-2xl border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-md"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar ao site
-        </Link>
+          <Image
+            src="/logo_aquitemods.png"
+            alt="Logo AquiTemODS"
+            width={170}
+            height={170}
+            priority
+          />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative max-w-md text-white"
+          className="relative mx-auto max-w-xl text-center text-white"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium backdrop-blur">
-            <ShieldCheck className="h-4 w-4" />
-            Área restrita
-          </div>
-          <h1 className="text-4xl font-bold leading-tight">
-            Painel do Administrador
+          <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight">
+            Painel de Gestão do{" "}
+            <span className="bg-gradient-to-r from-[hsl(339_90%_70%)] to-[hsl(30_95%_65%)] bg-clip-text text-transparent">
+              AquiTemODS
+            </span>
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-white/80">
-            Gerencie projetos, cursos, usuários e indicadores da plataforma
-            AquiTemODS em um só lugar.
+          <p className="mt-6 text-lg leading-relaxed text-white/80">
+            Plataforma municipal para aprovação de projetos, moderação de
+            avaliações, gestão de usuários e acompanhamento dos indicadores das
+            ODS.
           </p>
+
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {["Aprovação de Projetos", "Indicadores e Relatórios"].map((t) => (
+              <span
+                key={t}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium backdrop-blur"
+              >
+                <CheckCircle2 className="h-4 w-4 text-[hsl(339_90%_70%)]" />
+                {t}
+              </span>
+            ))}
+          </div>
         </motion.div>
 
-        <p className="relative text-xs text-white/60">
-          © {new Date().getFullYear()} AquiTemODS
-        </p>
+        <div className="relative flex items-center justify-between border-t border-white/15 pt-5 text-xs text-white/70">
+          <span className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Prefeitura Municipal de Saquarema
+          </span>
+          <span>SMGS • LabISA</span>
+        </div>
       </aside>
 
       {/* Formulário */}
-      <main className="relative flex items-center justify-center bg-gray-50 px-6 py-12">
+      <main className="flex flex-col bg-white px-6 py-8 sm:px-12 lg:px-16">
         <Link
           href="/"
-          className="absolute left-6 top-6 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-[hsl(339_65%_53%)] lg:hidden"
+          className="flex w-fit items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" />
-          Voltar
+          Voltar ao portal
         </Link>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md rounded-3xl border border-[hsl(339_65%_53%)]/20 bg-white p-8 shadow-xl sm:p-10"
-        >
-          <div className="mb-8 text-center">
-            <Image
-              src="/logo_aquitemods.png"
-              alt="Logo AquiTemODS"
-              width={120}
-              height={120}
-              className="mx-auto mb-5"
-              priority
-            />
-            <h2 className="text-2xl font-bold text-gray-900">
-              Bem-vindo de volta
+        <div className="flex flex-1 items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto w-full max-w-md"
+          >
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+              <Lock className="h-5 w-5" />
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
+              Acesso Administrativo
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Entre com suas credenciais de administrador.
+            <p className="mt-2 text-sm text-gray-500">
+              Informe suas credenciais para gerenciar a plataforma.
             </p>
-          </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-2">
-              <label
-                htmlFor="username"
-                className="text-sm font-medium text-gray-700"
-              >
-                Usuário
-              </label>
-              <div className="relative">
-                <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="username"
-                  type="text"
-                  required
-                  autoComplete="username"
-                  placeholder="Seu nome de usuário"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={loading}
-                  className={inputClass}
-                />
+            <form onSubmit={handleLogin} className="mt-8 space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="username" className={labelClass}>
+                  Usuário ou e-mail
+                </label>
+                <div className="relative">
+                  <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="username"
+                    type="text"
+                    required
+                    autoComplete="username"
+                    placeholder="Seu usuário cadastrado"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    disabled={loading}
+                    className={inputClass}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-700"
-              >
-                Senha
-              </label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  placeholder="Sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  className={inputClass}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:text-[hsl(339_65%_53%)]"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
+              <div className="space-y-2">
+                <label htmlFor="password" className={labelClass}>
+                  Senha
+                </label>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Sua senha de acesso"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={
+                      showPassword ? "Ocultar senha" : "Mostrar senha"
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:text-primary"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-[hsl(339_65%_43%)] py-3 text-sm font-semibold text-white shadow-lg shadow-[hsl(339_65%_53%)]/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-[hsl(339_65%_53%)]/30 disabled:translate-y-0 disabled:opacity-70"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Entrando...
-                </>
-              ) : (
-                "Entrar"
-              )}
-            </button>
-          </form>
-        </motion.div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-[hsl(339_65%_43%)] py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-primary/30 disabled:translate-y-0 disabled:opacity-70"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Entrando...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4" />
+                    Entrar no Painel
+                  </>
+                )}
+              </button>
+            </form>
+          </motion.div>
+        </div>
+
+        <p className="text-center text-xs text-gray-500">
+          © {new Date().getFullYear()} AquiTemODS • Prefeitura de Saquarema
+        </p>
       </main>
     </div>
   );
