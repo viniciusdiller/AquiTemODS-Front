@@ -64,7 +64,8 @@ export default function CategoryPage() {
   //TRAVA DE SEGURANÇA PARA ENVIAR APENAS 1 REQUISIÇÃO PARA O BACKEND
   const jaContabilizou = useRef(false);
   useEffect(() => {
-    if (params.slug && !jaContabilizou.current) {
+    // Só contabiliza categorias reais, para slugs inválidos não poluírem os indicadores
+    if (params.slug && category && !jaContabilizou.current) {
       jaContabilizou.current = true;
 
       fetch(
@@ -74,7 +75,7 @@ export default function CategoryPage() {
         },
       ).catch((err) => console.error("Falha silenciosa no contador:", err));
     }
-  }, [params.slug]);
+  }, [params.slug, category]);
 
   const filteredProjetos = useMemo(
     () =>

@@ -53,6 +53,21 @@ export const getOdsColor = (odsName: string) => {
   return ODS_COLORS[numero] || "#8884d8";
 };
 
+/** Mantém só as ODS válidas (1 a 18), em ordem numérica. */
+export const filtrarOdsValidas = <T extends { ods: string }>(data?: T[]): T[] =>
+  (data ?? [])
+    .filter((d) => /^ODS\s*\d{1,2}$/i.test(String(d.ods).trim()))
+    .filter((d) => {
+      const n = parseInt(String(d.ods).replace(/\D/g, ""));
+      return n >= 1 && n <= 18;
+    })
+    .sort(
+      (a, b) =>
+        parseInt(a.ods.replace(/\D/g, "")) - parseInt(b.ods.replace(/\D/g, "")),
+    );
+
+const tickOds = (v: string) => String(v).replace(/\D/g, "");
+
 const hoverCursorColor = { fill: "#d1d5db", opacity: 0.15 };
 
 // Configurações do Shadcn UI Charts
@@ -70,133 +85,149 @@ const chartConfigEscala = {
 } satisfies ChartConfig;
 
 // --- 1. Gráfico de Oferta de Projetos ---
-export const OfertaProjetosChart = ({ data }: { data: any[] }) => (
-  <Card
-    title={
-      <>
-        <BulbOutlined className="mr-2 text-primary" />
-        Oferta de Projetos (Cadastrados)
-      </>
-    }
-    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
-    size="small"
-    bordered={false}
-  >
-    <Text type="secondary" className="block mb-4 text-xs">
-      Quantidade de projetos ativos em cada ODS.
-    </Text>
-    <ChartContainer config={chartConfigProjetos} className="h-[300px] w-full">
-      <BarChart
-        accessibilityLayer
-        data={data}
-        margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
-        barSize={24}
-      >
-        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#eee" />
-        <XAxis
-          dataKey="ods"
-          tickLine={false}
-          axisLine={false}
-          tick={{ fontSize: 11, fill: "#666" }}
-          dy={10}
-          interval={0}
-          angle={-45}
-          textAnchor="end"
-          height={60}
-        />
-        <YAxis
-          allowDecimals={false}
-          width={30}
-          tick={{ fontSize: 11, fill: "#666" }}
-        />
-        <ChartTooltip
-          cursor={hoverCursorColor}
-          content={
-            <ChartTooltipContent
-              indicator="line"
-              className="bg-white border border-gray-200 shadow-xl"
-            />
-          }
-        />
-        <Bar dataKey="qtd" radius={[4, 4, 0, 0]}>
-          <LabelList
-            dataKey="qtd"
-            position="top"
-            style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+export const OfertaProjetosChart = ({ data: raw }: { data: any[] }) => {
+  const data = filtrarOdsValidas(raw);
+  return (
+    <Card
+      title={
+        <>
+          <BulbOutlined className="mr-2 text-primary" />
+          Oferta de Projetos (Cadastrados)
+        </>
+      }
+      className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
+      size="small"
+      bordered={false}
+    >
+      <Text type="secondary" className="block mb-4 text-xs">
+        Quantidade de projetos ativos em cada ODS.
+      </Text>
+      <ChartContainer config={chartConfigProjetos} className="h-[300px] w-full">
+        <BarChart
+          accessibilityLayer
+          data={data}
+          margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
+          barSize={20}
+        >
+          <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#eee" />
+          <XAxis
+            dataKey="ods"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 11, fill: "#666" }}
+            dy={4}
+            interval={0}
+            tickFormatter={tickOds}
+            height={40}
+            label={{
+              value: "ODS",
+              position: "insideBottom",
+              offset: -2,
+              style: { fontSize: 11, fill: "#9ca3af" },
+            }}
           />
-          {data?.map((entry: any, index: number) => (
-            <Cell key={`cell-${index}`} fill={getOdsColor(entry.ods)} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ChartContainer>
-  </Card>
-);
+          <YAxis
+            allowDecimals={false}
+            width={30}
+            tick={{ fontSize: 11, fill: "#666" }}
+          />
+          <ChartTooltip
+            cursor={hoverCursorColor}
+            content={
+              <ChartTooltipContent
+                indicator="line"
+                className="bg-white border border-gray-200 shadow-xl"
+              />
+            }
+          />
+          <Bar dataKey="qtd" radius={[4, 4, 0, 0]}>
+            <LabelList
+              dataKey="qtd"
+              position="top"
+              style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+            />
+            {data?.map((entry: any, index: number) => (
+              <Cell key={`cell-${index}`} fill={getOdsColor(entry.ods)} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ChartContainer>
+    </Card>
+  );
+};
 
 // --- 2. Gráfico de Interesse Público ---
-export const InteressePublicoChart = ({ data }: { data: any[] }) => (
-  <Card
-    title={
-      <>
-        <BarChartOutlined className="mr-2 text-purple-600" />
-        Interesse Público (Acessos)
-      </>
-    }
-    className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
-    size="small"
-    bordered={false}
-  >
-    <Text type="secondary" className="block mb-4 text-xs">
-      Categorias mais visitadas pela população.
-    </Text>
-    <ChartContainer config={chartConfigViews} className="h-[300px] w-full">
-      <BarChart
-        accessibilityLayer
-        data={data}
-        margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
-        barSize={24}
-      >
-        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#eee" />
-        <XAxis
-          dataKey="ods"
-          tickLine={false}
-          axisLine={false}
-          tick={{ fontSize: 11, fill: "#666" }}
-          dy={10}
-          interval={0}
-          height={60}
-          angle={-45}
-          textAnchor="end"
-        />
-        <YAxis
-          hide
-          allowDecimals={false}
-          width={30}
-          tick={{ fontSize: 11, fill: "#666" }}
-        />
-        <ChartTooltip
-          cursor={hoverCursorColor}
-          content={
-            <ChartTooltipContent
-              indicator="line"
-              className="bg-white border border-gray-200 shadow-xl"
-            />
-          }
-        />
-        <Bar dataKey="views" radius={[4, 4, 0, 0]}>
-          <LabelList
-            dataKey="views"
-            position="top"
-            style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+export const InteressePublicoChart = ({ data: raw }: { data: any[] }) => {
+  const data = filtrarOdsValidas(raw);
+  return (
+    <Card
+      title={
+        <>
+          <BarChartOutlined className="mr-2 text-primary" />
+          Interesse Público (Acessos)
+        </>
+      }
+      className="h-full rounded-2xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md"
+      size="small"
+      bordered={false}
+    >
+      <Text type="secondary" className="block mb-4 text-xs">
+        Categorias mais visitadas pela população.
+      </Text>
+      <ChartContainer config={chartConfigViews} className="h-[300px] w-full">
+        <BarChart
+          accessibilityLayer
+          data={data}
+          margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
+          barSize={20}
+        >
+          <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#eee" />
+          <XAxis
+            dataKey="ods"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 11, fill: "#666" }}
+            dy={4}
+            interval={0}
+            tickFormatter={tickOds}
+            height={40}
+            label={{
+              value: "ODS",
+              position: "insideBottom",
+              offset: -2,
+              style: { fontSize: 11, fill: "#9ca3af" },
+            }}
           />
-          {data?.map((entry: any, index: number) => (
-            <Cell key={`cell-${index}`} fill={getOdsColor(entry.ods)} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ChartContainer>
-  </Card>
-);
+          <YAxis
+            hide
+            allowDecimals={false}
+            width={30}
+            tick={{ fontSize: 11, fill: "#666" }}
+          />
+          <ChartTooltip
+            cursor={hoverCursorColor}
+            content={
+              <ChartTooltipContent
+                indicator="line"
+                className="bg-white border border-gray-200 shadow-xl"
+              />
+            }
+          />
+          <Bar dataKey="views" radius={[4, 4, 0, 0]}>
+            <LabelList
+              dataKey="views"
+              position="top"
+              style={{ fill: "#666", fontWeight: "bold", fontSize: 12 }}
+            />
+            {data?.map((entry: any, index: number) => (
+              <Cell key={`cell-${index}`} fill={getOdsColor(entry.ods)} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ChartContainer>
+    </Card>
+  );
+};
 
 // --- 3. Gráfico de Apoio ao Planejamento ---
 export const ApoioPlanejamentoChart = ({ data }: { data: any[] }) => (
@@ -282,7 +313,7 @@ export const EscalaImpactoChart = ({ data }: { data: any[] }) => (
           tickLine={false}
           axisLine={false}
           tick={{ fontSize: 12, fill: "#666" }}
-          dy={10}
+          dy={4}
         />
         <YAxis hide />
         <ChartTooltip
