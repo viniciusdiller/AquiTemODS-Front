@@ -6,9 +6,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Toaster as RadixToaster } from "@/components/ui/toaster";
 import { ConditionalFooter } from "@/components/ConditionalFooter";
-import AccessibilityStyles from "@/components/AccessibilityStyles";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
-import { ConditionalAccessibility } from "@/components/ConditionalAccessibility";
+import AcessibilidadeSaqua from "@/components/AcessibilidadeSaqua";
 import "react-quill/dist/quill.snow.css";
 import "@/app/cadastro-projeto/quill-styles.css";
 
@@ -70,9 +69,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <AccessibilityStyles />
-      </head>
       <body
         className={`${poppins.variable} bg-white flex flex-col min-h-screen`}
       >
@@ -106,7 +102,7 @@ export default function RootLayout({
             <SonnerToaster richColors />
             {/* Toaster do sistema interno (Radix) para use-toast hook */}
             <RadixToaster />
-            <ConditionalAccessibility />
+            <AcessibilidadeSaqua />
           </AuthProvider>
         </ConfigProvider>
       </body>
