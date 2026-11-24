@@ -73,6 +73,7 @@
     "react-quill": "^2.0.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
+    "sienna-accessibility": "2.1.0",
     "sonner": "^1.7.1",
     "styled-components": "^6.1.19",
     "swiper": "^11.2.10",
