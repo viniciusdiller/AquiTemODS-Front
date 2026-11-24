@@ -170,11 +170,34 @@ export function useAcessibilidadeVendors(
       window.setTimeout(() => elemento.classList.remove("vlibras-links"), 0);
     };
 
+    const ignorarCliqueNoSiennaUmaVez = () => {
+      const fnSienna = window.__asw__onClickScreenReader;
+      if (!fnSienna) return;
+      document.removeEventListener("click", fnSienna, true);
+      window.setTimeout(() => {
+        if (
+          leitorParagrafoLigado() &&
+          window.__asw__onClickScreenReader === fnSienna
+        ) {
+          document.addEventListener("click", fnSienna, true);
+        }
+      }, 0);
+    };
+
     const aoCapturarCliqueNaJanela = (evento: MouseEvent) => {
       const alvo = evento.target as HTMLElement | null;
       if (!alvo) return;
 
-      const dentroDoMenuAcessibilidade = !!alvo.closest("#acesso");
+      const dentroDoVLibras = !!alvo.closest(
+        "#vlibras-app-root, #vlibras-access-wrapper",
+      );
+      const dentroDoMenuAcessibilidade =
+        !!alvo.closest("#acesso") ||
+        !!alvo.closest(".asw-container") ||
+        !!alvo.closest(".asw-menu") ||
+        !!alvo.closest(".asw-menu-btn") ||
+        !!alvo.closest(".asw-widget") ||
+        !!alvo.closest(".asw-structure-modal");
       const interativo = alvo.closest<HTMLElement>(
         "a[href], button, [role='button'], input, select, label",
       );
@@ -190,13 +213,11 @@ export function useAcessibilidadeVendors(
       }
 
       if (!leitorParagrafoLigado()) return;
-      if (
-        dentroDoMenuAcessibilidade ||
-        alvo.closest(".asw-menu") ||
-        alvo.closest(".asw-menu-btn") ||
-        alvo.closest(".asw-widget") ||
-        alvo.closest(".asw-structure-modal")
-      ) {
+      if (dentroDoVLibras) {
+        ignorarCliqueNoSiennaUmaVez();
+        return;
+      }
+      if (dentroDoMenuAcessibilidade) {
         return;
       }
 
@@ -211,19 +232,7 @@ export function useAcessibilidadeVendors(
         window.clearTimeout(timerInterativoRef.current);
         window.speechSynthesis?.cancel();
         limparDestaquesLeituraSienna();
-
-        const funcaoSienna = window.__asw__onClickScreenReader;
-        if (funcaoSienna) {
-          document.removeEventListener("click", funcaoSienna, true);
-          window.setTimeout(() => {
-            if (
-              leitorParagrafoLigado() &&
-              window.__asw__onClickScreenReader === funcaoSienna
-            ) {
-              document.addEventListener("click", funcaoSienna, true);
-            }
-          }, 0);
-        }
+        ignorarCliqueNoSiennaUmaVez();
         return;
       }
 
