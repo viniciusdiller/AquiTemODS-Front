@@ -1,17 +1,31 @@
 /**
- * Lógica pura e helpers de DOM para o menu de acessibilidade
- * (VLibras, Sienna Accessibility 2.1.0 e leitura em voz alta via Web Speech API).
+ * Menu de acessibilidade (Libras, ajustes de leitura, ouvir por parágrafo e
+ * ouvir a página). Funções puras / de DOM usadas por `components/AcessibilidadeSaqua`
+ * e pelos hooks `use-acessibilidade-vendors` e `use-leitor-pagina`.
+ *
+ * O Sienna (npm `sienna-accessibility`, fixo em 2.1.0) e o VLibras (script do
+ * governo) manipulam o DOM por seletores internos (`.asw-*`, `#vlibras-*`).
+ * Os ajustes que fazemos sobre eles ficam concentrados aqui.
  */
 
 export const VLIBRAS_SCRIPT_URL = "https://vlibras.gov.br/app/vlibras-plugin.js";
 export const VLIBRAS_ROOT_PATH = "https://vlibras.gov.br/app";
 export const CHAVE_DICA_LIBRAS = "acesso-dica-libras";
-
 export const MENSAGEM_LIBRAS_INDISPONIVEL =
-  "O VLibras está indisponível no momento. Tente novamente em instantes.";
+  "Libras indisponível no momento. Recarregue a página ou tente novamente mais tarde.";
 export const MENSAGEM_DICA_LIBRAS =
   "Dica: arraste o avatar pela barra azul para tirá-lo da frente.";
 
+/** O menu não aparece no painel administrativo (/admin e subrotas). */
+export function rotaSemMenu(pathname: string): boolean {
+  return pathname === "/admin" || pathname.startsWith("/admin/");
+}
+
+// ---------------------------------------------------------------------------
+// Ouvir a página (Web Speech API)
+// ---------------------------------------------------------------------------
+
+/** O que não se lê: escondido, scripts, o próprio menu e os campos de seleção. */
 export const IGNORAR_NA_LEITURA = [
   "[aria-hidden='true']",
   "[hidden]",
@@ -25,31 +39,26 @@ export const IGNORAR_NA_LEITURA = [
   "[data-acesso-ignorar]",
 ].join(",");
 
+/** Caracteres por fala: o Chrome corta falas longas. */
 export const TAMANHO_TRECHO = 220;
 
-const SELETOR_BLOCO_LEITURA =
+const BLOCOS_DE_TEXTO =
   "h1, h2, h3, h4, h5, h6, p, li, dt, dd, button, a, td, th, small, strong";
 
-/** O menu não aparece no painel administrativo (/admin e subrotas). */
-export function rotaSemMenu(pathname: string): boolean {
-  return pathname === "/admin" || pathname.startsWith("/admin/");
-}
-
-/** Retorna o <main> visível da página; se não existir, usa document.body. */
+/** O <main> visível; sem ele, a página inteira. */
 export function conteudoPrincipal(doc: Document): HTMLElement {
-  const mains = Array.from(doc.querySelectorAll<HTMLElement>("main"));
-  return mains.find((el) => !el.closest("[hidden]")) ?? doc.body;
+  const principais = Array.from(doc.querySelectorAll<HTMLElement>("main"));
+  return (
+    principais.find((principal) => !principal.closest("[hidden]")) ?? doc.body
+  );
 }
 
-/**
- * Extrai o texto visível do conteúdo principal em frases, ignorando elementos
- * ocultos, scripts, seletores e o próprio menu de acessibilidade.
- */
+/** Junta o texto visível da raiz em frases, uma por bloco (título, parágrafo, item...). */
 export function textoDaPagina(doc: Document): string {
-  const raiz = conteudoPrincipal(doc);
-  if (!raiz) return "";
-
-  const percorrer = doc.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+  const percorrer = doc.createTreeWalker(
+    conteudoPrincipal(doc),
+    NodeFilter.SHOW_TEXT,
+  );
   const blocos: string[] = [];
   let blocoAtual: Element | null = null;
   let paiAnterior: Element | null = null;
@@ -60,7 +69,7 @@ export function textoDaPagina(doc: Document): string {
     const conteudo = (noDeTexto.nodeValue ?? "").replace(/\s+/g, " ");
     if (!conteudo.trim() || !pai || pai.closest(IGNORAR_NA_LEITURA)) continue;
 
-    const bloco = pai.closest(SELETOR_BLOCO_LEITURA) ?? pai;
+    const bloco = pai.closest(BLOCOS_DE_TEXTO) ?? pai;
     if (bloco !== blocoAtual) {
       blocos.push("");
       blocoAtual = bloco;
@@ -68,6 +77,7 @@ export function textoDaPagina(doc: Document): string {
       pai !== paiAnterior &&
       !/[\s,.;:]$/.test(blocos[blocos.length - 1])
     ) {
+      // Textos de elementos diferentes no mesmo bloco ganham vírgula, para a voz não emendar as palavras.
       blocos[blocos.length - 1] += ", ";
     }
 
@@ -82,84 +92,79 @@ export function textoDaPagina(doc: Document): string {
     .join(" ");
 }
 
-/** Divide um texto em trechos curtos respeitando fins de frase até o limite. */
-export function dividirEmTrechos(
-  texto: string,
-  tamanhoMaximo = TAMANHO_TRECHO,
-): string[] {
-  const limpo = texto.trim();
-  if (!limpo) return [];
-
-  const frases = limpo.match(/[^.!?…]+[.!?…]*\s*/g) ?? [];
+/** Corta o texto em trechos curtos, sempre no fim de uma frase. */
+export function dividirEmTrechos(texto: string): string[] {
+  const frases = texto.match(/[^.!?…]+[.!?…]*\s*/g) ?? [];
   const lista: string[] = [];
   let atual = "";
 
-  for (const frase of frases) {
-    if ((atual + frase).length > tamanhoMaximo && atual) {
+  frases.forEach((frase) => {
+    if ((atual + frase).length > TAMANHO_TRECHO && atual) {
       lista.push(atual.trim());
       atual = "";
     }
     atual += frase;
-  }
-
+  });
   if (atual.trim()) lista.push(atual.trim());
+
   return lista;
 }
 
-/** Extrai e divide em trechos o conteúdo principal da página. */
 export function extrairTrechosDaPagina(doc: Document): string[] {
   return dividirEmTrechos(textoDaPagina(doc));
 }
 
+// ---------------------------------------------------------------------------
+// Sienna
+// ---------------------------------------------------------------------------
+
 /**
- * Correções de runtime para o Sienna 2.1.0:
- * - Polyfill de SVGElement.prototype.innerText (fallback para textContent).
- * - Setter em window.__asw__onClickScreenReader que remove o listener click
- *   (capture) anterior antes de registrar um novo, evitando vazamento.
+ * O Sienna 2.1.0 registra um listener de clique no `document` a cada vez que o
+ * leitor de tela é ligado e não remove o anterior. Aqui, ao trocar a função em
+ * `window.__asw__onClickScreenReader`, o listener antigo sai. Também dá
+ * `innerText` aos SVGs, que o Sienna lê e o navegador não tem.
  */
-export function instalarProtetorListenerSienna(win: Window): void {
-  const svgCtor = (win as unknown as { SVGElement?: typeof SVGElement })
-    .SVGElement;
-  if (svgCtor?.prototype && !("innerText" in svgCtor.prototype)) {
-    Object.defineProperty(svgCtor.prototype, "innerText", {
+export function instalarProtetorListenerSienna(win: Window = window): void {
+  const SVG = (win as Window & typeof globalThis).SVGElement;
+  if (SVG && !("innerText" in SVG.prototype)) {
+    Object.defineProperty(SVG.prototype, "innerText", {
       configurable: true,
+      enumerable: false,
       get(this: SVGElement) {
-        return this.textContent ?? "";
-      },
-      set(this: SVGElement, valor: string) {
-        this.textContent = valor;
+        return this.textContent || "";
       },
     });
   }
 
-  const desc = Object.getOwnPropertyDescriptor(win, "__asw__onClickScreenReader");
-  if (desc?.set) return;
+  const descritor = Object.getOwnPropertyDescriptor(
+    win,
+    "__asw__onClickScreenReader",
+  );
+  if (descritor?.set) return;
 
-  let listenerAtual: EventListener | undefined = win.__asw__onClickScreenReader;
+  let atual = win.__asw__onClickScreenReader;
   Object.defineProperty(win, "__asw__onClickScreenReader", {
     configurable: true,
     enumerable: true,
     get() {
-      return listenerAtual;
+      return atual;
     },
-    set(novoListener: EventListener | undefined) {
-      if (listenerAtual && listenerAtual !== novoListener) {
-        win.document.removeEventListener("click", listenerAtual, true);
+    set(nova: ((e: MouseEvent) => void) | undefined) {
+      if (atual && atual !== nova) {
+        win.document.removeEventListener("click", atual, true);
       }
-      listenerAtual = novoListener;
+      atual = nova;
     },
   });
 }
 
-/** Lê a escala de fonte salva pelo Sienna no localStorage (padrão 1). */
+/** Tamanho do texto que o usuário pediu ao Sienna (1 = 100%). */
 export function escalaDaFonte(
-  storage: Pick<Storage, "getItem"> | null | undefined,
+  storage: Pick<Storage, "getItem"> | null = localStorage,
 ): number {
   if (!storage) return 1;
   try {
-    const salvo = JSON.parse(storage.getItem("asw-user-settings") || "{}") as {
-      states?: { fontSize?: unknown };
-    };
+    const salvo = JSON.parse(storage.getItem("asw-user-settings") || "{}");
     return Number(salvo?.states?.fontSize) || 1;
   } catch {
     return 1;
@@ -167,16 +172,13 @@ export function escalaDaFonte(
 }
 
 /**
- * Quando fontSize === 1, remove font-size inline e data-asw-org-font-size
- * gravados pelo Sienna 2.1.0 para preservar tipografia fluida do CSS.
+ * O Sienna, ao iniciar e a cada ajuste de fonte, grava o tamanho de todo título,
+ * parágrafo, link e span em pixels no elemento, mesmo em 100%. Em 100% (ninguém
+ * pediu fonte maior) os tamanhos voltam a ser os do CSS, para textos fluidos
+ * (clamp, vw) não ficarem presos num valor.
  */
-export function liberarTamanhosSienna(
-  doc: Document,
-  storage?: Pick<Storage, "getItem"> | null,
-): void {
-  const store = storage === undefined ? doc.defaultView?.localStorage : storage;
-  if (escalaDaFonte(store) !== 1) return;
-
+export function liberarTamanhosSienna(doc: Document = document): void {
+  if (escalaDaFonte() !== 1) return;
   doc
     .querySelectorAll<HTMLElement>("[data-asw-org-font-size]")
     .forEach((elemento) => {
@@ -185,33 +187,29 @@ export function liberarTamanhosSienna(
     });
 }
 
-/** Restaura a cor original salva em data-asw-orgcolor pelo leitor do Sienna. */
-export function restaurarCorElementoSienna(el: Element): void {
-  if (!(el instanceof HTMLElement)) return;
-  if (!el.hasAttribute("data-asw-orgcolor")) return;
-
-  const corOriginal = el.getAttribute("data-asw-orgcolor") ?? "";
-  if (corOriginal) {
-    el.style.color = corOriginal;
-  } else {
-    el.style.removeProperty("color");
-  }
-  el.removeAttribute("data-asw-orgcolor");
+/** Devolve ao elemento a cor que ele tinha antes de o Sienna destacá-lo. */
+export function restaurarCorElementoSienna(elemento: HTMLElement): void {
+  if (!elemento.hasAttribute("data-asw-orgcolor")) return;
+  const corOriginal = elemento.getAttribute("data-asw-orgcolor");
+  if (corOriginal) elemento.style.color = corOriginal;
+  else elemento.style.removeProperty("color");
+  elemento.removeAttribute("data-asw-orgcolor");
 }
 
-/** Remove destaques .asw-reading e restaura cores alteradas pelo Sienna. */
-export function limparDestaquesLeituraSienna(doc: Document): void {
-  doc.querySelectorAll(".asw-reading").forEach((el) => {
-    el.classList.remove("asw-reading");
-    restaurarCorElementoSienna(el);
+export function limparDestaquesLeituraSienna(doc: Document = document): void {
+  doc.querySelectorAll<HTMLElement>(".asw-reading").forEach((elemento) => {
+    elemento.classList.remove("asw-reading");
+    restaurarCorElementoSienna(elemento);
   });
-  doc.querySelectorAll("[data-asw-orgcolor]").forEach((el) => {
-    restaurarCorElementoSienna(el);
-  });
+  doc
+    .querySelectorAll<HTMLElement>("[data-asw-orgcolor]")
+    .forEach((elemento) => {
+      restaurarCorElementoSienna(elemento);
+    });
 }
 
-/** Traduz aria-label e title em inglês do menu .asw-menu do Sienna para pt-BR. */
-export function traduzirRotulosSienna(doc: Document): void {
+/** Rótulos em português: o Sienna deixa os de leitor de tela em inglês. */
+export function traduzirRotulosSienna(doc: Document = document): void {
   const menu = doc.querySelector<HTMLElement>(".asw-menu");
   if (!menu) return;
 
@@ -233,40 +231,32 @@ export function traduzirRotulosSienna(doc: Document): void {
       elemento.setAttribute("aria-label", "Idioma do menu");
       return;
     }
-    const textoBruto = elemento.innerText || elemento.textContent || "";
-    const texto = textoBruto.trim().split("\n")[0]?.trim();
+    // A primeira linha do texto que já aparece traduzido.
+    const texto = (elemento.innerText || elemento.textContent || "")
+      .trim()
+      .split("\n")[0];
     if (texto) elemento.setAttribute("aria-label", texto);
   });
 }
 
-/** Indica se o painel do Sienna está aberto na tela. */
-export function siennaAberto(doc: Document): boolean {
-  const menu = doc.querySelector<HTMLElement>(".asw-menu");
-  return Boolean(
-    menu && menu.parentElement && menu.parentElement.style.display !== "none",
-  );
+/** O menu do Sienna só existe no DOM depois do primeiro clique: abre e fecha para criá-lo. */
+export function garantirMenuSiennaNoDom(
+  doc: Document = document,
+): HTMLElement | null {
+  let menu = doc.querySelector<HTMLElement>(".asw-menu");
+  if (menu) return menu;
+
+  const botaoSienna = doc.querySelector<HTMLElement>(".asw-menu-btn");
+  if (!botaoSienna) return null;
+
+  botaoSienna.click();
+  menu = doc.querySelector<HTMLElement>(".asw-menu");
+  menu?.querySelector<HTMLElement>(".asw-menu-close")?.click();
+  return menu;
 }
 
-/**
- * Garante que .asw-menu exista no DOM (o Sienna o cria sob demanda no primeiro
- * clique em .asw-menu-btn), mantendo-o fechado caso não estivesse aberto.
- */
-export function garantirMenuSiennaNoDom(doc: Document): HTMLElement | null {
-  const existente = doc.querySelector<HTMLElement>(".asw-menu");
-  if (existente) return existente;
-
-  const botao = doc.querySelector<HTMLElement>(".asw-menu-btn");
-  if (!botao) return null;
-
-  botao.click();
-  const criado = doc.querySelector<HTMLElement>(".asw-menu");
-  if (criado && siennaAberto(doc)) {
-    const fechar = criado.querySelector<HTMLElement>(".asw-menu-close");
-    if (fechar) {
-      fechar.click();
-    } else {
-      botao.click();
-    }
-  }
-  return criado;
+/** O menu fica dentro de uma caixa que o Sienna mostra e esconde com `display`. */
+export function siennaAberto(doc: Document = document): boolean {
+  const menu = doc.querySelector<HTMLElement>(".asw-menu");
+  return !!menu && menu.parentElement?.style.display !== "none";
 }

@@ -1,46 +1,59 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { extrairTrechosDaPagina } from "@/lib/acessibilidade";
 
 export type SituacaoLeitura = "parado" | "lendo" | "pausado";
-export type VelocidadeLeitura = "0.75" | "1" | "1.25" | "1.5";
 
-const MENSAGEM_INICIAL =
-  "Lê em voz alta o conteúdo principal, sem menus nem rodapé.";
+/**
+ * "Ouvir página inteira": lê em voz alta o conteúdo principal (Web Speech API, pt-BR).
+ *  - o texto vem do <main> visível, em trechos curtos (o Chrome corta falas longas);
+ *  - "Pausar" interrompe e guarda o trecho; "Continuar" retoma desse trecho
+ *    (o pause() nativo não funciona no Chrome do Android);
+ *  - a leitura para ao trocar de rota e ao sair da página.
+ */
+export function useLeitorPagina(
+  painelRef: React.RefObject<HTMLElement>,
+  aoPerderFoco?: (novaSituacao: SituacaoLeitura) => void,
+) {
+  const pathname = usePathname();
 
-export interface OpcoesUseLeitorPagina {
-  pathname: string;
-  aoDevolverFoco?: (situacao: SituacaoLeitura) => void;
-}
-
-export function useLeitorPagina({
-  pathname,
-  aoDevolverFoco,
-}: OpcoesUseLeitorPagina) {
   const [suportaVoz, setSuportaVoz] = useState(false);
   const [situacao, setSituacao] = useState<SituacaoLeitura>("parado");
-  const [mensagemVoz, setMensagemVoz] = useState(MENSAGEM_INICIAL);
-  const [velocidade, setVelocidadeState] = useState<VelocidadeLeitura>("1");
+  const [mensagemVoz, setMensagemVoz] = useState("Pronto para ler a página.");
+  const [velocidade, setVelocidade] = useState("1");
 
   const trechosRef = useRef<string[]>([]);
   const posicaoRef = useRef(0);
-  const situacaoRef = useRef<SituacaoLeitura>("parado");
+  // Muda a cada cancelamento: o "fim" de uma fala cancelada é ignorado.
   const rodadaRef = useRef(0);
+  const situacaoRef = useRef<SituacaoLeitura>("parado");
+  const velocidadeRef = useRef("1");
   const vozRef = useRef<SpeechSynthesisVoice | null>(null);
-  const velocidadeRef = useRef<VelocidadeLeitura>("1");
-  const pathnameAnteriorRef = useRef(pathname);
-  const aoDevolverFocoRef = useRef(aoDevolverFoco);
 
   useEffect(() => {
-    aoDevolverFocoRef.current = aoDevolverFoco;
-  }, [aoDevolverFoco]);
+    if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window))
+      return;
+    setSuportaVoz(true);
+
+    // Voz pt-BR, se o sistema tiver; em alguns navegadores as vozes chegam depois.
+    const sintese = window.speechSynthesis;
+    const escolherVoz = () => {
+      const vozes = sintese.getVoices();
+      vozRef.current =
+        vozes.find((voz) => /^pt[-_]BR$/i.test(voz.lang)) ??
+        vozes.find((voz) => /^pt/i.test(voz.lang)) ??
+        null;
+    };
+    escolherVoz();
+    sintese.addEventListener?.("voiceschanged", escolherVoz);
+    return () => sintese.removeEventListener?.("voiceschanged", escolherVoz);
+  }, []);
 
   const silenciar = useCallback(() => {
     rodadaRef.current += 1;
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   }, []);
 
   const atualizarSituacao = useCallback(
@@ -48,52 +61,48 @@ export function useLeitorPagina({
       situacaoRef.current = novaSituacao;
       setSituacao(novaSituacao);
       setMensagemVoz(mensagem);
-      if (typeof window !== "undefined") {
-        window.requestAnimationFrame(() => {
-          aoDevolverFocoRef.current?.(novaSituacao);
-        });
-      }
+
+      // Se o botão em foco ficou desativado, o foco passa para o que faz sentido.
+      window.setTimeout(() => {
+        const focado = document.activeElement as HTMLButtonElement | null;
+        if (focado?.disabled && painelRef.current?.contains(focado)) {
+          aoPerderFoco?.(novaSituacao);
+        }
+      }, 0);
     },
-    [],
+    [aoPerderFoco, painelRef],
   );
 
-  const parar = useCallback(
-    (mensagem = "Leitura parada.") => {
+  const pararLeitura = useCallback(
+    (mensagem?: string) => {
       silenciar();
       posicaoRef.current = 0;
-      atualizarSituacao("parado", mensagem);
+      atualizarSituacao("parado", mensagem || "Leitura parada.");
     },
     [atualizarSituacao, silenciar],
   );
 
-  const falar = useCallback(() => {
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window) ||
-      typeof window.SpeechSynthesisUtterance === "undefined"
-    ) {
-      return;
-    }
-
+  const falarTrechoAtual = useCallback(() => {
+    if (!("speechSynthesis" in window)) return;
     const trechos = trechosRef.current;
-    const indice = posicaoRef.current;
-    if (indice >= trechos.length) {
-      parar("Leitura concluída.");
+    const posicao = posicaoRef.current;
+
+    if (posicao >= trechos.length) {
+      pararLeitura("Leitura concluída.");
       return;
     }
 
     const minhaRodada = rodadaRef.current;
-    const fala = new window.SpeechSynthesisUtterance(trechos[indice]);
+    const fala = new SpeechSynthesisUtterance(trechos[posicao]);
     fala.lang = "pt-BR";
     if (vozRef.current) fala.voice = vozRef.current;
     fala.rate = Number(velocidadeRef.current) || 1;
 
     fala.onend = () => {
-      if (minhaRodada !== rodadaRef.current || situacaoRef.current !== "lendo") {
+      if (minhaRodada !== rodadaRef.current || situacaoRef.current !== "lendo")
         return;
-      }
       posicaoRef.current += 1;
-      falar();
+      falarTrechoAtual();
     };
 
     fala.onerror = (erro) => {
@@ -101,34 +110,30 @@ export function useLeitorPagina({
         minhaRodada !== rodadaRef.current ||
         erro.error === "interrupted" ||
         erro.error === "canceled"
-      ) {
+      )
         return;
-      }
-      parar("Não foi possível ler a página neste navegador.");
+      pararLeitura("Não foi possível ler a página neste navegador.");
     };
 
     atualizarSituacao(
       "lendo",
-      `Lendo… trecho ${indice + 1} de ${trechos.length}.`,
+      `Lendo… trecho ${posicao + 1} de ${trechos.length}.`,
     );
     window.speechSynthesis.speak(fala);
-  }, [atualizarSituacao, parar]);
+  }, [atualizarSituacao, pararLeitura]);
 
-  const ler = useCallback(() => {
+  const iniciarLeitura = useCallback(() => {
     silenciar();
-    const trechos = extrairTrechosDaPagina(document);
-    trechosRef.current = trechos;
+    trechosRef.current = extrairTrechosDaPagina(document);
     posicaoRef.current = 0;
-
-    if (!trechos.length) {
-      parar("Não há texto para ler nesta página.");
+    if (!trechosRef.current.length) {
+      pararLeitura("Não há texto para ler nesta página.");
       return;
     }
+    falarTrechoAtual();
+  }, [falarTrechoAtual, pararLeitura, silenciar]);
 
-    falar();
-  }, [falar, parar, silenciar]);
-
-  const pausar = useCallback(() => {
+  const pausarLeitura = useCallback(() => {
     if (situacaoRef.current !== "lendo") return;
     silenciar();
     atualizarSituacao(
@@ -137,77 +142,50 @@ export function useLeitorPagina({
     );
   }, [atualizarSituacao, silenciar]);
 
-  const continuar = useCallback(() => {
+  const continuarLeitura = useCallback(() => {
     if (situacaoRef.current !== "pausado") return;
-    falar();
-  }, [falar]);
+    falarTrechoAtual();
+  }, [falarTrechoAtual]);
 
-  const alterarVelocidade = useCallback(
-    (novaVelocidade: VelocidadeLeitura) => {
-      velocidadeRef.current = novaVelocidade;
-      setVelocidadeState(novaVelocidade);
+  // Nova velocidade vale na hora: recomeça o trecho atual.
+  const aoMudarVelocidade = useCallback(
+    (novoValor: string) => {
+      setVelocidade(novoValor);
+      velocidadeRef.current = novoValor;
       if (situacaoRef.current === "lendo") {
         silenciar();
-        falar();
+        falarTrechoAtual();
       }
     },
-    [falar, silenciar],
+    [falarTrechoAtual, silenciar],
   );
 
-  // Detecta suporte à Web Speech API, seleciona voz pt-BR/pt* e escuta pagehide.
+  // Navegação dentro do app (sem recarregar): a leitura da tela anterior para.
   useEffect(() => {
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window) ||
-      typeof window.SpeechSynthesisUtterance === "undefined"
-    ) {
-      return;
+    if (situacaoRef.current !== "parado") {
+      pararLeitura("A página mudou. Use “Ouvir” para ler a nova página.");
     }
+  }, [pathname, pararLeitura]);
 
-    setSuportaVoz(true);
-    const sintese = window.speechSynthesis;
-
-    const escolherVoz = () => {
-      const vozes = sintese.getVoices();
-      vozRef.current =
-        vozes.find((candidata) => /^pt[-_]BR$/i.test(candidata.lang)) ??
-        vozes.find((candidata) => /^pt/i.test(candidata.lang)) ??
-        null;
-    };
-
-    escolherVoz();
-    sintese.addEventListener?.("voiceschanged", escolherVoz);
-
-    const aoSairDaPagina = () => {
-      silenciar();
-    };
-    window.addEventListener("pagehide", aoSairDaPagina);
-
+  // Ao sair da página (ou desmontar o menu), a leitura para.
+  useEffect(() => {
+    const aoSair = () => silenciar();
+    window.addEventListener("pagehide", aoSair);
     return () => {
-      sintese.removeEventListener?.("voiceschanged", escolherVoz);
-      window.removeEventListener("pagehide", aoSairDaPagina);
+      window.removeEventListener("pagehide", aoSair);
       silenciar();
     };
   }, [silenciar]);
-
-  // Para automaticamente ao navegar entre rotas.
-  useEffect(() => {
-    if (pathnameAnteriorRef.current === pathname) return;
-    pathnameAnteriorRef.current = pathname;
-    if (situacaoRef.current !== "parado") {
-      parar("A tela mudou. Use “Ouvir” para ler a nova tela.");
-    }
-  }, [parar, pathname]);
 
   return {
     suportaVoz,
     situacao,
     mensagemVoz,
     velocidade,
-    ler,
-    pausar,
-    continuar,
-    parar,
-    alterarVelocidade,
+    iniciarLeitura,
+    pausarLeitura,
+    continuarLeitura,
+    pararLeitura,
+    aoMudarVelocidade,
   };
 }

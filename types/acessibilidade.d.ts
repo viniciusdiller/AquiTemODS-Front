@@ -1,25 +1,10 @@
-export interface VLibrasWidgetOptions {
-  rootPath: string;
-  position?: "L" | "R" | "T" | "B";
-  avatar?: string;
-  opacity?: number;
+/** Globais que o VLibras e o Sienna criam em `window`. */
+interface Window {
+  VLibras?: {
+    Widget: new (opcoes: { rootPath: string; position?: string }) => unknown;
+  };
+  VLibrasWidget?: {
+    open?: () => void;
+  };
+  __asw__onClickScreenReader?: (e: MouseEvent) => void;
 }
-
-export interface VLibrasNamespace {
-  Widget: new (options: VLibrasWidgetOptions) => unknown;
-}
-
-export interface VLibrasWidgetInstance {
-  open?: () => void;
-  close?: () => void;
-}
-
-declare global {
-  interface Window {
-    VLibras?: VLibrasNamespace;
-    VLibrasWidget?: VLibrasWidgetInstance;
-    __asw__onClickScreenReader?: EventListener;
-  }
-}
-
-export {};

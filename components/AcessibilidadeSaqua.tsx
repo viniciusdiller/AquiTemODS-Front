@@ -5,165 +5,119 @@ import { usePathname } from "next/navigation";
 import {
   Hand,
   MousePointerClick,
-  Pause,
-  Play,
   SlidersHorizontal,
-  Square,
   Volume2,
-  X,
 } from "lucide-react";
-import { rotaSemMenu } from "@/lib/acessibilidade";
-import {
-  type SituacaoLeitura,
-  type VelocidadeLeitura,
-  useLeitorPagina,
-} from "@/hooks/use-leitor-pagina";
 import { useAcessibilidadeVendors } from "@/hooks/use-acessibilidade-vendors";
+import { useLeitorPagina } from "@/hooks/use-leitor-pagina";
+import { rotaSemMenu } from "@/lib/acessibilidade";
 
-function MenuAcessibilidade({ pathname }: { pathname: string }) {
+const ICONE = { size: 18, strokeWidth: 2, "aria-hidden": true } as const;
+
+function MenuAcessibilidade() {
   const [aberto, setAberto] = useState(false);
-  const [playerExpandido, setPlayerExpandido] = useState(false);
+  const [ouvirExpandido, setOuvirExpandido] = useState(false);
 
   const caixaRef = useRef<HTMLDivElement>(null);
   const painelRef = useRef<HTMLDivElement>(null);
-  const botaoPrincipalRef = useRef<HTMLButtonElement>(null);
-  const botaoPrincipalOuvirRef = useRef<HTMLButtonElement>(null);
+  const botaoRef = useRef<HTMLButtonElement>(null);
+  const botaoOuvirRef = useRef<HTMLButtonElement>(null);
 
-  const focarBotaoPrincipal = useCallback(() => {
-    botaoPrincipalRef.current?.focus();
+  const focarBotaoPrincipalPlayer = useCallback(() => {
+    botaoOuvirRef.current?.focus();
   }, []);
 
-  const devolverFocoPlayer = useCallback((_situacao: SituacaoLeitura) => {
-    const ativo = document.activeElement;
-    if (
-      ativo === document.body ||
-      (ativo instanceof HTMLButtonElement && ativo.disabled)
-    ) {
-      botaoPrincipalOuvirRef.current?.focus();
-    }
-  }, []);
+  const {
+    siennaPronto,
+    leitorParagrafoAtivo,
+    definirLeitorParagrafo,
+    alternarLeitorParagrafo,
+    abrirLibras,
+    abrirAjustesSienna,
+  } = useAcessibilidadeVendors(botaoRef);
 
   const {
     suportaVoz,
     situacao,
     mensagemVoz,
     velocidade,
-    ler,
-    pausar,
-    continuar,
-    parar,
-    alterarVelocidade,
-  } = useLeitorPagina({
-    pathname,
-    aoDevolverFoco: devolverFocoPlayer,
-  });
+    iniciarLeitura,
+    pausarLeitura,
+    continuarLeitura,
+    pararLeitura,
+    aoMudarVelocidade,
+  } = useLeitorPagina(painelRef, focarBotaoPrincipalPlayer);
 
-  const {
-    siennaPronto,
-    leitorParagrafoAtivo,
-    abrirLibras,
-    abrirAjustesSienna,
-    definirLeitorParagrafo,
-    alternarLeitorParagrafo,
-  } = useAcessibilidadeVendors({
-    pathname,
-    aoFocarBotaoPrincipal: focarBotaoPrincipal,
-  });
+  const algumLeitorAtivo = situacao !== "parado" || leitorParagrafoAtivo;
 
-  // Exclusão mútua: se o leitor por parágrafo for ativado pelo menu do Sienna, para a leitura da página inteira.
+  const alternarMenu = useCallback(() => {
+    setAberto((atual) => {
+      const proximo = !atual;
+      if (proximo) {
+        window.setTimeout(() => {
+          painelRef.current
+            ?.querySelector<HTMLElement>(".acesso-pilula, .ouvir-acao")
+            ?.focus();
+        }, 0);
+      }
+      return proximo;
+    });
+  }, []);
+
+  // Fecha com clique fora e com Esc (o foco volta para o botão do menu).
   useEffect(() => {
-    if (leitorParagrafoAtivo && situacao !== "parado") {
-      parar();
-    }
-  }, [leitorParagrafoAtivo, parar, situacao]);
-
-  // Ao abrir o painel, foca o primeiro controle disponível.
-  useEffect(() => {
-    if (!aberto) return;
-    const primeiro = painelRef.current?.querySelector<HTMLElement>(
-      "button:not([disabled]), select:not([disabled])",
-    );
-    primeiro?.focus();
-  }, [aberto]);
-
-  // Fecha ao clicar fora (composedPath) ou pressionar Esc (devolvendo foco ao botão principal).
-  useEffect(() => {
-    if (!aberto) return;
-
     const aoClicarFora = (evento: MouseEvent) => {
-      const caixa = caixaRef.current;
-      if (!caixa) return;
-      const caminho =
-        typeof evento.composedPath === "function" ? evento.composedPath() : [];
-      const dentro =
-        caminho.length > 0
-          ? caminho.includes(caixa)
-          : evento.target instanceof Node && caixa.contains(evento.target);
-      if (!dentro) setAberto(false);
+      const clicouDentro =
+        !!caixaRef.current && evento.composedPath().includes(caixaRef.current);
+      if (aberto && !clicouDentro) setAberto(false);
     };
 
-    const aoPressionarTecla = (evento: KeyboardEvent) => {
-      if (evento.key === "Escape") {
+    const aoPressionarEsc = (evento: KeyboardEvent) => {
+      if (evento.key === "Escape" && aberto) {
         evento.preventDefault();
         setAberto(false);
-        focarBotaoPrincipal();
+        botaoRef.current?.focus();
       }
     };
 
     document.addEventListener("click", aoClicarFora);
-    document.addEventListener("keydown", aoPressionarTecla);
+    document.addEventListener("keydown", aoPressionarEsc, true);
     return () => {
       document.removeEventListener("click", aoClicarFora);
-      document.removeEventListener("keydown", aoPressionarTecla);
+      document.removeEventListener("keydown", aoPressionarEsc, true);
     };
-  }, [aberto, focarBotaoPrincipal]);
+  }, [aberto]);
 
-  const algumLeitorAtivo = situacao !== "parado" || leitorParagrafoAtivo;
-
-  const acionarLibras = () => {
-    setAberto(false);
-    abrirLibras();
-  };
-
-  const acionarAjustes = () => {
-    setAberto(false);
-    abrirAjustesSienna();
-  };
-
-  const acionarLeitorParagrafo = () => {
-    if (!leitorParagrafoAtivo && situacao !== "parado") {
-      parar();
+  // As duas leituras não falam ao mesmo tempo.
+  useEffect(() => {
+    if (leitorParagrafoAtivo && situacao !== "parado") {
+      pararLeitura(
+        "Leitura da página pausada para usar o Ouvir por parágrafo.",
+      );
     }
+  }, [leitorParagrafoAtivo, pararLeitura, situacao]);
+
+  const aoAlternarLeitorParagrafo = () => {
+    if (!leitorParagrafoAtivo && situacao !== "parado") pararLeitura();
     alternarLeitorParagrafo();
+    setAberto(false);
   };
 
-  const acionarBotaoPrincipalOuvir = () => {
+  const aoAlternarLeituraPagina = () => {
     if (situacao === "lendo") {
-      pausar();
+      pausarLeitura();
       return;
     }
-    if (leitorParagrafoAtivo) {
-      definirLeitorParagrafo(false);
-    }
-    if (situacao === "pausado") {
-      continuar();
-    } else {
-      ler();
-    }
+    if (leitorParagrafoAtivo) definirLeitorParagrafo(false);
+    if (situacao === "parado") iniciarLeitura();
+    else continuarLeitura();
   };
 
-  const textoBotaoPrincipalOuvir =
-    situacao === "lendo"
-      ? "Pausar"
-      : situacao === "pausado"
-        ? "Continuar"
-        : "Ouvir";
-
   return (
-    <div id="acesso" className="acesso asw-widget" ref={caixaRef}>
+    <div ref={caixaRef} id="acesso" className="acesso asw-widget">
       <div
-        id="acesso-painel"
         ref={painelRef}
+        id="acesso-painel"
         className="acesso-pilulas"
         role="group"
         aria-label="Ferramentas de acessibilidade"
@@ -171,12 +125,15 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
       >
         <button
           type="button"
-          id="acesso-libras"
           className="acesso-pilula"
-          onClick={acionarLibras}
+          id="acesso-libras"
+          onClick={() => {
+            setAberto(false);
+            abrirLibras();
+          }}
         >
           <span className="acesso-pilula-icone" aria-hidden="true">
-            <Hand size={17} />
+            <Hand {...ICONE} />
           </span>
           <span>Traduzir em Libras</span>
         </button>
@@ -184,12 +141,15 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
         {siennaPronto && (
           <button
             type="button"
-            id="acesso-ajustes"
             className="acesso-pilula"
-            onClick={acionarAjustes}
+            id="acesso-ajustes"
+            onClick={() => {
+              setAberto(false);
+              abrirAjustesSienna();
+            }}
           >
             <span className="acesso-pilula-icone" aria-hidden="true">
-              <SlidersHorizontal size={17} />
+              <SlidersHorizontal {...ICONE} />
             </span>
             <span>Menu de acessibilidade</span>
           </button>
@@ -198,13 +158,13 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
         {siennaPronto && suportaVoz && (
           <button
             type="button"
-            id="acesso-ouvir-paragrafo"
             className="acesso-pilula"
+            id="acesso-ouvir-paragrafo"
             aria-pressed={leitorParagrafoAtivo}
-            onClick={acionarLeitorParagrafo}
+            onClick={aoAlternarLeitorParagrafo}
           >
             <span className="acesso-pilula-icone" aria-hidden="true">
-              <MousePointerClick size={17} />
+              <MousePointerClick {...ICONE} />
             </span>
             <span>Ouvir por parágrafo</span>
             {leitorParagrafoAtivo && (
@@ -214,79 +174,74 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
         )}
 
         {suportaVoz &&
-          (!playerExpandido ? (
+          (!ouvirExpandido ? (
             <button
               type="button"
-              id="acesso-ouvir"
               className="acesso-pilula"
-              onClick={() => setPlayerExpandido(true)}
+              id="acesso-ouvir"
+              aria-expanded={false}
+              onClick={() => setOuvirExpandido(true)}
             >
               <span className="acesso-pilula-icone" aria-hidden="true">
-                <Volume2 size={17} />
+                <Volume2 {...ICONE} />
               </span>
               <span>Ouvir página inteira</span>
-              {situacao === "lendo" && (
-                <span className="acesso-pilula-badge">Lendo</span>
-              )}
-              {situacao === "pausado" && (
-                <span className="acesso-pilula-badge">Pausado</span>
+              {situacao !== "parado" && (
+                <span className="acesso-pilula-badge">
+                  {situacao === "lendo" ? "Lendo" : "Pausado"}
+                </span>
               )}
             </button>
           ) : (
             <section
-              id="ouvir"
               className="acesso-pilula-player"
+              id="ouvir"
               aria-label="Ouvir página inteira"
             >
-              <div className="acesso-player-cabecalho">
+              <div className="acesso-player-topo">
                 <span className="acesso-player-titulo">
-                  <Volume2 size={16} aria-hidden="true" />
                   Ouvir página inteira
                 </span>
                 <button
                   type="button"
                   className="acesso-player-fechar"
                   aria-label="Recolher controles de leitura"
-                  onClick={() => setPlayerExpandido(false)}
+                  onClick={() => setOuvirExpandido(false)}
                 >
-                  <X size={15} aria-hidden="true" />
+                  ×
                 </button>
               </div>
 
               <div className="acesso-player-controles">
                 <button
+                  ref={botaoOuvirRef}
                   type="button"
-                  ref={botaoPrincipalOuvirRef}
                   className="ouvir-acao ouvir-acao-principal"
-                  onClick={acionarBotaoPrincipalOuvir}
+                  onClick={aoAlternarLeituraPagina}
                 >
-                  {situacao === "lendo" ? (
-                    <Pause size={15} aria-hidden="true" />
-                  ) : (
-                    <Play size={15} aria-hidden="true" />
-                  )}
-                  {textoBotaoPrincipalOuvir}
+                  {situacao === "lendo"
+                    ? "Pausar"
+                    : situacao === "pausado"
+                      ? "Continuar"
+                      : "Ouvir"}
                 </button>
 
                 {situacao !== "parado" && (
                   <button
                     type="button"
                     className="ouvir-acao"
-                    onClick={() => parar()}
+                    onClick={() => pararLeitura()}
                   >
-                    <Square size={14} aria-hidden="true" />
                     Parar
                   </button>
                 )}
 
                 <select
                   id="ouvir-velocidade"
-                  className="ouvir-velocidade-compacta"
                   aria-label="Velocidade da leitura"
+                  className="ouvir-velocidade-compacta"
                   value={velocidade}
-                  onChange={(e) =>
-                    alterarVelocidade(e.target.value as VelocidadeLeitura)
-                  }
+                  onChange={(evento) => aoMudarVelocidade(evento.target.value)}
                 >
                   <option value="0.75">0,75×</option>
                   <option value="1">1×</option>
@@ -295,7 +250,7 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
                 </select>
               </div>
 
-              <p id="ouvir-estado" className="ouvir-estado" aria-live="polite">
+              <p className="ouvir-estado" id="ouvir-estado" aria-live="polite">
                 {mensagemVoz}
               </p>
             </section>
@@ -303,17 +258,17 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
       </div>
 
       <button
+        ref={botaoRef}
         type="button"
-        id="acesso-botao"
-        ref={botaoPrincipalRef}
         className={`acesso-botao${algumLeitorAtivo ? " ativo" : ""}`}
+        id="acesso-botao"
         aria-expanded={aberto}
         aria-controls="acesso-painel"
         aria-label="Acessibilidade: Libras, ajustes de leitura e ouvir a página"
-        onClick={() => setAberto((anterior) => !anterior)}
+        onClick={alternarMenu}
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
+          className="icone"
           width="22"
           height="22"
           viewBox="0 0 24 24"
@@ -323,8 +278,8 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
+          focusable="false"
         >
-          <circle cx="12" cy="12" r="10" />
           <circle cx="12" cy="6.8" r="1.5" />
           <path d="M7 9.6 12 11l5-1.4M12 11v3.4M9.4 18.2 12 14.4l2.6 3.8" />
         </svg>
@@ -335,11 +290,11 @@ function MenuAcessibilidade({ pathname }: { pathname: string }) {
 }
 
 /**
- * Menu de acessibilidade (Libras, ajustes de leitura e ouvir a página).
- * Não monta hooks nem carrega scripts no painel administrativo (/admin).
+ * Menu de acessibilidade (Libras, ajustes de leitura, ouvir por parágrafo e
+ * ouvir a página inteira). Não aparece no /admin.
  */
 export default function AcessibilidadeSaqua() {
-  const pathname = usePathname() ?? "/";
-  if (rotaSemMenu(pathname)) return null;
-  return <MenuAcessibilidade pathname={pathname} />;
+  const pathname = usePathname();
+  if (rotaSemMenu(pathname ?? "/")) return null;
+  return <MenuAcessibilidade />;
 }

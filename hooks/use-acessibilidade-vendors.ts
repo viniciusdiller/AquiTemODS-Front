@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import {
   CHAVE_DICA_LIBRAS,
@@ -17,328 +18,257 @@ import {
   traduzirRotulosSienna,
 } from "@/lib/acessibilidade";
 
-const SELETOR_INTERATIVO =
-  "button, a[href], [role='button'], input, select, textarea, summary, label";
+const CLASSE_LEITOR_PARAGRAFO = "asw-screen-reader";
 
-const JANELA_SEGUNDO_CLIQUE_MS = 4000;
+const leitorParagrafoLigado = () =>
+  document.documentElement.classList.contains(CLASSE_LEITOR_PARAGRAFO);
 
-function semTextoVisivel(el: Element): boolean {
-  const texto = (el.textContent ?? "")
-    .replace(/[\s×✕✕+−–—\-‹›<>•·|]+/g, "")
-    .trim();
-  return texto.length === 0;
-}
-
-function adicionarClasseTemporaria(el: Element, classe: string): void {
-  if (el.classList.contains(classe)) return;
-  el.classList.add(classe);
-  window.setTimeout(() => {
-    el.classList.remove(classe);
-  }, 0);
-}
-
-export interface OpcoesUseAcessibilidadeVendors {
-  pathname: string;
-  aoFocarBotaoPrincipal?: () => void;
-}
-
-export function useAcessibilidadeVendors({
-  pathname,
-  aoFocarBotaoPrincipal,
-}: OpcoesUseAcessibilidadeVendors) {
+/**
+ * Integra as duas ferramentas externas ao menu: o VLibras (script do governo,
+ * por URL) e o Sienna (pacote npm, import dinâmico). Os botões próprios dos dois
+ * ficam escondidos por CSS e este hook os aciona.
+ */
+export function useAcessibilidadeVendors(
+  botaoRetornoRef: React.RefObject<HTMLElement>,
+) {
+  const pathname = usePathname();
   const [siennaPronto, setSiennaPronto] = useState(false);
   const [leitorParagrafoAtivo, setLeitorParagrafoAtivo] = useState(false);
 
-  const aoFocarBotaoPrincipalRef = useRef(aoFocarBotaoPrincipal);
-  const ultimoCliqueInterativoRef = useRef<{
-    el: Element;
-    hora: number;
-  } | null>(null);
+  const ultimoInterativoRef = useRef<HTMLElement | null>(null);
+  const timerInterativoRef = useRef(0);
 
-  useEffect(() => {
-    aoFocarBotaoPrincipalRef.current = aoFocarBotaoPrincipal;
-  }, [aoFocarBotaoPrincipal]);
-
+  // "Ouvir por parágrafo" é o leitor de tela do Sienna: liga/desliga pelo botão dele.
   const definirLeitorParagrafo = useCallback((ativo: boolean) => {
-    if (typeof document === "undefined") return;
-    const estaAtivo =
-      document.documentElement.classList.contains("asw-screen-reader");
-    if (estaAtivo === ativo) return;
-
-    const menu = garantirMenuSiennaNoDom(document);
-    const botaoLeitor = menu?.querySelector<HTMLElement>(
-      ".asw-btn[data-key='screen-reader']",
-    );
-    botaoLeitor?.click();
-  }, []);
-
-  const alternarLeitorParagrafo = useCallback(() => {
-    if (typeof document === "undefined") return;
-    const estaAtivo =
-      document.documentElement.classList.contains("asw-screen-reader");
-    definirLeitorParagrafo(!estaAtivo);
-  }, [definirLeitorParagrafo]);
-
-  const abrirLibras = useCallback(() => {
-    if (typeof window === "undefined") return;
-    if (!window.VLibras || !window.VLibrasWidget?.open) {
-      toast(MENSAGEM_LIBRAS_INDISPONIVEL);
+    if (leitorParagrafoLigado() === ativo) {
+      setLeitorParagrafoAtivo(ativo);
       return;
     }
 
-    window.VLibrasWidget.open();
+    const menu = garantirMenuSiennaNoDom();
+    const botaoLeitor = menu?.querySelector<HTMLElement>(
+      ".asw-btn[data-key='screen-reader']",
+    );
+    if (!botaoLeitor) return;
 
-    if (window.matchMedia?.("(pointer: coarse)").matches) {
-      let jaExibiu = false;
-      try {
-        jaExibiu = Boolean(window.localStorage.getItem(CHAVE_DICA_LIBRAS));
-        if (!jaExibiu) {
-          window.localStorage.setItem(CHAVE_DICA_LIBRAS, "1");
-        }
-      } catch {
-        // Sem localStorage disponível: exibe a dica mesmo assim.
-      }
-
-      if (!jaExibiu) {
-        window.setTimeout(() => {
-          toast(MENSAGEM_DICA_LIBRAS);
-        }, 1500);
-      }
-    }
+    botaoLeitor.click();
+    if (!ativo) limparDestaquesLeituraSienna();
+    setLeitorParagrafoAtivo(leitorParagrafoLigado());
   }, []);
 
-  const abrirAjustesSienna = useCallback(() => {
-    if (typeof document === "undefined") return;
-    const botaoSienna = document.querySelector<HTMLElement>(".asw-menu-btn");
-    if (!botaoSienna) return;
+  const alternarLeitorParagrafo = useCallback(() => {
+    definirLeitorParagrafo(!leitorParagrafoLigado());
+  }, [definirLeitorParagrafo]);
 
-    botaoSienna.click();
-    window.setTimeout(() => {
-      if (!siennaAberto(document)) return;
-      traduzirRotulosSienna(document);
-      const fechar = document.querySelector<HTMLElement>(
-        ".asw-menu .asw-menu-close",
-      );
-      fechar?.focus();
-    }, 60);
-  }, []);
-
-  // Carrega Sienna via import dinâmico e observa DOM / classes / destaques.
+  // Carrega o Sienna e acompanha o estado do leitor de parágrafo.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     let cancelado = false;
-    instalarProtetorListenerSienna(window);
 
-    const marcarProntoSeExistir = (): boolean => {
-      if (!document.querySelector(".asw-menu-btn")) return false;
-      if (!cancelado) setSiennaPronto(true);
-      liberarTamanhosSienna(document);
-      return true;
-    };
+    instalarProtetorListenerSienna();
 
-    let observadorSienna: MutationObserver | null = null;
-    if (!marcarProntoSeExistir()) {
-      observadorSienna = new MutationObserver(() => {
-        if (marcarProntoSeExistir()) {
-          observadorSienna?.disconnect();
-        }
-      });
-      observadorSienna.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-    }
-
-    void import("sienna-accessibility").catch(() => {
-      // Falha silenciosa: o restante do menu continua funcionando.
-    });
-
-    const sincronizarLeitorParagrafo = () => {
-      const ativo =
-        document.documentElement.classList.contains("asw-screen-reader");
+    const sincronizarClasseLeitor = () => {
+      const ativo = leitorParagrafoLigado();
       setLeitorParagrafoAtivo(ativo);
-      if (!ativo) {
-        limparDestaquesLeituraSienna(document);
-      }
+      if (!ativo) limparDestaquesLeituraSienna();
     };
-    sincronizarLeitorParagrafo();
 
-    const observadorHtml = new MutationObserver(sincronizarLeitorParagrafo);
+    const observadorHtml = new MutationObserver(sincronizarClasseLeitor);
     observadorHtml.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
+    sincronizarClasseLeitor();
 
-    const observadorCores = new MutationObserver((mutacoes) => {
+    // O Sienna pinta o texto lido e guarda a cor original; aqui ela volta sempre que ele a guarda de novo.
+    const observadorCor = new MutationObserver((mutacoes) => {
       for (const mutacao of mutacoes) {
-        const alvo = mutacao.target;
-        if (
-          alvo instanceof HTMLElement &&
-          alvo.hasAttribute("data-asw-orgcolor") &&
-          !alvo.classList.contains("asw-reading")
-        ) {
-          restaurarCorElementoSienna(alvo);
+        if (mutacao.target instanceof HTMLElement) {
+          restaurarCorElementoSienna(mutacao.target);
         }
       }
     });
-    observadorCores.observe(document.body, {
-      attributes: true,
+    observadorCor.observe(document.body, {
       subtree: true,
-      attributeFilter: ["class", "data-asw-orgcolor"],
+      attributes: true,
+      attributeFilter: ["data-asw-orgcolor"],
     });
 
-    const aoClicarNoMenuSienna = (evento: MouseEvent) => {
-      const alvo = evento.target;
-      if (alvo instanceof Element && alvo.closest(".asw-menu")) {
-        window.setTimeout(() => liberarTamanhosSienna(document), 50);
-      }
+    // O Sienna termina de montar o botão dele depois do import.
+    let observadorBotao: MutationObserver | null = null;
+    const verificarBotaoSienna = () => {
+      if (!document.querySelector(".asw-menu-btn")) return false;
+      setSiennaPronto(true);
+      liberarTamanhosSienna();
+      sincronizarClasseLeitor();
+      return true;
     };
-    document.addEventListener("click", aoClicarNoMenuSienna);
 
-    return () => {
-      cancelado = true;
-      observadorSienna?.disconnect();
-      observadorHtml.disconnect();
-      observadorCores.disconnect();
-      document.removeEventListener("click", aoClicarNoMenuSienna);
-    };
-  }, []);
+    import("sienna-accessibility")
+      .then(() => {
+        if (cancelado || verificarBotaoSienna()) return;
+        observadorBotao = new MutationObserver(() => {
+          if (verificarBotaoSienna()) observadorBotao?.disconnect();
+        });
+        observadorBotao.observe(document.body, { childList: true });
+      })
+      .catch((erro) => console.error("Falha ao carregar o widget Sienna:", erro));
 
-  // Libera tamanhos inline do Sienna a cada mudança de rota.
-  useEffect(() => {
-    if (!siennaPronto) return;
-    liberarTamanhosSienna(document);
-  }, [pathname, siennaPronto]);
-
-  // Carrega o VLibras uma única vez (seguro com React Strict Mode).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const inicializarWidget = () => {
+    // VLibras: o botão do menu aparece sempre; sem o script, abrirLibras() avisa.
+    const iniciarVLibras = () => {
       if (
+        cancelado ||
         !window.VLibras ||
         document.getElementById("vlibras-access-wrapper")
       ) {
         return;
       }
-      new window.VLibras.Widget({
-        rootPath: VLIBRAS_ROOT_PATH,
-        position: "R",
-      });
+      try {
+        new window.VLibras.Widget({ rootPath: VLIBRAS_ROOT_PATH, position: "R" });
+      } catch (erro) {
+        console.error("Falha ao iniciar o VLibras:", erro);
+      }
     };
 
-    if (document.getElementById("vlibras-access-wrapper")) return;
-
     if (window.VLibras) {
-      inicializarWidget();
-      return;
+      iniciarVLibras();
+    } else {
+      const existente = document.querySelector<HTMLScriptElement>(
+        `script[src="${VLIBRAS_SCRIPT_URL}"]`,
+      );
+      if (existente) {
+        existente.addEventListener("load", iniciarVLibras);
+      } else {
+        const script = document.createElement("script");
+        script.src = VLIBRAS_SCRIPT_URL;
+        script.async = true;
+        script.onload = iniciarVLibras;
+        document.body.appendChild(script);
+      }
     }
-
-    const scriptExistente = document.querySelector<HTMLScriptElement>(
-      `script[src="${VLIBRAS_SCRIPT_URL}"]`,
-    );
-    if (scriptExistente) {
-      scriptExistente.addEventListener("load", inicializarWidget);
-      return () => {
-        scriptExistente.removeEventListener("load", inicializarWidget);
-      };
-    }
-
-    const tag = document.createElement("script");
-    tag.src = VLIBRAS_SCRIPT_URL;
-    tag.async = true;
-    tag.addEventListener("load", inicializarWidget);
-    document.body.appendChild(tag);
 
     return () => {
-      tag.removeEventListener("load", inicializarWidget);
+      cancelado = true;
+      observadorHtml.disconnect();
+      observadorCor.disconnect();
+      observadorBotao?.disconnect();
+      window.clearTimeout(timerInterativoRef.current);
     };
   }, []);
 
-  // Listeners globais (click em capture na window e keydown em capture no document).
+  // O Sienna prende o tamanho da fonte em pixels: a cada rota nova, libera.
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    liberarTamanhosSienna();
+    ultimoInterativoRef.current = null;
+  }, [pathname]);
 
-    const aoClicarCapture = (evento: MouseEvent) => {
-      const alvo = evento.target;
-      if (!(alvo instanceof Element)) return;
+  // Cliques e teclas: o que o VLibras e o Sienna não tratam sozinhos.
+  useEffect(() => {
+    // O VLibras traduz o que é clicado. Em botões do menu e em botões só de ícone não há o que traduzir.
+    const liberarElementoDoVLibras = (elemento: Element) => {
+      if (elemento.classList.contains("vlibras-links")) return;
+      elemento.classList.add("vlibras-links");
+      window.setTimeout(() => elemento.classList.remove("vlibras-links"), 0);
+    };
 
-      const dentroAcesso = Boolean(alvo.closest("#acesso"));
-      const interativo = alvo.closest(SELETOR_INTERATIVO);
-      const interativoSemTexto = Boolean(
-        interativo && semTextoVisivel(interativo),
+    const aoCapturarCliqueNaJanela = (evento: MouseEvent) => {
+      const alvo = evento.target as HTMLElement | null;
+      if (!alvo) return;
+
+      const dentroDoMenuAcessibilidade = !!alvo.closest("#acesso");
+      const interativo = alvo.closest<HTMLElement>(
+        "a[href], button, [role='button'], input, select, label",
       );
+      const textoVisivel = (interativo?.innerText || "").trim();
+      const semTextoParaLer =
+        !!interativo && (!textoVisivel || /^[×✕xX+-]$/.test(textoVisivel));
 
-      if (dentroAcesso || interativoSemTexto) {
-        adicionarClasseTemporaria(interativo ?? alvo, "vlibras-links");
+      if (dentroDoMenuAcessibilidade || semTextoParaLer) {
+        liberarElementoDoVLibras(alvo);
+        if (interativo && interativo !== alvo) {
+          liberarElementoDoVLibras(interativo);
+        }
       }
 
+      if (!leitorParagrafoLigado()) return;
       if (
-        dentroAcesso ||
-        !document.documentElement.classList.contains("asw-screen-reader")
+        dentroDoMenuAcessibilidade ||
+        alvo.closest(".asw-menu") ||
+        alvo.closest(".asw-menu-btn") ||
+        alvo.closest(".asw-widget") ||
+        alvo.closest(".asw-structure-modal")
       ) {
-        return;
-      }
-
-      if (alvo.closest(".asw-menu, .asw-menu-btn, .asw-widget")) {
         return;
       }
 
       if (!interativo) {
-        ultimoCliqueInterativoRef.current = null;
+        ultimoInterativoRef.current = null;
         return;
       }
 
-      if (interativoSemTexto) {
-        adicionarClasseTemporaria(alvo, "asw-widget");
+      // Segundo clique no mesmo botão (ou botão sem texto): quem leu é cancelado e o clique segue normal.
+      if (semTextoParaLer || ultimoInterativoRef.current === interativo) {
+        ultimoInterativoRef.current = null;
+        window.clearTimeout(timerInterativoRef.current);
+        window.speechSynthesis?.cancel();
+        limparDestaquesLeituraSienna();
+
+        const funcaoSienna = window.__asw__onClickScreenReader;
+        if (funcaoSienna) {
+          document.removeEventListener("click", funcaoSienna, true);
+          window.setTimeout(() => {
+            if (
+              leitorParagrafoLigado() &&
+              window.__asw__onClickScreenReader === funcaoSienna
+            ) {
+              document.addEventListener("click", funcaoSienna, true);
+            }
+          }, 0);
+        }
         return;
       }
 
-      const agora = Date.now();
-      const anterior = ultimoCliqueInterativoRef.current;
-      if (
-        anterior &&
-        anterior.el === interativo &&
-        agora - anterior.hora <= JANELA_SEGUNDO_CLIQUE_MS
-      ) {
-        ultimoCliqueInterativoRef.current = null;
-        adicionarClasseTemporaria(alvo, "asw-widget");
-        return;
-      }
-
-      ultimoCliqueInterativoRef.current = { el: interativo, hora: agora };
+      ultimoInterativoRef.current = interativo;
+      window.clearTimeout(timerInterativoRef.current);
+      timerInterativoRef.current = window.setTimeout(() => {
+        if (ultimoInterativoRef.current === interativo) {
+          ultimoInterativoRef.current = null;
+        }
+      }, 4000);
     };
 
-    const aoPressionarTeclaCapture = (evento: KeyboardEvent) => {
-      if (siennaAberto(document)) {
+    const aoClicarNoSienna = (evento: MouseEvent) => {
+      const alvo = evento.target as HTMLElement | null;
+      if (alvo?.closest?.(".asw-menu")) {
+        window.setTimeout(() => liberarTamanhosSienna(), 50);
+      }
+    };
+
+    // Ao fechar o Sienna, o foco volta para o botão do menu de acessibilidade.
+    const fecharAjustesSienna = () => {
+      document.querySelector<HTMLElement>(".asw-menu .asw-menu-close")?.click();
+      botaoRetornoRef.current?.focus();
+    };
+
+    const aoPressionarTecla = (evento: KeyboardEvent) => {
+      if (siennaAberto()) {
+        // Sienna aberto: Esc fecha; Enter e espaço acionam os "botões" feitos com <div role="button">.
         if (evento.key === "Escape") {
           evento.preventDefault();
-          const fechar = document.querySelector<HTMLElement>(
-            ".asw-menu .asw-menu-close",
-          );
-          fechar?.click();
-          aoFocarBotaoPrincipalRef.current?.();
+          fecharAjustesSienna();
           return;
         }
-
-        const alvo = evento.target;
+        const alvo = evento.target as HTMLElement | null;
         const menu = document.querySelector<HTMLElement>(".asw-menu");
         if (
           (evento.key === "Enter" || evento.key === " ") &&
-          alvo instanceof HTMLElement &&
-          alvo.getAttribute("role") === "button" &&
+          alvo?.getAttribute("role") === "button" &&
           alvo.tagName !== "BUTTON" &&
           alvo.tagName !== "A" &&
           menu?.contains(alvo)
         ) {
           evento.preventDefault();
-          if (alvo.classList.contains("asw-menu-close")) {
-            alvo.click();
-            aoFocarBotaoPrincipalRef.current?.();
-          } else {
-            alvo.click();
-          }
+          if (alvo.classList.contains("asw-menu-close")) fecharAjustesSienna();
+          else alvo.click();
         }
         return;
       }
@@ -346,28 +276,63 @@ export function useAcessibilidadeVendors({
       if (
         evento.key === "Escape" &&
         !document.querySelector("#acesso-painel:not([hidden])") &&
-        document.documentElement.classList.contains("asw-screen-reader")
+        leitorParagrafoLigado()
       ) {
-        evento.preventDefault();
         definirLeitorParagrafo(false);
       }
     };
 
-    window.addEventListener("click", aoClicarCapture, true);
-    document.addEventListener("keydown", aoPressionarTeclaCapture, true);
-
+    window.addEventListener("click", aoCapturarCliqueNaJanela, true);
+    document.addEventListener("click", aoClicarNoSienna);
+    document.addEventListener("keydown", aoPressionarTecla, true);
     return () => {
-      window.removeEventListener("click", aoClicarCapture, true);
-      document.removeEventListener("keydown", aoPressionarTeclaCapture, true);
+      window.removeEventListener("click", aoCapturarCliqueNaJanela, true);
+      document.removeEventListener("click", aoClicarNoSienna);
+      document.removeEventListener("keydown", aoPressionarTecla, true);
     };
-  }, [definirLeitorParagrafo]);
+  }, [botaoRetornoRef, definirLeitorParagrafo]);
+
+  // window.VLibrasWidget.open() é a função do próprio botão do VLibras.
+  const abrirLibras = useCallback(() => {
+    const widget = window.VLibrasWidget;
+    // Script bloqueado (CSP, rede, bloqueador) ou ainda carregando: avisa em vez de falhar calado.
+    if (!window.VLibras || !widget?.open) {
+      toast(MENSAGEM_LIBRAS_INDISPONIVEL);
+      return;
+    }
+    widget.open();
+
+    // Em tela de toque não há cursor de "mover": na primeira vez, um aviso conta que o avatar sai da frente arrastando.
+    if (!window.matchMedia("(pointer: coarse)").matches) return;
+    try {
+      if (localStorage.getItem(CHAVE_DICA_LIBRAS)) return;
+      localStorage.setItem(CHAVE_DICA_LIBRAS, "1");
+    } catch {
+      // Sem armazenamento: o aviso aparece de novo da próxima vez.
+    }
+    window.setTimeout(() => toast(MENSAGEM_DICA_LIBRAS), 1500);
+  }, []);
+
+  // Abre o menu do Sienna pelo botão escondido dele e leva o foco para dentro.
+  const abrirAjustesSienna = useCallback(() => {
+    const botaoSienna = document.querySelector<HTMLElement>(".asw-menu-btn");
+    if (!botaoSienna) return;
+    botaoSienna.click();
+    window.setTimeout(() => {
+      if (!siennaAberto()) return;
+      traduzirRotulosSienna();
+      document
+        .querySelector<HTMLElement>(".asw-menu .asw-menu-close")
+        ?.focus();
+    }, 60);
+  }, []);
 
   return {
     siennaPronto,
     leitorParagrafoAtivo,
-    abrirLibras,
-    abrirAjustesSienna,
     definirLeitorParagrafo,
     alternarLeitorParagrafo,
+    abrirLibras,
+    abrirAjustesSienna,
   };
 }
